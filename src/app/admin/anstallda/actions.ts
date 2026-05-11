@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import ExcelJS from "exceljs";
 
+import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import { createClient } from "@/lib/supabase/server";
 
 export async function createEmployee(formData: FormData) {
@@ -17,6 +18,9 @@ export async function createEmployee(formData: FormData) {
   };
   const { error } = await supabase.from("employees").insert(payload);
   if (error) throw new Error(error.message);
+  await appendEmployeeAddDigestEntries(payload.company_id, [
+    { first_name: payload.first_name, last_name: payload.last_name },
+  ]);
   revalidatePath("/admin/anstallda");
 }
 
@@ -241,6 +245,13 @@ export async function importEmployeesExcel(
       };
     }
     imported = validRows.length;
+    await appendEmployeeAddDigestEntries(
+      companyId,
+      validRows.map((r) => ({
+        first_name: r.first_name,
+        last_name: r.last_name,
+      })),
+    );
   }
 
   revalidatePath("/admin/anstallda");

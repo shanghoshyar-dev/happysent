@@ -257,6 +257,37 @@ export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
   });
 }
 
+/** Batch notification after admin registers one or more employees (max one mail per company per calendar day). */
+export interface EmployeeAdditionsDigestArgs {
+  to: string;
+  companyName: string;
+  digestDateIso: string;
+  names: Array<{ first_name: string; last_name: string }>;
+}
+export async function sendEmployeeAdditionsDigest(a: EmployeeAdditionsDigestArgs) {
+  const count = a.names.length;
+  const subject =
+    count === 1
+      ? `Ny anställd registrerad – Happysent`
+      : `${count} nya anställda registrerade – Happysent`;
+  const lines = a.names
+    .map((n) => `• ${n.first_name} ${n.last_name}`)
+    .join("\n");
+  const text =
+    `Hej ${a.companyName}!\n\n` +
+    `Vi har registrerat följande ${count === 1 ? "nya anställd" : "nya anställda"} hos er (${formatSwedishDate(a.digestDateIso)}):\n\n` +
+    `${lines}\n\n` +
+    `Ni behöver inte göra något – vi sköter påminnelser och leveranser automatiskt.\n\n` +
+    `Hälsningar,\nHappysent`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: a.to,
+    subject,
+    text,
+  });
+}
+
 export interface MonthlyInvoiceSummaryArgs {
   monthLabel: string; // e.g. "maj 2026"
   rows: Array<{

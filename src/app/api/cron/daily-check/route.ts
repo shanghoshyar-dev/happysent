@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { runDailyCheck } from "@/lib/cron/daily-check";
+import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
 import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
 import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
 import { recordLog } from "@/lib/logs";
@@ -52,6 +53,19 @@ export async function GET(request: Request) {
   try {
     const daily = await runDailyCheck(today);
 
+    let employeeDigest: Awaited<ReturnType<typeof flushPendingEmployeeAddDigests>>;
+    try {
+      employeeDigest = await flushPendingEmployeeAddDigests(today);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      await notifyError(message, "employee-add-digest");
+      employeeDigest = {
+        digestsSent: 0,
+        digestsSkippedEmpty: 0,
+        errors: [message],
+      };
+    }
+
     // On the last day of each month, also fire the invoicing digest.
     let monthly: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null = null;
     if (isLastDayOfMonth(today)) {
@@ -68,6 +82,7 @@ export async function GET(request: Request) {
       today: today.toISOString().slice(0, 10),
       stockholmHour: hour,
       daily,
+      employeeDigest,
       monthly,
     });
   } catch (err) {

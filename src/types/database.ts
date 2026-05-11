@@ -78,6 +78,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      employee_add_digest: {
+        Row: {
+          id: string;
+          company_id: string;
+          digest_date: string;
+          additions: Json;
+          notified_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          digest_date: string;
+          additions?: Json;
+          notified_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          digest_date?: string;
+          additions?: Json;
+          notified_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employee_add_digest_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       companies: {
         Row: {
           id: string;

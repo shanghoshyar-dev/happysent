@@ -26,8 +26,9 @@ export function ManualCronButton() {
             Kör daglig kontroll manuellt
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Triggar samma flöde som körs automatiskt kl 07:00 svensk tid.
-            Användbart för test eller om en cron-körning behöver göras om.
+            Triggar samma flöde som körs automatiskt kl 07:00 svensk tid
+            (födelsedagspåminnelser, månadsslut vid behov, och samlade mejl om
+            nya anställda för gårdagen). Användbart för test.
           </p>
         </div>
         <Button onClick={onClick} disabled={pending}>
@@ -53,6 +54,18 @@ export function ManualCronButton() {
                 Månadsrapport skickad för {result.monthly.monthLabel}{" "}
                 ({result.monthly.rowsSummarised} företag,{" "}
                 {result.monthly.totalAmount} kr).
+              </li>
+            )}
+            {result.employeeDigest && (
+              <li>
+                Mejl om nya anställda (per företag/dag):{" "}
+                {result.employeeDigest.digestsSent} skickade
+                {result.employeeDigest.errors.length > 0 && (
+                  <span className="text-amber-700">
+                    {" "}
+                    ({result.employeeDigest.errors.length} fel)
+                  </span>
+                )}
               </li>
             )}
           </ul>

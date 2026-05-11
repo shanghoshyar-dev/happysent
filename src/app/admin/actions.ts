@@ -1,6 +1,7 @@
 "use server";
 
 import { runDailyCheck } from "@/lib/cron/daily-check";
+import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
 import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
 import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
 import { recordLog } from "@/lib/logs";
@@ -10,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 export interface ManualCheckResult {
   ok: boolean;
   daily?: Awaited<ReturnType<typeof runDailyCheck>>;
+  employeeDigest?: Awaited<ReturnType<typeof flushPendingEmployeeAddDigests>>;
   monthly?: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null;
   error?: string;
 }
@@ -31,6 +33,18 @@ export async function triggerDailyCheckManually(): Promise<ManualCheckResult> {
   try {
     const daily = await runDailyCheck(today);
 
+    let employeeDigest: Awaited<ReturnType<typeof flushPendingEmployeeAddDigests>>;
+    try {
+      employeeDigest = await flushPendingEmployeeAddDigests(today);
+    } catch (err) {
+      console.error("[manual] employee digest failed:", err);
+      employeeDigest = {
+        digestsSent: 0,
+        digestsSkippedEmpty: 0,
+        errors: [err instanceof Error ? err.message : String(err)],
+      };
+    }
+
     let monthly: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null = null;
     if (isLastDayOfMonth(today)) {
       try {
@@ -40,7 +54,7 @@ export async function triggerDailyCheckManually(): Promise<ManualCheckResult> {
       }
     }
 
-    return { ok: true, daily, monthly };
+    return { ok: true, daily, employeeDigest, monthly };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await recordLog("error", "manual-trigger", message);
