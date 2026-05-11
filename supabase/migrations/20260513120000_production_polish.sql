@@ -31,6 +31,8 @@ on conflict (id) do nothing;
 
 alter table public.app_settings enable row level security;
 
+drop policy if exists app_settings_admin_all on public.app_settings;
+
 create policy app_settings_admin_all
   on public.app_settings
   for all
