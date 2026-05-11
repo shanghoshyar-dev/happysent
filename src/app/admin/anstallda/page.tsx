@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
 import { EmployeeRowActions } from "./employee-row-actions";
+import { ExcelImportForm } from "./excel-import-form";
 import { NewEmployeeForm } from "./new-employee-form";
 
 export const dynamic = "force-dynamic";
@@ -50,12 +51,18 @@ export default async function AnstalldaPage({ searchParams }: Props) {
         }
       />
 
-      <div className="mb-8">
-        <Card className="max-w-3xl">
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <Card>
           <h2 className="mb-4 font-semibold text-slate-900">
             Lägg till ny anställd
           </h2>
           <NewEmployeeForm
+            companies={companies ?? []}
+            defaultCompanyId={filterCompany}
+          />
+        </Card>
+        <Card>
+          <ExcelImportForm
             companies={companies ?? []}
             defaultCompanyId={filterCompany}
           />

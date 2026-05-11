@@ -50,7 +50,7 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
       `
       id, first_name, last_name, birthday, number_of_people, is_active, company_id,
       companies:company_id (
-        id, name, address, contact_email, billing_email, price_per_cake, status,
+        id, name, address, city, contact_email, billing_email, price_per_cake, status,
         bakeries:bakery_id ( id, name, email )
       )
     `,
@@ -151,6 +151,7 @@ interface CompanyJoin {
   id: string;
   name: string;
   address: string;
+  city: string;
   contact_email: string;
   billing_email: string;
   price_per_cake: number;
@@ -258,6 +259,7 @@ function buildActions(args: {
               bakeryName: bakery.name,
               companyName: company.name,
               companyAddress: company.address,
+              companyCity: company.city,
               employeeFirstName: emp.first_name,
               employeeLastName: emp.last_name,
               deliveryDate: deliveryIso,

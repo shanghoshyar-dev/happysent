@@ -22,17 +22,17 @@ export default function KontaktPage() {
               Skriv några rader om ert företag så hör vi av oss inom en
               arbetsdag. Eller mejla oss direkt på{" "}
               <a
-                href="mailto:hej@happysent.se"
+                href="mailto:info@happysent.com"
                 className="font-medium text-candy-600 hover:underline"
               >
-                hej@happysent.se
+                info@happysent.com
               </a>
               .
             </p>
             <dl className="mt-10 space-y-4 text-sm text-slate-600">
               <div>
                 <dt className="font-semibold text-slate-900">Mejl</dt>
-                <dd>hej@happysent.se</dd>
+                <dd>info@happysent.com</dd>
               </div>
               <div>
                 <dt className="font-semibold text-slate-900">Just nu i</dt>

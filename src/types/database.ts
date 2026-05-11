@@ -306,6 +306,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      logs: {
+        Row: {
+          id: string;
+          level: "info" | "warn" | "error";
+          context: string;
+          message: string;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          level: "info" | "warn" | "error";
+          context: string;
+          message: string;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          level?: "info" | "warn" | "error";
+          context?: string;
+          message?: string;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       blog_posts: {
         Row: {
           id: string;

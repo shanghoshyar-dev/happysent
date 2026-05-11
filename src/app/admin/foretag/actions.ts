@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendCompanyWelcome } from "@/lib/resend/templates";
 
 export async function createCompany(formData: FormData) {
   const supabase = createClient();
@@ -19,6 +20,19 @@ export async function createCompany(formData: FormData) {
   };
   const { error } = await supabase.from("companies").insert(payload);
   if (error) throw new Error(error.message);
+
+  // Fire-and-forget welcome email — don't block the redirect if it fails.
+  if (payload.contact_email) {
+    try {
+      await sendCompanyWelcome({
+        to: payload.contact_email,
+        companyName: payload.name,
+      });
+    } catch (err) {
+      console.error("[createCompany] welcome email failed:", err);
+    }
+  }
+
   revalidatePath("/admin/foretag");
   redirect("/admin/foretag");
 }

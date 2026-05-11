@@ -16,7 +16,6 @@ function formatSwedishDate(iso: string): string {
 }
 
 function from(): string {
-  // Resend wants a verified sender. ADMIN_EMAIL must be on a verified domain.
   return `Happysent <${requireEnv("ADMIN_EMAIL")}>`;
 }
 
@@ -32,12 +31,13 @@ export interface FourteenDayCompanyArgs extends BaseArgs {
   to: string;
 }
 export async function send14DayCompany(a: FourteenDayCompanyArgs) {
-  const subject = `${a.employeeFirstName} fyller år om 2 veckor – tårtan är bokad`;
+  const subject = `🎂 ${a.employeeFirstName} fyller år om två veckor!`;
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `${a.employeeFirstName} ${a.employeeLastName} fyller år om 2 veckor. ` +
-    `Tårtan är bokad och levereras ${formatSwedishDate(a.deliveryDate)}.\n\n` +
-    `Vänliga hälsningar,\nHappysent`;
+    `Vi vill påminna om att ${a.employeeFirstName} ${a.employeeLastName} fyller år om 14 dagar, den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
+    `En tårta är bokad och levereras automatiskt den dagen.\n` +
+    `Ni behöver inte göra någonting!\n\n` +
+    `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
     from: from(),
@@ -49,24 +49,31 @@ export async function send14DayCompany(a: FourteenDayCompanyArgs) {
 
 // 2a) 7 days before — order to bakery
 export interface SevenDayBakeryArgs {
-  to: string; // bakery email
+  to: string;
   bakeryName: string;
   companyName: string;
   companyAddress: string;
+  companyCity?: string | null;
   employeeFirstName: string;
   employeeLastName: string;
   deliveryDate: string;
   numberOfPeople: number;
 }
 export async function send7DayBakery(a: SevenDayBakeryArgs) {
-  const subject = `Beställning – tårta till ${a.companyName} ${formatSwedishDate(a.deliveryDate)}`;
+  const subject = `Beställning – Tårta till ${a.companyName} den ${formatSwedishDate(a.deliveryDate)}`;
+  const deliveryAddress = a.companyCity
+    ? `${a.companyAddress}, ${a.companyCity}`
+    : a.companyAddress;
   const text =
     `Hej ${a.bakeryName}!\n\n` +
-    `Beställning – baka och leverera en tårta den ${formatSwedishDate(a.deliveryDate)} till ${a.companyName}. ` +
-    `${a.employeeFirstName} ${a.employeeLastName} fyller år.\n\n` +
-    `Adress: ${a.companyAddress}\n` +
-    `Antal personer: ${a.numberOfPeople}\n\n` +
-    `Tack på förhand!\nHappysent`;
+    `Vi bekräftar följande beställning:\n\n` +
+    `Kund:             ${a.employeeFirstName} ${a.employeeLastName} fyller år den ${formatSwedishDate(a.deliveryDate)}\n` +
+    `Företag:          ${a.companyName}\n` +
+    `Leveransadress:   ${deliveryAddress}\n` +
+    `Antal personer:   ${a.numberOfPeople}\n` +
+    `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
+    `Skicka faktura till: ${requireEnv("ADMIN_EMAIL")}\n\n` +
+    `Tack!\nHappysent`;
 
   return getResend().emails.send({
     from: from(),
@@ -81,12 +88,12 @@ export interface SevenDayCompanyArgs extends BaseArgs {
   to: string;
 }
 export async function send7DayCompany(a: SevenDayCompanyArgs) {
-  const subject = `En vecka kvar till ${a.employeeFirstName}s födelsedag`;
+  const subject = `🎂 ${a.employeeFirstName} fyller år om en vecka!`;
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `En vecka kvar till ${a.employeeFirstName}s födelsedag, tårtan är beställd ` +
-    `och levereras ${formatSwedishDate(a.deliveryDate)}.\n\n` +
-    `Vänliga hälsningar,\nHappysent`;
+    `En påminnelse om att ${a.employeeFirstName} fyller år om 7 dagar.\n` +
+    `Tårtan är beställd och levereras den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
+    `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
     from: from(),
@@ -101,12 +108,12 @@ export interface OneDayCompanyArgs extends BaseArgs {
   to: string;
 }
 export async function send1DayCompany(a: OneDayCompanyArgs) {
-  const subject = `Imorgon fyller ${a.employeeFirstName} år`;
+  const subject = `🎂 Imorgon fyller ${a.employeeFirstName} år!`;
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `Imorgon fyller ${a.employeeFirstName} år, tårtan levereras imorgon ` +
-    `(${formatSwedishDate(a.deliveryDate)}) mellan 08:00 och 11:00.\n\n` +
-    `Vänliga hälsningar,\nHappysent`;
+    `Imorgon fyller ${a.employeeFirstName} ${a.employeeLastName} år!\n` +
+    `Tårtan levereras imorgon den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
+    `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
     from: from(),
@@ -121,12 +128,13 @@ export interface DayOfCompanyArgs extends BaseArgs {
   to: string;
 }
 export async function sendDayOfCompany(a: DayOfCompanyArgs) {
-  const subject = `Tårtan levereras idag`;
+  const subject = `🎂 Grattis ${a.employeeFirstName}!`;
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `Tårtan till ${a.employeeFirstName} ${a.employeeLastName} levereras idag mellan 08:00 och 11:00.\n\n` +
-    `Grattis på födelsedagen, ${a.employeeFirstName}!\n\n` +
-    `Vänliga hälsningar,\nHappysent`;
+    `Idag fyller ${a.employeeFirstName} år!\n` +
+    `Tårtan levereras idag mellan 08:00 och 11:00.\n\n` +
+    `Vi hoppas ${a.employeeFirstName} får en fantastisk dag!\n\n` +
+    `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
     from: from(),
@@ -138,7 +146,6 @@ export async function sendDayOfCompany(a: DayOfCompanyArgs) {
 
 // ---------- Public marketing site forms ----------
 
-// 5a) Contact form — admin notification (general inquiry)
 export interface ContactAdminArgs {
   name: string;
   company: string;
@@ -148,7 +155,7 @@ export interface ContactAdminArgs {
 export async function sendContactAdminNotification(a: ContactAdminArgs) {
   const subject = `Nytt kontaktmeddelande från ${a.name} (${a.company})`;
   const text =
-    `Ny förfrågan via happysent.se/kontakt:\n\n` +
+    `Ny förfrågan via happysent.com/kontakt:\n\n` +
     `Namn:     ${a.name}\n` +
     `Företag:  ${a.company}\n` +
     `Mejl:     ${a.email}\n\n` +
@@ -163,7 +170,6 @@ export async function sendContactAdminNotification(a: ContactAdminArgs) {
   });
 }
 
-// 5b) Employee add/remove request — admin notification
 export interface EmployeeRequestAdminArgs {
   action: "add" | "remove";
   companyName: string;
@@ -188,7 +194,7 @@ export async function sendEmployeeRequestAdminNotification(
         `Antal personer:   ${a.numberOfPeople ?? "(saknas)"}\n`
       : "";
   const text =
-    `Ny ${actionLabel.toLowerCase()}-förfrågan via happysent.se/kontakt:\n\n` +
+    `Ny ${actionLabel.toLowerCase()}-förfrågan via happysent.com/kontakt:\n\n` +
     `Företag:          ${a.companyName}\n` +
     `Adress:           ${a.address}\n` +
     `Postnummer:       ${a.postalCode}\n` +
@@ -207,7 +213,6 @@ export async function sendEmployeeRequestAdminNotification(
   });
 }
 
-// 5c) Confirmation back to the person who submitted any form
 export interface ContactConfirmationArgs {
   to: string;
   name: string;
@@ -222,6 +227,91 @@ export async function sendContactConfirmation(a: ContactConfirmationArgs) {
   return getResend().emails.send({
     from: from(),
     to: a.to,
+    subject,
+    text,
+  });
+}
+
+// ---------- Admin / lifecycle ----------
+
+export interface WelcomeCompanyArgs {
+  to: string;
+  companyName: string;
+}
+export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
+  const subject = `Välkommen till Happysent! 🎂`;
+  const text =
+    `Hej ${a.companyName}!\n\n` +
+    `Välkommen till Happysent!\n\n` +
+    `Era anställda är nu registrerade i vårt system.\n` +
+    `Ni behöver inte göra någonting – vi sköter allt.\n` +
+    `Tårtan levereras automatiskt på rätt dag.\n\n` +
+    `Hör av er om ni har frågor på ${requireEnv("ADMIN_EMAIL")}\n\n` +
+    `Hälsningar,\nHappysent-teamet`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: a.to,
+    subject,
+    text,
+  });
+}
+
+export interface MonthlyInvoiceSummaryArgs {
+  monthLabel: string; // e.g. "maj 2026"
+  rows: Array<{
+    companyName: string;
+    deliveries: number;
+    amount: number;
+  }>;
+  total: number;
+}
+export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
+  const sek = (n: number) =>
+    new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
+  const subject = `Happysent – Dags att fakturera ${a.monthLabel}`;
+  const lines = a.rows.length
+    ? a.rows
+        .map(
+          (r) =>
+            `  • ${r.companyName.padEnd(30, " ")} ${String(r.deliveries).padStart(3, " ")} tårtor   ${sek(r.amount)}`,
+        )
+        .join("\n")
+    : "  (Inga leveranser denna månad.)";
+
+  const text =
+    `Hej!\n\n` +
+    `Här är månadens sammanställning för ${a.monthLabel}:\n\n` +
+    `${lines}\n\n` +
+    `Total: ${sek(a.total)}\n\n` +
+    `Logga in på admin-panelen för att markera fakturorna som skickade.\n\n` +
+    `Hälsningar,\nHappysent`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: requireEnv("ADMIN_EMAIL"),
+    subject,
+    text,
+  });
+}
+
+export interface SystemErrorArgs {
+  errorMessage: string;
+  context?: string;
+  timestamp: string; // ISO string
+}
+export async function sendSystemErrorEmail(a: SystemErrorArgs) {
+  const subject = `⚠️ Happysent – Systemfel`;
+  const text =
+    `Ett fel uppstod i systemet:\n\n` +
+    `${a.errorMessage}\n\n` +
+    (a.context ? `Sammanhang: ${a.context}\n\n` : "") +
+    `Tidpunkt: ${a.timestamp}\n\n` +
+    `Kontrollera admin-panelen för mer information.`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: requireEnv("ADMIN_EMAIL"),
     subject,
     text,
   });

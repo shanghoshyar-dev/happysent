@@ -2,9 +2,18 @@ import { PageHeader } from "@/components/admin/page-header";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
+import {
+  diffInDays,
+  parseDateString,
+  todayInStockholm,
+} from "@/lib/holidays/swedish";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatSek } from "@/lib/utils";
 import type { OrderStatus } from "@/types/database";
+
+import { CancelOrderButton } from "./cancel-button";
+
+const CANCELLATION_BUFFER_DAYS = 10;
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +66,7 @@ export default async function BestallningarPage() {
               <TH>Anställd</TH>
               <TH>Pris</TH>
               <TH>Status</TH>
+              <TH className="text-right">Åtgärder</TH>
             </TR>
           </THead>
           <TBody>
@@ -65,6 +75,14 @@ export default async function BestallningarPage() {
                 | { first_name: string; last_name: string }
                 | null;
               const company = o.companies as { name: string } | null;
+              const today = todayInStockholm();
+              const daysAway = diffInDays(
+                parseDateString(o.delivery_date),
+                today,
+              );
+              const canCancel =
+                (o.status === "scheduled" || o.status === "sent_to_bakery") &&
+                daysAway >= CANCELLATION_BUFFER_DAYS;
               return (
                 <TR key={o.id}>
                   <TD className="font-medium text-slate-900">
@@ -79,6 +97,9 @@ export default async function BestallningarPage() {
                     <Badge tone={STATUS_TONE[o.status]}>
                       {STATUS_LABELS[o.status]}
                     </Badge>
+                  </TD>
+                  <TD className="text-right">
+                    <CancelOrderButton orderId={o.id} canCancel={canCancel} />
                   </TD>
                 </TR>
               );

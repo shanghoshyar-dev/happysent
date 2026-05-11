@@ -33,7 +33,15 @@ export function MarketingFooter() {
             Logga in
           </Link>
         </nav>
-        <p>&copy; {new Date().getFullYear()} Happysent</p>
+        <div className="flex flex-col gap-1 text-right md:text-left">
+          <a
+            href="mailto:info@happysent.com"
+            className="font-medium text-slate-700 hover:text-candy-600"
+          >
+            info@happysent.com
+          </a>
+          <p>&copy; {new Date().getFullYear()} Happysent</p>
+        </div>
       </div>
     </footer>
   );

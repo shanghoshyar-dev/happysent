@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { runDailyCheck } from "@/lib/cron/daily-check";
-import { todayInStockholm } from "@/lib/holidays/swedish";
+import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
+import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
+import { recordLog } from "@/lib/logs";
+import { sendSystemErrorEmail } from "@/lib/resend/templates";
 import { requireEnv } from "@/lib/env";
 
 export const runtime = "nodejs";
@@ -47,15 +50,42 @@ export async function GET(request: Request) {
 
   const today = todayInStockholm();
   try {
-    const result = await runDailyCheck(today);
+    const daily = await runDailyCheck(today);
+
+    // On the last day of each month, also fire the invoicing digest.
+    let monthly: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null = null;
+    if (isLastDayOfMonth(today)) {
+      try {
+        monthly = await runMonthlyInvoiceSummary(today);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        await notifyError(message, "monthly-invoice");
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       today: today.toISOString().slice(0, 10),
       stockholmHour: hour,
-      ...result,
+      daily,
+      monthly,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    await notifyError(message, "daily-check");
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
+}
+
+async function notifyError(message: string, context: string): Promise<void> {
+  await recordLog("error", context, message);
+  try {
+    await sendSystemErrorEmail({
+      errorMessage: message,
+      context,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (mailErr) {
+    console.error("[cron] failed to send system error email:", mailErr);
   }
 }

@@ -13,6 +13,8 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatSek } from "@/lib/utils";
 
+import { ManualCronButton } from "./manual-cron-button";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
@@ -126,6 +128,10 @@ export default async function AdminDashboardPage() {
           value={formatSek(Math.round(mrr))}
           hint={`${bakeriesCount ?? 0} bagerier`}
         />
+      </div>
+
+      <div className="mt-10">
+        <ManualCronButton />
       </div>
 
       <div className="mt-10">

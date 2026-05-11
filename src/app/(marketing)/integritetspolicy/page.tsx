@@ -131,10 +131,10 @@ export default function IntegritetspolicyPage() {
             <strong>dataportabilitet</strong> av dina uppgifter. Du har också
             rätt att invända mot vår behandling. Skicka en förfrågan till{" "}
             <a
-              href="mailto:hej@happysent.se"
+              href="mailto:info@happysent.com"
               className="font-medium text-candy-600 hover:underline"
             >
-              hej@happysent.se
+              info@happysent.com
             </a>
             .
           </p>
@@ -166,10 +166,10 @@ export default function IntegritetspolicyPage() {
           <p className="mt-3">
             Frågor? Skriv till{" "}
             <a
-              href="mailto:hej@happysent.se"
+              href="mailto:info@happysent.com"
               className="font-medium text-candy-600 hover:underline"
             >
-              hej@happysent.se
+              info@happysent.com
             </a>{" "}
             eller via vårt{" "}
             <Link

@@ -178,3 +178,19 @@ export function todayInStockholm(now: Date = new Date()): Date {
 export function diffInDays(a: Date, b: Date): number {
   return Math.round((a.getTime() - b.getTime()) / MS_PER_DAY);
 }
+
+/** True if `date` is the last calendar day of its month. */
+export function isLastDayOfMonth(date: Date): boolean {
+  const next = addDays(date, 1);
+  return next.getUTCMonth() !== date.getUTCMonth();
+}
+
+/** Long Swedish month label, e.g. "maj 2026". */
+export function swedishMonthLabel(date: Date): string {
+  const fmt = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+  return fmt.format(date);
+}
