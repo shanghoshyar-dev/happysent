@@ -1,18 +1,42 @@
+"use client";
+
+import { useFormState } from "react-dom";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/types/database";
 
+import {
+  createBlogPost,
+  updateBlogPost,
+  type BlogPostFormState,
+} from "./actions";
+
 interface PostFormProps {
   post?: Tables<"blog_posts"> | null;
-  action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
 }
 
-export function BlogPostForm({ post, action, submitLabel }: PostFormProps) {
+export function BlogPostForm({ post, submitLabel }: PostFormProps) {
+  const boundUpdate = post
+    ? updateBlogPost.bind(null, post.id)
+    : undefined;
+
+  const [state, formAction] = useFormState<
+    BlogPostFormState,
+    FormData
+  >(boundUpdate ?? createBlogPost, undefined);
+
   return (
-    <form action={action} className="space-y-5">
+    <form action={formAction} className="space-y-5">
+      {state?.error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 whitespace-pre-wrap">
+          {state.error}
+        </div>
+      ) : null}
+
       <div>
         <Label htmlFor="title">Titel</Label>
         <Input id="title" name="title" required defaultValue={post?.title} />

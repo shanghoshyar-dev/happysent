@@ -8,6 +8,32 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+export type BlogPostFormState = { error: string } | undefined;
+
+function friendlyBlogDbError(message: string): string {
+  const m = message.trim();
+  if (/column .* does not exist|Could not find the .*column/i.test(m)) {
+    return (
+      `${m}\n\n` +
+      "Trolig orsak: produktionsdatabasen saknar nya fält (slug, meta_title, meta_description osv.). " +
+      "Kör Supabase-migrationerna mot samma projekt som Vercel använder (t.ex. `supabase db push` eller kör SQL från `supabase/migrations/` i Supabase Dashboard)."
+    );
+  }
+  if (/row-level security|RLS|violates row-level security/i.test(m)) {
+    return (
+      `${m}\n\n` +
+      "Kontrollera att du är inloggad som admin och att tabellen blog_posts har policy som tillåter insert/update för authenticated."
+    );
+  }
+  if (/duplicate key|unique constraint|already exists/i.test(m)) {
+    return (
+      `${m}\n\n` +
+      "Slug eller annat unikt värde finns redan. Ändra slug eller titel och försök igen."
+    );
+  }
+  return m;
+}
+
 function optStr(formData: FormData, key: string): string | null {
   const v = String(formData.get(key) ?? "").trim();
   return v === "" ? null : v;
@@ -42,11 +68,7 @@ async function buildPayload(
 
   const rawSlug = String(formData.get("slug") ?? "").trim();
   const baseSlug = rawSlug ? slugify(rawSlug) : slugify(title);
-  const slug = await ensureUniqueSlug(
-    supabase,
-    baseSlug,
-    existing?.id,
-  );
+  const slug = await ensureUniqueSlug(supabase, baseSlug, existing?.id);
 
   const isPublished = formData.get("is_published") === "on";
   const published_at = isPublished
@@ -70,18 +92,37 @@ async function buildPayload(
   };
 }
 
-export async function createBlogPost(formData: FormData) {
+export async function createBlogPost(
+  _prev: BlogPostFormState,
+  formData: FormData,
+): Promise<BlogPostFormState> {
   const supabase = createClient();
-  const payload = await buildPayload(supabase, formData, null);
+
+  let payload;
+  try {
+    payload = await buildPayload(supabase, formData, null);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Valideringsfel.";
+    return { error: msg };
+  }
+
   const { error } = await supabase.from("blog_posts").insert(payload);
-  if (error) throw new Error(error.message);
+  if (error) {
+    return { error: friendlyBlogDbError(error.message) };
+  }
+
   revalidatePath("/admin/blogg");
   revalidatePath("/blogg");
   revalidatePath(`/blogg/${payload.slug}`);
   redirect("/admin/blogg");
 }
 
-export async function updateBlogPost(id: string, formData: FormData) {
+/** `id` bound first via `.bind(null, post.id)` for useFormState. */
+export async function updateBlogPost(
+  id: string,
+  _prev: BlogPostFormState,
+  formData: FormData,
+): Promise<BlogPostFormState> {
   const supabase = createClient();
   const { data: existing } = await supabase
     .from("blog_posts")
@@ -89,14 +130,25 @@ export async function updateBlogPost(id: string, formData: FormData) {
     .eq("id", id)
     .maybeSingle();
 
-  if (!existing) throw new Error("Inlägget hittades inte.");
+  if (!existing) {
+    return { error: "Inlägget hittades inte." };
+  }
 
-  const payload = await buildPayload(supabase, formData, existing);
+  let payload;
+  try {
+    payload = await buildPayload(supabase, formData, existing);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Valideringsfel.";
+    return { error: msg };
+  }
+
   const { error } = await supabase
     .from("blog_posts")
     .update(payload)
     .eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) {
+    return { error: friendlyBlogDbError(error.message) };
+  }
 
   revalidatePath("/admin/blogg");
   revalidatePath(`/admin/blogg/${id}`);
@@ -105,6 +157,8 @@ export async function updateBlogPost(id: string, formData: FormData) {
   if (payload.slug !== existing.slug) {
     revalidatePath(`/blogg/${payload.slug}`);
   }
+
+  return undefined;
 }
 
 export async function deleteBlogPost(id: string) {

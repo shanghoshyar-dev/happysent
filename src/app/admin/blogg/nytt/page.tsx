@@ -1,7 +1,6 @@
 import { PageHeader } from "@/components/admin/page-header";
 import { Card } from "@/components/ui/card";
 
-import { createBlogPost } from "../actions";
 import { BlogPostForm } from "../post-form";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +18,7 @@ export default function NyttBlogginlaggPage() {
         ]}
       />
       <Card className="max-w-3xl">
-        <BlogPostForm action={createBlogPost} submitLabel="Spara inlägg" />
+        <BlogPostForm submitLabel="Spara inlägg" />
       </Card>
     </div>
   );

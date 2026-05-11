@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 
-import { deleteBlogPost, updateBlogPost } from "../actions";
+import { deleteBlogPost } from "../actions";
 import { DeleteBlogPostForm } from "../delete-blog-post-form";
 import { BlogPostForm } from "../post-form";
 
@@ -26,7 +26,6 @@ export default async function EditBlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  const update = updateBlogPost.bind(null, post.id);
   const remove = deleteBlogPost.bind(null, post.id);
 
   return (
@@ -46,11 +45,7 @@ export default async function EditBlogPostPage({ params }: Props) {
         }
       />
       <Card className="max-w-3xl">
-        <BlogPostForm
-          post={post}
-          action={update}
-          submitLabel="Spara ändringar"
-        />
+        <BlogPostForm post={post} submitLabel="Spara ändringar" />
       </Card>
 
       <div className="mt-8 max-w-3xl rounded-2xl border border-red-100 bg-red-50/50 p-6">
