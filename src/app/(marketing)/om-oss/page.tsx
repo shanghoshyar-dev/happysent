@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
-  title: "Om oss",
+export const metadata: Metadata = svMarketingPageMeta({
+  title: "Om oss – Happysent",
   description:
     "Happysent gör det enkelt för företag att fira sina anställda – utan tidskrävande administration.",
-};
+  path: "/om-oss",
+});
 
 export default function OmOssPage() {
   return (

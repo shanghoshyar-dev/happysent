@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Integritetspolicy",
+import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+
+export const metadata: Metadata = svMarketingPageMeta({
+  title: "Integritetspolicy – Happysent",
   description:
     "Hur Happysent hanterar personuppgifter enligt GDPR – vad vi samlar in, varför, och hur länge.",
-};
+  path: "/integritetspolicy",
+});
 
 export default function IntegritetspolicyPage() {
   return (

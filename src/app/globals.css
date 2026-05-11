@@ -8,7 +8,7 @@
 
 html,
 body {
-  background-color: #fffaf3;
+  background-color: #fdf6ec;
   color: #0f172a;
 }
 
@@ -18,12 +18,31 @@ body {
 }
 
 .prose-happysent h1,
-.prose-happysent h2,
-.prose-happysent h3 {
-  font-family: var(--font-fraunces, Georgia, serif);
-  color: #0f172a;
+.prose-happysent h2 {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #2d4a3e;
 }
+
+.prose-happysent h3 {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  color: #2d4a3e;
+}
+
 .prose-happysent p {
-  line-height: 1.7;
+  line-height: 1.75;
   color: #334155;
+}
+
+.prose-happysent a {
+  color: #e8603c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.prose-happysent a:hover {
+  color: #d54e30;
 }

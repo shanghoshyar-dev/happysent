@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 
+import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+
 import { ContactForm } from "./contact-form";
 import { EmployeeRequestForm } from "./employee-request-form";
 
-export const metadata: Metadata = {
-  title: "Kontakt",
+export const metadata: Metadata = svMarketingPageMeta({
+  title: "Kontakta Happysent – Bli kund idag",
   description:
     "Hör av dig så bokar vi en kort demo och ser om Happysent passar er.",
-};
+  path: "/kontakt",
+});
 
 export default function KontaktPage() {
   return (
@@ -23,11 +26,21 @@ export default function KontaktPage() {
               arbetsdag. Eller mejla oss direkt på{" "}
               <a
                 href="mailto:info@happysent.com"
-                className="font-medium text-candy-600 hover:underline"
+                className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
               >
                 info@happysent.com
               </a>
               .
+            </p>
+            <p className="mt-4 text-sm text-slate-600">
+              <a
+                href="/happysent-mall.xlsx"
+                download
+                className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
+              >
+                Ladda ner vår Excel-mall här
+              </a>{" "}
+              om du vill förbereda din personallista i förväg.
             </p>
             <dl className="mt-10 space-y-4 text-sm text-slate-600">
               <div>
@@ -54,10 +67,21 @@ export default function KontaktPage() {
               Skicka in när någon börjar eller slutar så uppdaterar vi
               personallistan åt er. Du behöver inte logga in någonstans.
             </p>
+            <p className="mt-4 text-sm text-slate-600">
+              <a
+                href="/happysent-mall.xlsx"
+                download
+                className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
+              >
+                Ladda ner vår Excel-mall här
+              </a>
+            </p>
             <ul className="mt-6 space-y-3 text-sm text-slate-600">
               <li>• Vi svarar inom en arbetsdag</li>
               <li>• Bekräftelse skickas direkt till din mejl</li>
-              <li>• Inga ändringar i pågående beställningar utan att vi hör av oss</li>
+              <li>
+                • Inga ändringar i pågående beställningar utan att vi hör av oss
+              </li>
             </ul>
           </div>
           <EmployeeRequestForm />

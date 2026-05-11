@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 
 import { submitEmployeeRequest, type ContactState } from "./actions";
@@ -18,7 +19,14 @@ function SubmitButton({ action }: { action: "add" | "remove" }) {
   const label = action === "add" ? "Skicka tillägg" : "Skicka borttagning";
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Skickar..." : label}
+      {pending ? (
+        <span className="inline-flex items-center justify-center gap-2">
+          <Spinner />
+          Skickar…
+        </span>
+      ) : (
+        label
+      )}
     </Button>
   );
 }

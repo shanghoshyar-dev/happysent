@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
-  title: "Hur det fungerar",
+export const metadata: Metadata = svMarketingPageMeta({
+  title: "Hur Happysent fungerar – Enkel automatisk tårtaleverans",
   description:
     "Från första registrering till färsk tårta på kontoret — så jobbar Happysent steg för steg.",
-};
+  path: "/hur-det-fungerar",
+});
 
 const steps = [
   {

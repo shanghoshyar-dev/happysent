@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 import { triggerDailyCheckManually, type ManualCheckResult } from "./actions";
 
@@ -19,11 +20,11 @@ export function ManualCronButton() {
   };
 
   return (
-    <div className="rounded-2xl border border-candy-100 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border-2 border-coral-400 bg-gradient-to-br from-coral-50 via-white to-cream p-6 shadow-md ring-2 ring-coral-100">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="font-display text-lg text-slate-900">
-            Kör daglig kontroll manuellt
+          <h2 className="font-display text-lg font-semibold text-forest-800">
+            Manuell test: kör daglig kontroll
           </h2>
           <p className="mt-1 text-sm text-slate-600">
             Triggar samma flöde som körs automatiskt kl 07:00 svensk tid
@@ -31,8 +32,19 @@ export function ManualCronButton() {
             nya anställda för gårdagen). Användbart för test.
           </p>
         </div>
-        <Button onClick={onClick} disabled={pending}>
-          {pending ? "Kör..." : "Kör nu"}
+        <Button
+          onClick={onClick}
+          disabled={pending}
+          className="min-w-[8rem] shrink-0 shadow-md"
+        >
+          {pending ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner />
+              Kör…
+            </span>
+          ) : (
+            "Kör nu"
+          )}
         </Button>
       </div>
 

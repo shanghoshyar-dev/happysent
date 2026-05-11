@@ -49,6 +49,10 @@ export default async function AnstalldaPage({ searchParams }: Props) {
             ? `Visar anställda för valt företag.`
             : "Alla registrerade anställda hos era företag."
         }
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Anställda" },
+        ]}
       />
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">

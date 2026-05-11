@@ -1,5 +1,10 @@
 "use server";
 
+import { getRequestIp } from "@/lib/client-ip";
+import {
+  ContactRateLimitError,
+  assertContactRateLimit,
+} from "@/lib/rate-limit-contact";
 import {
   sendContactAdminNotification,
   sendContactConfirmation,
@@ -47,6 +52,15 @@ export async function submitContactForm(
       message:
         "Du behöver godkänna integritetspolicyn och databehandlingsavtalet.",
     };
+  }
+
+  try {
+    await assertContactRateLimit(getRequestIp());
+  } catch (e) {
+    if (e instanceof ContactRateLimitError) {
+      return { status: "error", message: e.message };
+    }
+    throw e;
   }
 
   try {
@@ -108,6 +122,15 @@ export async function submitEmployeeRequest(
         message: "Antal personer måste vara minst 1.",
       };
     }
+  }
+
+  try {
+    await assertContactRateLimit(getRequestIp());
+  } catch (e) {
+    if (e instanceof ContactRateLimitError) {
+      return { status: "error", message: e.message };
+    }
+    throw e;
   }
 
   try {

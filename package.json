@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:types": "supabase gen types typescript --linked > src/types/database.ts",
     "db:reset": "supabase db reset",
-    "db:push": "supabase db push"
+    "db:push": "supabase db push",
+    "generate:excel-template": "node scripts/generate-excel-template.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
@@ -19,6 +20,8 @@
     "next": "^14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "resend": "^4.0.1",
     "tailwind-merge": "^2.5.4"
   },

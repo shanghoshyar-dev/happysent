@@ -1,39 +1,22 @@
 import { PageHeader } from "@/components/admin/page-header";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
+import { getAppSettings } from "@/lib/app-settings";
 import {
   diffInDays,
   parseDateString,
   todayInStockholm,
 } from "@/lib/holidays/swedish";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate, formatSek } from "@/lib/utils";
 import type { OrderStatus } from "@/types/database";
 
-import { CancelOrderButton } from "./cancel-button";
-
-const CANCELLATION_BUFFER_DAYS = 10;
+import { OrdersTable, type OrderTableRow } from "./orders-table";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  scheduled: "Schemalagd",
-  sent_to_bakery: "Skickad till bageri",
-  delivered: "Levererad",
-  invoiced: "Fakturerad",
-  cancelled: "Avbruten",
-};
-
-const STATUS_TONE: Record<OrderStatus, "neutral" | "info" | "success" | "warning" | "danger"> = {
-  scheduled: "info",
-  sent_to_bakery: "warning",
-  delivered: "success",
-  invoiced: "neutral",
-  cancelled: "danger",
-};
-
 export default async function BestallningarPage() {
+  const settings = await getAppSettings();
+  const cancellationDays = settings.cancellation_days_before_delivery;
+
   const supabase = createClient();
   const { data: orders } = await supabase
     .from("orders")
@@ -43,13 +26,38 @@ export default async function BestallningarPage() {
        companies:company_id ( name )`,
     )
     .order("delivery_date", { ascending: false })
-    .limit(200);
+    .limit(500);
+
+  const rows: OrderTableRow[] = (orders ?? []).map((o) => {
+    const emp = o.employees as
+      | { first_name: string; last_name: string }
+      | null;
+    const company = o.companies as { name: string } | null;
+    const today = todayInStockholm();
+    const daysAway = diffInDays(parseDateString(o.delivery_date), today);
+    const canCancel =
+      (o.status === "scheduled" || o.status === "sent_to_bakery") &&
+      daysAway >= cancellationDays;
+    return {
+      id: o.id,
+      delivery_date: o.delivery_date,
+      status: o.status as OrderStatus,
+      price: o.price,
+      companyName: company?.name ?? "—",
+      employeeName: emp ? `${emp.first_name} ${emp.last_name}` : "—",
+      canCancel,
+    };
+  });
 
   return (
     <div>
       <PageHeader
         title="Beställningar"
-        description="Alla planerade och levererade tårtor."
+        description={`Alla planerade och levererade tårtor. Avbokning tillåten tidigast ${cancellationDays} dagar före leverans.`}
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Beställningar" },
+        ]}
       />
 
       {!orders || orders.length === 0 ? (
@@ -58,54 +66,7 @@ export default async function BestallningarPage() {
           description="Beställningar skapas automatiskt när en anställds födelsedag närmar sig."
         />
       ) : (
-        <Table>
-          <THead>
-            <TR>
-              <TH>Leveransdag</TH>
-              <TH>Företag</TH>
-              <TH>Anställd</TH>
-              <TH>Pris</TH>
-              <TH>Status</TH>
-              <TH className="text-right">Åtgärder</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {orders.map((o) => {
-              const emp = o.employees as
-                | { first_name: string; last_name: string }
-                | null;
-              const company = o.companies as { name: string } | null;
-              const today = todayInStockholm();
-              const daysAway = diffInDays(
-                parseDateString(o.delivery_date),
-                today,
-              );
-              const canCancel =
-                (o.status === "scheduled" || o.status === "sent_to_bakery") &&
-                daysAway >= CANCELLATION_BUFFER_DAYS;
-              return (
-                <TR key={o.id}>
-                  <TD className="font-medium text-slate-900">
-                    {formatDate(o.delivery_date)}
-                  </TD>
-                  <TD>{company?.name ?? "—"}</TD>
-                  <TD>
-                    {emp ? `${emp.first_name} ${emp.last_name}` : "—"}
-                  </TD>
-                  <TD>{formatSek(o.price)}</TD>
-                  <TD>
-                    <Badge tone={STATUS_TONE[o.status]}>
-                      {STATUS_LABELS[o.status]}
-                    </Badge>
-                  </TD>
-                  <TD className="text-right">
-                    <CancelOrderButton orderId={o.id} canCancel={canCancel} />
-                  </TD>
-                </TR>
-              );
-            })}
-          </TBody>
-        </Table>
+        <OrdersTable rows={rows} />
       )}
     </div>
   );

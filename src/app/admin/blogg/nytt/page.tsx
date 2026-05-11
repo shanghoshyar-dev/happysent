@@ -4,12 +4,19 @@ import { Card } from "@/components/ui/card";
 import { createBlogPost } from "../actions";
 import { BlogPostForm } from "../post-form";
 
+export const dynamic = "force-dynamic";
+
 export default function NyttBlogginlaggPage() {
   return (
     <div>
       <PageHeader
         title="Nytt inlägg"
         description="Skriv ett nytt blogginlägg."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Blogg", href: "/admin/blogg" },
+          { label: "Nytt inlägg" },
+        ]}
       />
       <Card className="max-w-3xl">
         <BlogPostForm action={createBlogPost} submitLabel="Spara inlägg" />

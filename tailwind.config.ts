@@ -8,22 +8,51 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        /** Brand cream background #FDF6EC */
         cream: {
-          50: "#fffaf3",
-          100: "#fef3e2",
-          200: "#fde4bf",
+          DEFAULT: "#FDF6EC",
+          50: "#FDF6EC",
+          100: "#faf1e6",
+          200: "#f3e6d4",
+        },
+        /** Primary coral/orange #E8603C — exposed as `coral-*` and legacy `candy-*` */
+        coral: {
+          50: "#fef4f1",
+          100: "#fde8e2",
+          200: "#fbd0c5",
+          300: "#f7ad9b",
+          400: "#f07d62",
+          500: "#E8603C",
+          600: "#d54e30",
+          700: "#b23f28",
+          800: "#933726",
+          900: "#7a3326",
         },
         candy: {
-          50: "#fff1f5",
-          100: "#ffe0ea",
-          200: "#ffc1d4",
-          300: "#ff90b1",
-          400: "#ff5d8c",
-          500: "#ef336c",
-          600: "#d31a55",
-          700: "#a91245",
-          800: "#7f0d35",
-          900: "#5b0a26",
+          50: "#fef4f1",
+          100: "#fde8e2",
+          200: "#fbd0c5",
+          300: "#f7ad9b",
+          400: "#f07d62",
+          500: "#E8603C",
+          600: "#d54e30",
+          700: "#b23f28",
+          800: "#933726",
+          900: "#7a3326",
+        },
+        /** Accent dark green #2D4A3E */
+        forest: {
+          DEFAULT: "#2D4A3E",
+          50: "#f4f7f6",
+          100: "#e3ebe8",
+          200: "#c7d7d1",
+          300: "#9cb8ae",
+          400: "#6d9285",
+          500: "#4e7568",
+          600: "#3d5f54",
+          700: "#2D4A3E",
+          800: "#273d36",
+          900: "#21332f",
         },
         sprinkle: {
           mint: "#a7f3d0",
@@ -33,14 +62,18 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-fraunces)", "Georgia", "serif"],
+        /** Same as sans — headings use Inter with tighter tracking */
+        display: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        soft: "0 10px 30px -12px rgba(239, 51, 108, 0.25)",
+        soft: "0 10px 30px -12px rgba(232, 96, 60, 0.22)",
       },
       backgroundImage: {
-        "candy-gradient":
-          "linear-gradient(135deg, #fff1f5 0%, #fef3e2 50%, #ffe0ea 100%)",
+        "brand-gradient":
+          "linear-gradient(135deg, #FDF6EC 0%, #fef4f1 45%, #fde8e2 100%)",
+      },
+      transitionDuration: {
+        DEFAULT: "200ms",
       },
     },
   },

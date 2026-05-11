@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 import { cancelOrder } from "./actions";
 
@@ -23,6 +24,13 @@ export function CancelOrderButton({ orderId, canCancel }: Props) {
   }
 
   const onClick = () => {
+    if (
+      !globalThis.confirm(
+        "Vill du verkligen avboka denna beställning? Leveransen planeras bort och statistik uppdateras.",
+      )
+    ) {
+      return;
+    }
     setError(null);
     startTransition(async () => {
       const result = await cancelOrder(orderId);
@@ -39,7 +47,14 @@ export function CancelOrderButton({ orderId, canCancel }: Props) {
         disabled={pending}
         className="text-red-600 hover:bg-red-50"
       >
-        {pending ? "..." : "Avboka"}
+        {pending ? (
+          <span className="inline-flex items-center gap-2">
+            <Spinner />
+            Avbokar…
+          </span>
+        ) : (
+          "Avboka"
+        )}
       </Button>
       {error && (
         <span className="max-w-xs text-right text-xs text-red-600">

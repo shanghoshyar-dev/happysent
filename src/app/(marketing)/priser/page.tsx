@@ -1,13 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
-  title: "Priser",
+export const metadata: Metadata = svMarketingPageMeta({
+  title: "Priser – Happysent",
   description:
     "Transparenta priser per levererad tårta. Inga uppstartsavgifter, ingen bindningstid.",
-};
+  path: "/priser",
+});
 
 const tiers = [
   {

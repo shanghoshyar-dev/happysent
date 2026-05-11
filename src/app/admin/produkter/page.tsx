@@ -23,6 +23,10 @@ export default async function ProdukterPage() {
       <PageHeader
         title="Produkter"
         description="De produktkategorier som bagerierna kan leverera."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Produkter" },
+        ]}
       />
 
       <div className="mb-8">

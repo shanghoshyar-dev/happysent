@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
+
+import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,20 +11,30 @@ const inter = Inter({
   display: "swap",
 });
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
+const site = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: {
-    default: "Happysent – Födelsedagstårtor till företag, automatiskt",
-    template: "%s | Happysent",
-  },
+  metadataBase: new URL(site),
+  title: "Happysent – Automatiska födelsedagstårtor till företag i Malmö",
   description:
-    "Glöm aldrig en kollegas födelsedag igen. Happysent bokar och levererar tårtor från lokala bagerier till ditt kontor – helt automatiskt.",
-  metadataBase: new URL("https://happysent.se"),
+    "Glöm aldrig en kollegas födelsedag igen. Happysent bokar och levererar tårtor från lokala bagerier till ert kontor i Malmö – automatiskt.",
+  openGraph: {
+    type: "website",
+    locale: "sv_SE",
+    url: site,
+    siteName: "Happysent",
+    title:
+      "Happysent – Automatiska födelsedagstårtor till företag i Malmö",
+    description:
+      "Automatiska födelsedagstårtor för företag. Lokala bagerier, leverans på jobbet, en faktura i månaden.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Happysent – Födelsedagstårtor till företag",
+    description:
+      "Automatiska födelsedagstårtor för företag i Malmö. Vi sköter påminnelser och leveranser.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -31,8 +43,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="sv" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="min-h-screen font-sans">{children}</body>
+    <html lang="sv" className={inter.variable}>
+      <body className="min-h-screen bg-cream font-sans antialiased transition-colors duration-200">
+        {children}
+      </body>
     </html>
   );
 }

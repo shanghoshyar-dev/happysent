@@ -12,11 +12,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-candy-500 text-white hover:bg-candy-600 active:bg-candy-700 shadow-soft",
+    "bg-candy-500 text-white shadow-soft transition-all duration-200 ease-out hover:bg-candy-600 hover:-translate-y-0.5 active:translate-y-0 active:bg-candy-700 disabled:hover:translate-y-0",
   secondary:
-    "bg-white text-candy-700 border border-candy-200 hover:bg-candy-50",
-  ghost: "bg-transparent text-candy-700 hover:bg-candy-50",
-  danger: "bg-red-600 text-white hover:bg-red-700",
+    "bg-white text-candy-700 border border-candy-200 transition-all duration-200 hover:bg-candy-50 hover:-translate-y-0.5 active:translate-y-0 disabled:hover:translate-y-0",
+  ghost:
+    "bg-transparent text-candy-700 transition-colors duration-200 hover:bg-candy-50",
+  danger:
+    "bg-red-600 text-white transition-all duration-200 hover:bg-red-700 hover:-translate-y-0.5 active:translate-y-0 disabled:hover:translate-y-0",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -35,7 +37,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         className={cn(
-          "inline-flex items-center justify-center rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-candy-300 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+          "inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-coral-300 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none disabled:hover:translate-y-0",
           variantClasses[variant],
           sizeClasses[size],
           className,

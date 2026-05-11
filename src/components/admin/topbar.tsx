@@ -1,3 +1,4 @@
+import { MobileAdminNav } from "./mobile-nav";
 import { SignOutButton } from "./sign-out-button";
 
 interface TopBarProps {
@@ -6,8 +7,11 @@ interface TopBarProps {
 
 export function AdminTopBar({ email }: TopBarProps) {
   return (
-    <div className="flex h-16 items-center justify-between border-b border-candy-100 bg-white px-6">
-      <div className="text-sm text-slate-500">Admin</div>
+    <div className="flex h-16 items-center justify-between gap-4 border-b border-candy-100 bg-white px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <MobileAdminNav />
+        <div className="hidden text-sm text-slate-500 md:block">Admin</div>
+      </div>
       <div className="flex items-center gap-4">
         {email ? (
           <span className="text-sm text-slate-600">{email}</span>

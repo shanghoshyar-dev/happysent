@@ -2,14 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/app-settings";
 import {
   diffInDays,
   parseDateString,
   todayInStockholm,
 } from "@/lib/holidays/swedish";
-
-const CANCELLATION_BUFFER_DAYS = 10;
+import { createClient } from "@/lib/supabase/server";
 
 export interface CancelOrderResult {
   ok: boolean;
@@ -17,10 +16,12 @@ export interface CancelOrderResult {
 }
 
 /**
- * Cancel an order if delivery is more than CANCELLATION_BUFFER_DAYS away.
+ * Cancel an order if delivery is more than the configured buffer away.
  * Surfaces a clear error message back to the UI otherwise.
  */
 export async function cancelOrder(id: string): Promise<CancelOrderResult> {
+  const settings = await getAppSettings();
+  const cancellationDays = settings.cancellation_days_before_delivery;
   const supabase = createClient();
 
   const { data: order, error: fetchErr } = await supabase
@@ -44,10 +45,10 @@ export async function cancelOrder(id: string): Promise<CancelOrderResult> {
   const delivery = parseDateString(order.delivery_date);
   const today = todayInStockholm();
   const daysToDelivery = diffInDays(delivery, today);
-  if (daysToDelivery < CANCELLATION_BUFFER_DAYS) {
+  if (daysToDelivery < cancellationDays) {
     return {
       ok: false,
-      error: `Avbokning ej möjlig – mindre än ${CANCELLATION_BUFFER_DAYS} dagar till leverans.`,
+      error: `Avbokning ej möjlig – mindre än ${cancellationDays} dagar till leverans.`,
     };
   }
 

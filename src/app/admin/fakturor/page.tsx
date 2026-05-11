@@ -26,6 +26,10 @@ export default async function FakturorPage() {
       <PageHeader
         title="Fakturor"
         description="Månadsfakturor per företag, baserat på levererade tårtor."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Fakturor" },
+        ]}
       />
 
       <Card className="mb-8 max-w-3xl">

@@ -368,11 +368,46 @@ export type Database = {
         };
         Relationships: [];
       };
+      app_settings: {
+        Row: {
+          id: number;
+          admin_email_override: string | null;
+          default_price_per_cake: number;
+          delivery_window_start: string;
+          delivery_window_end: string;
+          cancellation_days_before_delivery: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          admin_email_override?: string | null;
+          default_price_per_cake?: number;
+          delivery_window_start?: string;
+          delivery_window_end?: string;
+          cancellation_days_before_delivery?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          admin_email_override?: string | null;
+          default_price_per_cake?: number;
+          delivery_window_start?: string;
+          delivery_window_end?: string;
+          cancellation_days_before_delivery?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       blog_posts: {
         Row: {
           id: string;
           title: string;
           content: string;
+          slug: string;
+          meta_title: string | null;
+          meta_description: string | null;
+          og_image_url: string | null;
+          excerpt: string | null;
           published_at: string | null;
           author: string;
           is_published: boolean;
@@ -381,6 +416,11 @@ export type Database = {
           id?: string;
           title: string;
           content: string;
+          slug: string;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          og_image_url?: string | null;
+          excerpt?: string | null;
           published_at?: string | null;
           author: string;
           is_published?: boolean;
@@ -389,9 +429,35 @@ export type Database = {
           id?: string;
           title?: string;
           content?: string;
+          slug?: string;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          og_image_url?: string | null;
+          excerpt?: string | null;
           published_at?: string | null;
           author?: string;
           is_published?: boolean;
+        };
+        Relationships: [];
+      };
+      contact_rate_limits: {
+        Row: {
+          bucket_key: string;
+          window_start: string;
+          hit_count: number;
+          updated_at: string;
+        };
+        Insert: {
+          bucket_key: string;
+          window_start?: string;
+          hit_count?: number;
+          updated_at?: string;
+        };
+        Update: {
+          bucket_key?: string;
+          window_start?: string;
+          hit_count?: number;
+          updated_at?: string;
         };
         Relationships: [];
       };

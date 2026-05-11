@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteBlogPost, updateBlogPost } from "../actions";
+import { DeleteBlogPostForm } from "../delete-blog-post-form";
 import { BlogPostForm } from "../post-form";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,11 @@ export default async function EditBlogPostPage({ params }: Props) {
       <PageHeader
         title="Redigera inlägg"
         description={post.title}
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Blogg", href: "/admin/blogg" },
+          { label: post.title },
+        ]}
         action={
           <Link href="/admin/blogg">
             <Button variant="secondary">Tillbaka</Button>
@@ -49,11 +55,7 @@ export default async function EditBlogPostPage({ params }: Props) {
 
       <div className="mt-8 max-w-3xl rounded-2xl border border-red-100 bg-red-50/50 p-6">
         <h3 className="font-semibold text-red-800">Ta bort inlägg</h3>
-        <form action={remove} className="mt-4">
-          <Button type="submit" variant="danger">
-            Ta bort
-          </Button>
-        </form>
+        <DeleteBlogPostForm action={remove} />
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ interface CompanyFormProps {
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
+  /** Used when creating a new company (no `company` row yet). */
+  defaultPricePerCake?: number;
 }
 
 export function CompanyForm({
@@ -16,6 +18,7 @@ export function CompanyForm({
   company,
   action,
   submitLabel,
+  defaultPricePerCake,
 }: CompanyFormProps) {
   return (
     <form action={action} className="grid gap-5 md:grid-cols-2">
@@ -82,7 +85,7 @@ export function CompanyForm({
           type="number"
           min={0}
           required
-          defaultValue={company?.price_per_cake ?? 450}
+          defaultValue={company?.price_per_cake ?? defaultPricePerCake ?? 450}
         />
       </div>
       <div>

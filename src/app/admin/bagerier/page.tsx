@@ -25,6 +25,10 @@ export default async function BagerierPage() {
       <PageHeader
         title="Bagerier"
         description="De bagerier som vi samarbetar med per stad."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Bagerier" },
+        ]}
       />
 
       <div className="mb-8">

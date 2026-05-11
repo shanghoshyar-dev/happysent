@@ -14,6 +14,7 @@ const items = [
   { href: "/admin/fakturor", label: "Fakturor", icon: "💳" },
   { href: "/admin/produkter", label: "Produkter", icon: "🧁" },
   { href: "/admin/blogg", label: "Blogg", icon: "📝" },
+  { href: "/admin/settings", label: "Inställningar", icon: "⚙️" },
 ];
 
 export function AdminSidebar() {

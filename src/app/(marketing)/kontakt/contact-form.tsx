@@ -6,6 +6,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 
 import { submitContactForm, type ContactState } from "./actions";
@@ -16,7 +17,14 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Skickar..." : "Skicka"}
+      {pending ? (
+        <span className="inline-flex items-center justify-center gap-2">
+          <Spinner />
+          Skickar…
+        </span>
+      ) : (
+        "Skicka"
+      )}
     </Button>
   );
 }

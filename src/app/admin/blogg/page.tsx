@@ -14,7 +14,7 @@ export default async function BloggAdminPage() {
   const supabase = createClient();
   const { data: posts } = await supabase
     .from("blog_posts")
-    .select("id, title, author, is_published, published_at")
+    .select("id, slug, title, author, is_published, published_at")
     .order("published_at", { ascending: false, nullsFirst: false });
 
   return (
@@ -22,6 +22,10 @@ export default async function BloggAdminPage() {
       <PageHeader
         title="Blogg"
         description="Administrera publicerade och utkastade inlägg."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Blogg" },
+        ]}
         action={
           <Link href="/admin/blogg/nytt">
             <Button>Nytt inlägg</Button>
@@ -44,6 +48,7 @@ export default async function BloggAdminPage() {
           <THead>
             <TR>
               <TH>Titel</TH>
+              <TH>Slug / publik länk</TH>
               <TH>Författare</TH>
               <TH>Publicerad</TH>
               <TH>Status</TH>
@@ -55,10 +60,24 @@ export default async function BloggAdminPage() {
                 <TD className="font-medium text-slate-900">
                   <Link
                     href={`/admin/blogg/${p.id}`}
-                    className="hover:underline"
+                    className="hover:text-coral-600 hover:underline"
                   >
                     {p.title}
                   </Link>
+                </TD>
+                <TD className="max-w-[220px] truncate text-xs">
+                  {p.is_published ? (
+                    <Link
+                      href={`/blogg/${p.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-coral-600 hover:underline"
+                    >
+                      /blogg/{p.slug}
+                    </Link>
+                  ) : (
+                    <span className="font-mono text-slate-400">{p.slug}</span>
+                  )}
                 </TD>
                 <TD>{p.author}</TD>
                 <TD>

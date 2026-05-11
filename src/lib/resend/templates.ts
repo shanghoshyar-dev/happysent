@@ -1,7 +1,10 @@
 import "server-only";
 
 import { getResend } from "@/lib/resend/client";
-import { requireEnv } from "@/lib/env";
+import {
+  getAppSettings,
+  resolveAdminEmail,
+} from "@/lib/app-settings";
 
 const fmt = new Intl.DateTimeFormat("sv-SE", {
   year: "numeric",
@@ -15,8 +18,17 @@ function formatSwedishDate(iso: string): string {
   return fmt.format(new Date(Date.UTC(y, m - 1, d, 12)));
 }
 
-function from(): string {
-  return `Happysent <${requireEnv("ADMIN_EMAIL")}>`;
+async function mailFrom(): Promise<string> {
+  const settings = await getAppSettings();
+  const email = resolveAdminEmail(settings);
+  if (!email) throw new Error("ADMIN_EMAIL saknas i miljö eller inställningar.");
+  return `Happysent <${email}>`;
+}
+
+async function adminInbox(): Promise<string> {
+  const email = resolveAdminEmail(await getAppSettings());
+  if (!email) throw new Error("ADMIN_EMAIL saknas.");
+  return email;
 }
 
 interface BaseArgs {
@@ -40,7 +52,7 @@ export async function send14DayCompany(a: FourteenDayCompanyArgs) {
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -72,11 +84,11 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
     `Leveransadress:   ${deliveryAddress}\n` +
     `Antal personer:   ${a.numberOfPeople}\n` +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
-    `Skicka faktura till: ${requireEnv("ADMIN_EMAIL")}\n\n` +
+    `Skicka faktura till: ${await adminInbox()}\n\n` +
     `Tack!\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -96,7 +108,7 @@ export async function send7DayCompany(a: SevenDayCompanyArgs) {
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -116,7 +128,7 @@ export async function send1DayCompany(a: OneDayCompanyArgs) {
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -128,16 +140,18 @@ export interface DayOfCompanyArgs extends BaseArgs {
   to: string;
 }
 export async function sendDayOfCompany(a: DayOfCompanyArgs) {
+  const s = await getAppSettings();
+  const slot = `mellan ${s.delivery_window_start} och ${s.delivery_window_end}`;
   const subject = `🎂 Grattis ${a.employeeFirstName}!`;
   const text =
     `Hej ${a.companyName}!\n\n` +
     `Idag fyller ${a.employeeFirstName} år!\n` +
-    `Tårtan levereras idag mellan 08:00 och 11:00.\n\n` +
+    `Tårtan levereras idag ${slot}.\n\n` +
     `Vi hoppas ${a.employeeFirstName} får en fantastisk dag!\n\n` +
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -162,8 +176,8 @@ export async function sendContactAdminNotification(a: ContactAdminArgs) {
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
 
   return getResend().emails.send({
-    from: from(),
-    to: requireEnv("ADMIN_EMAIL"),
+    from: await mailFrom(),
+    to: await adminInbox(),
     replyTo: a.email,
     subject,
     text,
@@ -205,8 +219,8 @@ export async function sendEmployeeRequestAdminNotification(
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
 
   return getResend().emails.send({
-    from: from(),
-    to: requireEnv("ADMIN_EMAIL"),
+    from: await mailFrom(),
+    to: await adminInbox(),
     replyTo: a.submittedByEmail,
     subject,
     text,
@@ -225,7 +239,7 @@ export async function sendContactConfirmation(a: ContactConfirmationArgs) {
     `Hälsningar,\nHappysent-teamet`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -246,11 +260,11 @@ export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
     `Era anställda är nu registrerade i vårt system.\n` +
     `Ni behöver inte göra någonting – vi sköter allt.\n` +
     `Tårtan levereras automatiskt på rätt dag.\n\n` +
-    `Hör av er om ni har frågor på ${requireEnv("ADMIN_EMAIL")}\n\n` +
+    `Hör av er om ni har frågor på ${await adminInbox()}\n\n` +
     `Hälsningar,\nHappysent-teamet`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -281,7 +295,7 @@ export async function sendEmployeeAdditionsDigest(a: EmployeeAdditionsDigestArgs
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
+    from: await mailFrom(),
     to: a.to,
     subject,
     text,
@@ -319,8 +333,8 @@ export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
-    from: from(),
-    to: requireEnv("ADMIN_EMAIL"),
+    from: await mailFrom(),
+    to: await adminInbox(),
     subject,
     text,
   });
@@ -341,8 +355,8 @@ export async function sendSystemErrorEmail(a: SystemErrorArgs) {
     `Kontrollera admin-panelen för mer information.`;
 
   return getResend().emails.send({
-    from: from(),
-    to: requireEnv("ADMIN_EMAIL"),
+    from: await mailFrom(),
+    to: await adminInbox(),
     subject,
     text,
   });

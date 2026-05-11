@@ -1,12 +1,11 @@
 import Link from "next/link";
 
 import { PageHeader } from "@/components/admin/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
-import { formatSek } from "@/lib/utils";
+
+import { CompaniesTable, type CompanyTableRow } from "./companies-table";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +18,28 @@ export default async function ForetagPage() {
     )
     .order("created_at", { ascending: false });
 
+  const rows: CompanyTableRow[] = (companies ?? []).map((c) => {
+    const bakeryName = (c.bakeries as { name: string } | null)?.name ?? "—";
+    return {
+      id: c.id,
+      name: c.name,
+      city: c.city,
+      bakeryName,
+      contact_email: c.contact_email,
+      price_per_cake: c.price_per_cake,
+      status: c.status as "active" | "paused",
+    };
+  });
+
   return (
     <div>
       <PageHeader
         title="Företag"
         description="Företagen som vi levererar tårtor till."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Företag" },
+        ]}
         action={
           <Link href="/admin/foretag/nytt">
             <Button>Nytt företag</Button>
@@ -42,44 +58,7 @@ export default async function ForetagPage() {
           }
         />
       ) : (
-        <Table>
-          <THead>
-            <TR>
-              <TH>Namn</TH>
-              <TH>Stad</TH>
-              <TH>Bageri</TH>
-              <TH>Kontakt</TH>
-              <TH>Pris/tårta</TH>
-              <TH>Status</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {companies.map((c) => {
-              const bakeryName = (c.bakeries as { name: string } | null)?.name;
-              return (
-                <TR key={c.id}>
-                  <TD className="font-medium text-slate-900">
-                    <Link
-                      href={`/admin/foretag/${c.id}`}
-                      className="hover:underline"
-                    >
-                      {c.name}
-                    </Link>
-                  </TD>
-                  <TD>{c.city}</TD>
-                  <TD>{bakeryName ?? "—"}</TD>
-                  <TD>{c.contact_email}</TD>
-                  <TD>{formatSek(c.price_per_cake)}</TD>
-                  <TD>
-                    <Badge tone={c.status === "active" ? "success" : "warning"}>
-                      {c.status === "active" ? "Aktivt" : "Pausat"}
-                    </Badge>
-                  </TD>
-                </TR>
-              );
-            })}
-          </TBody>
-        </Table>
+        <CompaniesTable rows={rows} />
       )}
     </div>
   );
