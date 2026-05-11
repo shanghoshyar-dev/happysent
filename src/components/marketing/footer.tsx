@@ -11,8 +11,11 @@ export function MarketingFooter() {
           </span>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
-          <Link href="/om" className="hover:text-candy-600">
+          <Link href="/om-oss" className="hover:text-candy-600">
             Om oss
+          </Link>
+          <Link href="/hur-det-fungerar" className="hover:text-candy-600">
+            Hur det fungerar
           </Link>
           <Link href="/priser" className="hover:text-candy-600">
             Priser
@@ -22,6 +25,9 @@ export function MarketingFooter() {
           </Link>
           <Link href="/kontakt" className="hover:text-candy-600">
             Kontakt
+          </Link>
+          <Link href="/integritetspolicy" className="hover:text-candy-600">
+            Integritetspolicy
           </Link>
           <Link href="/login" className="hover:text-candy-600">
             Logga in

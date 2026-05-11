@@ -135,3 +135,94 @@ export async function sendDayOfCompany(a: DayOfCompanyArgs) {
     text,
   });
 }
+
+// ---------- Public marketing site forms ----------
+
+// 5a) Contact form — admin notification (general inquiry)
+export interface ContactAdminArgs {
+  name: string;
+  company: string;
+  email: string;
+  message: string;
+}
+export async function sendContactAdminNotification(a: ContactAdminArgs) {
+  const subject = `Nytt kontaktmeddelande från ${a.name} (${a.company})`;
+  const text =
+    `Ny förfrågan via happysent.se/kontakt:\n\n` +
+    `Namn:     ${a.name}\n` +
+    `Företag:  ${a.company}\n` +
+    `Mejl:     ${a.email}\n\n` +
+    `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: requireEnv("ADMIN_EMAIL"),
+    replyTo: a.email,
+    subject,
+    text,
+  });
+}
+
+// 5b) Employee add/remove request — admin notification
+export interface EmployeeRequestAdminArgs {
+  action: "add" | "remove";
+  companyName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  employeeFirstName: string;
+  employeeLastName: string;
+  birthday: string | null;
+  numberOfPeople: number | null;
+  message: string;
+  submittedByEmail: string;
+}
+export async function sendEmployeeRequestAdminNotification(
+  a: EmployeeRequestAdminArgs,
+) {
+  const actionLabel = a.action === "add" ? "Lägg till anställd" : "Ta bort anställd";
+  const subject = `${actionLabel}: ${a.employeeFirstName} ${a.employeeLastName} (${a.companyName})`;
+  const extraFields =
+    a.action === "add"
+      ? `Födelsedag:       ${a.birthday ?? "(saknas)"}\n` +
+        `Antal personer:   ${a.numberOfPeople ?? "(saknas)"}\n`
+      : "";
+  const text =
+    `Ny ${actionLabel.toLowerCase()}-förfrågan via happysent.se/kontakt:\n\n` +
+    `Företag:          ${a.companyName}\n` +
+    `Adress:           ${a.address}\n` +
+    `Postnummer:       ${a.postalCode}\n` +
+    `Ort:              ${a.city}\n\n` +
+    `Anställd:         ${a.employeeFirstName} ${a.employeeLastName}\n` +
+    extraFields +
+    `\nAvsändarens mejl: ${a.submittedByEmail}\n\n` +
+    `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: requireEnv("ADMIN_EMAIL"),
+    replyTo: a.submittedByEmail,
+    subject,
+    text,
+  });
+}
+
+// 5c) Confirmation back to the person who submitted any form
+export interface ContactConfirmationArgs {
+  to: string;
+  name: string;
+}
+export async function sendContactConfirmation(a: ContactConfirmationArgs) {
+  const subject = `Tack för ditt meddelande – Happysent`;
+  const text =
+    `Hej ${a.name}!\n\n` +
+    `Vi har tagit emot ditt meddelande och återkommer inom en arbetsdag.\n\n` +
+    `Hälsningar,\nHappysent-teamet`;
+
+  return getResend().emails.send({
+    from: from(),
+    to: a.to,
+    subject,
+    text,
+  });
+}

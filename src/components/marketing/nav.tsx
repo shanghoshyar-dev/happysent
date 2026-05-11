@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { href: "/om", label: "Om oss" },
+  { href: "/om-oss", label: "Om oss" },
+  { href: "/hur-det-fungerar", label: "Hur det fungerar" },
   { href: "/priser", label: "Priser" },
   { href: "/blogg", label: "Blogg" },
   { href: "/kontakt", label: "Kontakt" },
