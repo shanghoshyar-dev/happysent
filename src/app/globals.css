@@ -69,4 +69,45 @@ body {
       will-change: auto;
     }
   }
+
+  /**
+   * Smalt synligt fönster (~3–4 loggor) + gradientmask = “tunnel” in/ut.
+   */
+  .trusted-by-marquee-window {
+    margin-inline: auto;
+    width: 100%;
+    max-width: min(34rem, 90vw);
+    min-width: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 14%,
+      black 86%,
+      transparent 100%
+    );
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+  }
+
+  @media (min-width: 768px) {
+    .trusted-by-marquee-window {
+      max-width: min(46rem, 78vw);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .trusted-by-marquee-window {
+      max-width: min(52rem, 62vw);
+    }
+  }
 }

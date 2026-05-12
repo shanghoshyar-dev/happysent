@@ -40,33 +40,31 @@ export function TrustedBy() {
         </p>
       </div>
 
-      {/* Avgränsad vyport — förhindrar att den breda marqueen driver horisontell scroll */}
-      <div
-        className="relative mx-auto mt-10 w-full max-w-full min-w-0 overflow-hidden px-0"
-        aria-hidden
-      >
-        <div className="trusted-by-marquee-track flex w-max flex-nowrap">
-          {marqueeLogos.map((logo, i) => (
-            <div
-              key={`${logo.src}-${i}`}
-              className="relative shrink-0 px-6 md:px-10"
-            >
-              <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
-                <Image
-                  src={logo.src}
-                  alt=""
-                  fill
-                  sizes="176px"
-                  className={cn(
-                    "object-contain",
-                    "knockOutWhiteBg" in logo &&
-                      logo.knockOutWhiteBg &&
-                      "mix-blend-multiply",
-                  )}
-                />
+      <div className="mx-auto mt-10 flex w-full justify-center px-4">
+        <div className="trusted-by-marquee-window relative" aria-hidden>
+          <div className="trusted-by-marquee-track flex w-max flex-nowrap">
+            {marqueeLogos.map((logo, i) => (
+              <div
+                key={`${logo.src}-${i}`}
+                className="relative shrink-0 px-6 md:px-10"
+              >
+                <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
+                  <Image
+                    src={logo.src}
+                    alt=""
+                    fill
+                    sizes="176px"
+                    className={cn(
+                      "object-contain",
+                      "knockOutWhiteBg" in logo &&
+                        logo.knockOutWhiteBg &&
+                        "mix-blend-multiply",
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
