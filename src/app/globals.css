@@ -47,17 +47,18 @@ body {
   color: #d54e30;
 }
 
-/* Logo marquee — egen klass så animationen inte kan tappas av purge/specificity */
-@layer utilities {
-  @keyframes trusted-by-marquee {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(-50%, 0, 0);
-    }
+/* Marquee: keyframes på rotnivå — i @layer utilities kan vissa PostCSS/Tailwind-byggen äta upp dem */
+@keyframes trusted-by-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
   }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
 
+/* Logo marquee — utilities som refererar keyframes ovan */
+@layer utilities {
   .trusted-by-marquee-track {
     animation: trusted-by-marquee 32s linear infinite;
     will-change: transform;
@@ -79,19 +80,20 @@ body {
     max-width: min(34rem, 90vw);
     min-width: 0;
     overflow: hidden;
+    /* rgba(0,0,0,0) istället för transparent — Safari interpolerar mask-gradient säkrare */
     mask-image: linear-gradient(
       to right,
-      transparent 0%,
-      black 14%,
-      black 86%,
-      transparent 100%
+      rgba(0, 0, 0, 0) 0%,
+      #000 14%,
+      #000 86%,
+      rgba(0, 0, 0, 0) 100%
     );
     -webkit-mask-image: linear-gradient(
       to right,
-      transparent 0%,
-      black 14%,
-      black 86%,
-      transparent 100%
+      rgba(0, 0, 0, 0) 0%,
+      #000 14%,
+      #000 86%,
+      rgba(0, 0, 0, 0) 100%
     );
     mask-size: 100% 100%;
     -webkit-mask-size: 100% 100%;

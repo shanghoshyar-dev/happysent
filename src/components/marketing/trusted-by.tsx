@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { cn } from "@/lib/utils";
-
 const logos = [
   {
     src: "/marketing/logos/crisha.png",
@@ -49,18 +47,29 @@ export function TrustedBy() {
                 className="relative shrink-0 px-6 md:px-10"
               >
                 <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
-                  <Image
-                    src={logo.src}
-                    alt=""
-                    fill
-                    sizes="176px"
-                    className={cn(
-                      "object-contain",
-                      "knockOutWhiteBg" in logo &&
-                        logo.knockOutWhiteBg &&
-                        "mix-blend-multiply",
-                    )}
-                  />
+                  {"knockOutWhiteBg" in logo && logo.knockOutWhiteBg ? (
+                    <>
+                      <div
+                        className="pointer-events-none absolute inset-0 bg-candy-gradient"
+                        aria-hidden
+                      />
+                      <Image
+                        src={logo.src}
+                        alt=""
+                        fill
+                        sizes="176px"
+                        className="z-[1] object-contain mix-blend-multiply"
+                      />
+                    </>
+                  ) : (
+                    <Image
+                      src={logo.src}
+                      alt=""
+                      fill
+                      sizes="176px"
+                      className="object-contain"
+                    />
+                  )}
                 </div>
               </div>
             ))}
