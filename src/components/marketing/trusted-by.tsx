@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { cn } from "@/lib/utils";
+
 const logos = [
   {
     src: "/marketing/logos/crisha.png",
@@ -12,14 +14,19 @@ const logos = [
   {
     src: "/marketing/logos/shang-taxi.png",
     alt: "Shang Taxi",
+    /** Vit bakgrund i PNG — multiply låter den smälta in i ljus gradient */
+    knockOutWhiteBg: true,
   },
 ] as const;
+
+/** Dubbel lista så `translate3d(-50%,0,0)` loopar sömlöst. */
+const marqueeLogos = [...logos, ...logos];
 
 export function TrustedBy() {
   return (
     <section
       aria-labelledby="trusted-by-heading"
-      className="border-t border-candy-100/60 bg-cream-50 py-14"
+      className="relative w-full min-w-0 overflow-x-clip border-t border-candy-100/60 bg-candy-gradient py-14"
     >
       <div className="mx-auto max-w-6xl px-6">
         <h2
@@ -28,23 +35,39 @@ export function TrustedBy() {
         >
           Kunder vi jobbar med
         </h2>
-        <ul className="mt-10 flex list-none flex-wrap items-center justify-center gap-6 p-0 md:gap-10">
-          {logos.map((logo) => (
-            <li key={logo.src}>
-              <div className="rounded-xl bg-white px-5 py-3 shadow-sm ring-1 ring-slate-200/70">
-                <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
-                  <Image
-                    src={logo.src}
-                    alt={logo.alt}
-                    fill
-                    sizes="176px"
-                    className="object-contain"
-                  />
-                </div>
+        <p className="sr-only">
+          Samarbetspartners: {logos.map((l) => l.alt).join(", ")}.
+        </p>
+      </div>
+
+      {/* Avgränsad vyport — förhindrar att den breda marqueen driver horisontell scroll */}
+      <div
+        className="relative mx-auto mt-10 w-full max-w-full min-w-0 overflow-hidden px-0"
+        aria-hidden
+      >
+        <div className="trusted-by-marquee-track flex w-max flex-nowrap">
+          {marqueeLogos.map((logo, i) => (
+            <div
+              key={`${logo.src}-${i}`}
+              className="relative shrink-0 px-6 md:px-10"
+            >
+              <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
+                <Image
+                  src={logo.src}
+                  alt=""
+                  fill
+                  sizes="176px"
+                  className={cn(
+                    "object-contain",
+                    "knockOutWhiteBg" in logo &&
+                      logo.knockOutWhiteBg &&
+                      "mix-blend-multiply",
+                  )}
+                />
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );

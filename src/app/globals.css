@@ -46,3 +46,27 @@ body {
 .prose-happysent a:hover {
   color: #d54e30;
 }
+
+/* Logo marquee — egen klass så animationen inte kan tappas av purge/specificity */
+@layer utilities {
+  @keyframes trusted-by-marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .trusted-by-marquee-track {
+    animation: trusted-by-marquee 32s linear infinite;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trusted-by-marquee-track {
+      animation: none;
+      will-change: auto;
+    }
+  }
+}
