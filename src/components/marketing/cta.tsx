@@ -17,7 +17,7 @@ export function CtaBlock() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/kontakt">
               <Button variant="secondary" size="lg">
-                Boka demo
+                Kom igång
               </Button>
             </Link>
             <Link href="/priser">

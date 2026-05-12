@@ -11,9 +11,9 @@ export const config = {
     /*
      * Match all request paths except:
      * - _next/static, _next/image, favicon.ico
-     * - public assets (svg, png, jpg, jpeg, gif, webp)
+     * - public assets (svg, png, jpg, jpeg, gif, webp, avif)
      * - /api/cron/* (cron uses its own CRON_SECRET auth)
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif)$).*)",
   ],
 };

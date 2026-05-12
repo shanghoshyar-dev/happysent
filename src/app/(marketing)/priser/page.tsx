@@ -23,7 +23,7 @@ const tiers = [
       "Automatiska påminnelser",
       "Månadsfaktura",
     ],
-    cta: "Boka demo",
+    cta: "Kom igång",
     highlighted: false,
   },
   {
@@ -36,7 +36,7 @@ const tiers = [
       "Anpassningsbart prissteg",
       "Månadsfaktura",
     ],
-    cta: "Boka demo",
+    cta: "Kom igång",
     highlighted: true,
   },
   {

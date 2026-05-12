@@ -1,5 +1,9 @@
 import type { Config } from "tailwindcss";
 
+/** Hero/marketing section gradient (cream → blush pink). */
+const marketingHeroGradient =
+  "linear-gradient(135deg, #FDF6EC 0%, #fef4f1 45%, #fde8e2 100%)";
+
 const config: Config = {
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -69,8 +73,9 @@ const config: Config = {
         soft: "0 10px 30px -12px rgba(232, 96, 60, 0.22)",
       },
       backgroundImage: {
-        "brand-gradient":
-          "linear-gradient(135deg, #FDF6EC 0%, #fef4f1 45%, #fde8e2 100%)",
+        "brand-gradient": marketingHeroGradient,
+        /** Alias — components use `bg-candy-gradient` */
+        "candy-gradient": marketingHeroGradient,
       },
       transitionDuration: {
         DEFAULT: "200ms",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
@@ -77,6 +78,16 @@ const faqs = [
 ];
 
 export default function HurDetFungerarPage() {
+  const [
+    firstStep,
+    secondStep,
+    thirdStep,
+    fourthStep,
+    fifthStep,
+    sixthStep,
+    lastStep,
+  ] = steps;
+
   return (
     <>
       <section className="py-20">
@@ -92,26 +103,191 @@ export default function HurDetFungerarPage() {
       </section>
 
       <section className="pb-24">
-        <div className="mx-auto max-w-3xl px-6">
+        <div className="mx-auto max-w-5xl px-6">
           <ol className="space-y-6">
-            {steps.map((s) => (
-              <li
-                key={s.n}
-                className="flex gap-6 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-candy-100"
-              >
-                <span className="font-display text-4xl text-candy-300">
-                  {s.n}
-                </span>
-                <div>
-                  <h2 className="text-xl font-semibold text-slate-900">
-                    {s.title}
-                  </h2>
-                  <p className="mt-2 leading-relaxed text-slate-600">
-                    {s.body}
-                  </p>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step1.avif"
+                    alt="Kontaktadministratör som skickar in medarbetarlista till Happysent på kontoret"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
                 </div>
-              </li>
-            ))}
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {firstStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {firstStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {firstStep.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {secondStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {secondStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {secondStep.body}
+                    </p>
+                  </div>
+                </div>
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step2.avif"
+                    alt="Bagare dekorerar en tvåvånings födelsedagstårta i ett lokalt bageri"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step3.avif"
+                    alt="Mobil på skrivbord som visar mejl med bekräftelse att födelsedagstårta är bokad två veckor innan"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {thirdStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {thirdStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {thirdStep.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {fourthStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {fourthStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {fourthStep.body}
+                    </p>
+                  </div>
+                </div>
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step4.png"
+                    alt="Bagare i bageri som tar emot och läser en Happysent-beställning på surfplatta"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step5.avif"
+                    alt="Person på kontoret som läser en påminnelse på mobilen om att tårtleverans sker nästa dag"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {fifthStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {fifthStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {fifthStep.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {sixthStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {sixthStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {sixthStep.body}
+                    </p>
+                  </div>
+                </div>
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step6.avif"
+                    alt="Kollegor firar födelsedag med tårta på kontoret"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            </li>
+            <li className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-candy-100">
+              <div className="grid md:grid-cols-2 md:items-stretch">
+                <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
+                  <Image
+                    src="/marketing/how-it-works-step7.avif"
+                    alt="Ekonomiansvarig som granskar månadens Happysent-faktura på laptop på kontoret"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="flex gap-6 p-8">
+                  <span className="shrink-0 font-display text-4xl text-candy-300">
+                    {lastStep.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                      {lastStep.title}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-slate-600">
+                      {lastStep.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
           </ol>
         </div>
       </section>

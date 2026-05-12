@@ -23,7 +23,7 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-cream-50">
       <AdminSidebar />
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopBar email={user.email} />
         <main className="flex-1 px-6 py-8">{children}</main>
       </div>
