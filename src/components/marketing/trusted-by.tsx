@@ -10,10 +10,8 @@ const logos = [
     alt: "Carpathian Marketing Agency",
   },
   {
-    src: "/marketing/logos/shang-taxi.png",
+    src: "/marketing/logos/shang-taxi.svg",
     alt: "Shang Taxi",
-    /** Vit bakgrund i PNG — multiply låter den smälta in i ljus gradient */
-    knockOutWhiteBg: true,
   },
 ] as const;
 
@@ -47,29 +45,13 @@ export function TrustedBy() {
                 className="relative shrink-0 px-6 md:px-10"
               >
                 <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
-                  {"knockOutWhiteBg" in logo && logo.knockOutWhiteBg ? (
-                    <>
-                      <div
-                        className="pointer-events-none absolute inset-0 bg-candy-gradient"
-                        aria-hidden
-                      />
-                      <Image
-                        src={logo.src}
-                        alt=""
-                        fill
-                        sizes="176px"
-                        className="z-[1] object-contain mix-blend-multiply"
-                      />
-                    </>
-                  ) : (
-                    <Image
-                      src={logo.src}
-                      alt=""
-                      fill
-                      sizes="176px"
-                      className="object-contain"
-                    />
-                  )}
+                  <Image
+                    src={logo.src}
+                    alt=""
+                    fill
+                    sizes="176px"
+                    className="object-contain"
+                  />
                 </div>
               </div>
             ))}
