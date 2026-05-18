@@ -124,6 +124,22 @@ export function CompanyForm({
         />
       </div>
       <div>
+        <Label htmlFor="contact_phone">Kontaktperson telefon</Label>
+        <Input
+          id="contact_phone"
+          name="contact_phone"
+          type="tel"
+          autoComplete="tel"
+          inputMode="tel"
+          placeholder="t.ex. 070-123 45 67"
+          defaultValue={company?.contact_phone ?? pre?.contactPhone ?? ""}
+        />
+        <p className="mt-1 text-xs text-slate-500">
+          Ringnummer till kontakt på mottagande företag — ingår i beställningsmejlet till
+          bageriet en vecka före leverans.
+        </p>
+      </div>
+      <div>
         <Label htmlFor="billing_email">Faktura-mail</Label>
         <Input
           id="billing_email"

@@ -157,6 +157,7 @@ export type Database = {
           city: string;
           contact_email: string;
           billing_email: string;
+          contact_phone: string | null;
           bakery_id: string;
           offers_flowers: boolean;
           florist_id: string | null;
@@ -171,6 +172,7 @@ export type Database = {
           city: string;
           contact_email: string;
           billing_email: string;
+          contact_phone?: string | null;
           bakery_id: string;
           offers_flowers?: boolean;
           florist_id?: string | null;
@@ -185,6 +187,7 @@ export type Database = {
           city?: string;
           contact_email?: string;
           billing_email?: string;
+          contact_phone?: string | null;
           bakery_id?: string;
           offers_flowers?: boolean;
           florist_id?: string | null;

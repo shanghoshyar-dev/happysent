@@ -9,6 +9,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendCompanyWelcome } from "@/lib/resend/templates";
 
+function parseContactPhone(formData: FormData): string | null {
+  const t = String(formData.get("contact_phone") ?? "").trim();
+  return t ? t : null;
+}
+
 function parseFlowerPartnerFields(formData: FormData): {
   offers_flowers: boolean;
   florist_id: string | null;
@@ -54,6 +59,7 @@ export async function createCompany(formData: FormData) {
     city: String(formData.get("city") ?? "").trim(),
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
+    contact_phone: parseContactPhone(formData),
     bakery_id: String(formData.get("bakery_id") ?? ""),
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,
@@ -151,6 +157,7 @@ export async function updateCompany(id: string, formData: FormData) {
     city: String(formData.get("city") ?? "").trim(),
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
+    contact_phone: parseContactPhone(formData),
     bakery_id: String(formData.get("bakery_id") ?? ""),
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,

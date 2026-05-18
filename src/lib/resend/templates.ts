@@ -66,6 +66,7 @@ export interface SevenDayBakeryArgs {
   companyName: string;
   companyAddress: string;
   companyCity?: string | null;
+  contactPhone?: string | null;
   employeeFirstName: string;
   employeeLastName: string;
   deliveryDate: string;
@@ -76,12 +77,16 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
   const deliveryAddress = a.companyCity
     ? `${a.companyAddress}, ${a.companyCity}`
     : a.companyAddress;
+  const contactTel = a.contactPhone?.trim()
+    ? a.contactPhone.trim()
+    : "(saknas i kundregistret — kontakta Happysent vid leveransfrågor)";
   const text =
     `Hej ${a.bakeryName}!\n\n` +
     `Vi bekräftar följande beställning:\n\n` +
     `Kund:             ${a.employeeFirstName} ${a.employeeLastName} fyller år den ${formatSwedishDate(a.deliveryDate)}\n` +
     `Företag:          ${a.companyName}\n` +
     `Leveransadress:   ${deliveryAddress}\n` +
+    `Kontakt telefon:  ${contactTel}\n` +
     `Antal personer:   ${a.numberOfPeople}\n` +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
     `Skicka faktura till: ${await adminInbox()}\n\n` +
