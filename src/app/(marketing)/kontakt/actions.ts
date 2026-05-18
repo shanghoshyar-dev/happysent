@@ -10,6 +10,7 @@ import {
   sendContactConfirmation,
   sendEmployeeRequestAdminNotification,
 } from "@/lib/resend/templates";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ContactState =
   | { status: "idle" }
@@ -64,6 +65,21 @@ export async function submitContactForm(
   }
 
   try {
+    try {
+      const admin = createAdminClient();
+      const { error: qErr } = await admin.from("company_applications").insert({
+        contact_name: name,
+        company_name: company,
+        contact_email: email,
+        message: message || null,
+      });
+      if (qErr) {
+        console.error("[submitContactForm] kö-rad misslyckades:", qErr.message);
+      }
+    } catch (e) {
+      console.error("[submitContactForm] kö-rad oväntat fel:", e);
+    }
+
     await sendContactAdminNotification({ name, company, email, message });
     await sendContactConfirmation({ to: email, name });
     return { status: "success" };

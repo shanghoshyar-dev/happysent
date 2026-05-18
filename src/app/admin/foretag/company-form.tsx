@@ -4,13 +4,21 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import type { Tables } from "@/types/database";
 
-interface CompanyFormProps {
+export interface CompanyFormProps {
   bakeries: Pick<Tables<"bakeries">, "id" | "name" | "city">[];
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
   /** Used when creating a new company (no `company` row yet). */
   defaultPricePerCake?: number;
+  /** När ett företag godkänns från kön på /admin/foretag */
+  applicationPrefill?: {
+    applicationId: string;
+    companyName: string;
+    contactEmail: string;
+    contactName: string;
+    message: string | null;
+  };
 }
 
 export function CompanyForm({
@@ -19,12 +27,22 @@ export function CompanyForm({
   action,
   submitLabel,
   defaultPricePerCake,
+  applicationPrefill,
 }: CompanyFormProps) {
+  const pre = applicationPrefill;
   return (
     <form action={action} className="grid gap-5 md:grid-cols-2">
+      {pre ? (
+        <input type="hidden" name="application_id" value={pre.applicationId} />
+      ) : null}
       <div className="md:col-span-2">
         <Label htmlFor="name">Företagsnamn</Label>
-        <Input id="name" name="name" required defaultValue={company?.name} />
+        <Input
+          id="name"
+          name="name"
+          required
+          defaultValue={company?.name ?? pre?.companyName}
+        />
       </div>
       <div className="md:col-span-2">
         <Label htmlFor="address">Adress</Label>
@@ -64,7 +82,9 @@ export function CompanyForm({
           name="contact_email"
           type="email"
           required
-          defaultValue={company?.contact_email}
+          defaultValue={
+            company?.contact_email ?? pre?.contactEmail
+          }
         />
       </div>
       <div>
@@ -74,7 +94,9 @@ export function CompanyForm({
           name="billing_email"
           type="email"
           required
-          defaultValue={company?.billing_email}
+          defaultValue={
+            company?.billing_email ?? pre?.contactEmail
+          }
         />
       </div>
       <div>

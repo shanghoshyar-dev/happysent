@@ -160,6 +160,50 @@ export type Database = {
           },
         ];
       };
+      company_applications: {
+        Row: {
+          id: string;
+          contact_name: string;
+          company_name: string;
+          contact_email: string;
+          message: string | null;
+          status: "pending" | "approved" | "rejected";
+          processed_at: string | null;
+          created_company_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          contact_name: string;
+          company_name: string;
+          contact_email: string;
+          message?: string | null;
+          status?: "pending" | "approved" | "rejected";
+          processed_at?: string | null;
+          created_company_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          contact_name?: string;
+          company_name?: string;
+          contact_email?: string;
+          message?: string | null;
+          status?: "pending" | "approved" | "rejected";
+          processed_at?: string | null;
+          created_company_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_applications_created_company_id_fkey";
+            columns: ["created_company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       employees: {
         Row: {
           id: string;

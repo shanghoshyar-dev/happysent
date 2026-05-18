@@ -8,6 +8,23 @@ import { sendCompanyWelcome } from "@/lib/resend/templates";
 
 export async function createCompany(formData: FormData) {
   const supabase = createClient();
+  const applicationId = String(formData.get("application_id") ?? "").trim();
+
+  if (applicationId) {
+    const { data: pending, error: pendErr } = await supabase
+      .from("company_applications")
+      .select("id")
+      .eq("id", applicationId)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (pendErr) throw new Error(pendErr.message);
+    if (!pending) {
+      throw new Error(
+        "Förfrågan finns inte eller är redan hanterad. Uppdatera sidan.",
+      );
+    }
+  }
+
   const payload = {
     name: String(formData.get("name") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
@@ -18,8 +35,27 @@ export async function createCompany(formData: FormData) {
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
-  const { error } = await supabase.from("companies").insert(payload);
+  const { data: created, error } = await supabase
+    .from("companies")
+    .insert(payload)
+    .select("id")
+    .single();
   if (error) throw new Error(error.message);
+
+  if (applicationId && created?.id) {
+    const { error: upErr } = await supabase
+      .from("company_applications")
+      .update({
+        status: "approved",
+        processed_at: new Date().toISOString(),
+        created_company_id: created.id,
+      })
+      .eq("id", applicationId)
+      .eq("status", "pending");
+    if (upErr) {
+      console.error("[createCompany] kunde inte markera ansökan godkänd:", upErr);
+    }
+  }
 
   // Fire-and-forget welcome email — don't block the redirect if it fails.
   if (payload.contact_email) {
