@@ -107,7 +107,7 @@ function parseEmployeeRowsFromFormData(formData: FormData):
 /** Måste matcha default i migration `terms_document_version`. */
 const TERMS_DOCUMENT_VERSION = "May 2026";
 
-/** När DB inte har alla kolumner (migration inte körd) — PostgREST/Postgres feltext. */
+/** PostgREST/Postgres vid saknad kolumn. */
 function isLikelyMissingColumnError(error: {
   message?: string;
   code?: string;
@@ -123,17 +123,21 @@ function isLikelyMissingColumnError(error: {
   );
 }
 
-function messagePrefixedWithPhone(message: string, phone: string): string {
-  const phoneLine = `Telefon: ${phone}`;
-  const trimmed = message.trim();
-  return trimmed ? `${phoneLine}\n\n${trimmed}` : phoneLine;
+function errorMentionsTermsColumns(error: { message?: string }): boolean {
+  const m = (error.message ?? "").toLowerCase();
+  return m.includes("terms_accepted_at") || m.includes("terms_document_version");
+}
+
+function errorMentionsContactPhone(error: { message?: string }): boolean {
+  const m = (error.message ?? "").toLowerCase();
+  return m.includes("contact_phone");
 }
 
 /**
- * Försök full rad (telefon + villkor), sedan utan contact_phone (telefon i message),
- * sedan äldsta tabellen utan villkorskolumner i payload.
+ * Telefon ska alltid ligga i kolumnen contact_phone — aldrig gömd i message.
+ * Om villkorskolumner saknas i DB kan vi spara utan dem (migration pending).
  */
-async function insertCompanyApplicationBestEffort(
+async function insertCompanyApplicationRow(
   admin: ReturnType<typeof createAdminClient>,
   row: {
     name: string;
@@ -144,57 +148,47 @@ async function insertCompanyApplicationBestEffort(
   },
 ): Promise<{ ok: true } | { ok: false; error: { message: string; code?: string } }> {
   const baseMessage = row.message.trim() === "" ? null : row.message.trim();
-  const messageWithPhone = messagePrefixedWithPhone(row.message, row.phone);
 
-  const payloads: Record<string, unknown>[] = [
-    {
+  const fullPayload = {
+    contact_name: row.name,
+    company_name: row.company,
+    contact_email: row.email,
+    contact_phone: row.phone,
+    message: baseMessage,
+    terms_accepted_at: new Date().toISOString(),
+    terms_document_version: TERMS_DOCUMENT_VERSION,
+  };
+
+  const { error: fullErr } = await admin
+    .from("company_applications")
+    .insert(fullPayload as never);
+
+  if (!fullErr) return { ok: true };
+
+  const retryWithoutTerms =
+    isLikelyMissingColumnError(fullErr) &&
+    errorMentionsTermsColumns(fullErr) &&
+    !errorMentionsContactPhone(fullErr);
+
+  if (retryWithoutTerms) {
+    console.warn(
+      "[submitContactForm] villkorskolumner saknas — sparar med telefon i contact_phone men utan terms-fält. Kör migration company_applications_terms.",
+    );
+    const slimPayload = {
       contact_name: row.name,
       company_name: row.company,
       contact_email: row.email,
       contact_phone: row.phone,
       message: baseMessage,
-      terms_accepted_at: new Date().toISOString(),
-      terms_document_version: TERMS_DOCUMENT_VERSION,
-    },
-    {
-      contact_name: row.name,
-      company_name: row.company,
-      contact_email: row.email,
-      message: messageWithPhone,
-      terms_accepted_at: new Date().toISOString(),
-      terms_document_version: TERMS_DOCUMENT_VERSION,
-    },
-    {
-      contact_name: row.name,
-      company_name: row.company,
-      contact_email: row.email,
-      message: messageWithPhone,
-    },
-  ];
-
-  let lastErr: { message: string; code?: string } | null = null;
-
-  for (let i = 0; i < payloads.length; i++) {
-    const { error } = await admin
+    };
+    const { error: slimErr } = await admin
       .from("company_applications")
-      .insert(payloads[i] as never);
-    if (!error) {
-      if (i > 0) {
-        console.warn(
-          "[submitContactForm] körad sparad med bakåtkompatibel payload — kör pending migration(er) mot Supabase (contact_phone / terms).",
-        );
-      }
-      return { ok: true };
-    }
-    lastErr = error;
-    if (!isLikelyMissingColumnError(error)) break;
-    console.warn(
-      "[submitContactForm] insert misslyckades, provar enklare payload:",
-      error.message,
-    );
+      .insert(slimPayload as never);
+    if (!slimErr) return { ok: true };
+    return { ok: false, error: slimErr };
   }
 
-  return { ok: false, error: lastErr ?? { message: "Okänt fel" } };
+  return { ok: false, error: fullErr };
 }
 
 export async function submitContactForm(
@@ -251,7 +245,7 @@ export async function submitContactForm(
 
   try {
     const admin = createAdminClient();
-    const inserted = await insertCompanyApplicationBestEffort(admin, {
+    const inserted = await insertCompanyApplicationRow(admin, {
       name,
       company,
       email,
