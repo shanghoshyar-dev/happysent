@@ -32,11 +32,11 @@ export default async function BagerierPage() {
   return (
     <div>
       <PageHeader
-        title="Bagerier"
-        description="Leverantörer per stad: bagerier för tårtor och — nedan — blomsterbutiker när ni erbjuder blommor."
+        title="Bagerier / florist"
+        description="Leverantörer per stad: bagerier för tårtor och blomsterbutiker när ni erbjuder blommor."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
-          { label: "Bagerier" },
+          { label: "Bagerier / florist" },
         ]}
       />
 

@@ -35,12 +35,12 @@ export default async function FloristDetailPage({ params }: Props) {
         description="Redigera kontaktuppgifter för blomsterleverantören."
         action={
           <Link href="/admin/bagerier">
-            <Button variant="secondary">Tillbaka till bagerier</Button>
+            <Button variant="secondary">Tillbaka</Button>
           </Link>
         }
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
-          { label: "Bagerier", href: "/admin/bagerier" },
+          { label: "Bagerier / florist", href: "/admin/bagerier" },
           { label: florist.name },
         ]}
       />

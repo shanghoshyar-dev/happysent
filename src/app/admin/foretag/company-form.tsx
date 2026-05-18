@@ -91,7 +91,7 @@ export function CompanyForm({
             <span className="font-medium text-slate-900">Levererar blommor</span>
             <span className="mt-1 block text-slate-600">
               Obligatoriskt att välja blomsterbutik nedan. Partner finns under{" "}
-              <span className="font-medium text-slate-800">Bagerier</span>.
+              <span className="font-medium text-slate-800">Bagerier / florist</span>.
             </span>
           </span>
         </label>

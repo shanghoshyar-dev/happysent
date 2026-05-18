@@ -10,7 +10,11 @@ const items = [
   { href: "/admin/kolista", label: "Kölista", icon: "📋" },
   { href: "/admin/foretag", label: "Företag", icon: "🏢" },
   { href: "/admin/anstallda", label: "Anställda", icon: "🎂" },
-  { href: "/admin/bagerier", label: "Bagerier", icon: "🥐" },
+  {
+    href: "/admin/bagerier",
+    label: "Bagerier / florist",
+    icon: "🥐💐",
+  },
   { href: "/admin/bestallningar", label: "Beställningar", icon: "📦" },
   { href: "/admin/fakturor", label: "Fakturor", icon: "💳" },
   { href: "/admin/produkter", label: "Produkter", icon: "🧁" },
