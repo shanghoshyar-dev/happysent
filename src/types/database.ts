@@ -166,6 +166,7 @@ export type Database = {
           contact_name: string;
           company_name: string;
           contact_email: string;
+          contact_phone: string | null;
           message: string | null;
           status: "pending" | "approved" | "rejected";
           processed_at: string | null;
@@ -179,6 +180,7 @@ export type Database = {
           contact_name: string;
           company_name: string;
           contact_email: string;
+          contact_phone?: string | null;
           message?: string | null;
           status?: "pending" | "approved" | "rejected";
           processed_at?: string | null;
@@ -192,6 +194,7 @@ export type Database = {
           contact_name?: string;
           company_name?: string;
           contact_email?: string;
+          contact_phone?: string | null;
           message?: string | null;
           status?: "pending" | "approved" | "rejected";
           processed_at?: string | null;

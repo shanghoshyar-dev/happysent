@@ -16,6 +16,7 @@ export type ApplicationQueueRow = {
   contact_name: string;
   company_name: string;
   contact_email: string;
+  contact_phone: string | null;
   message: string | null;
   created_at: string;
   terms_accepted_at: string | null;
@@ -47,6 +48,7 @@ export function CompanyApplicationQueue({ rows }: Props) {
               <TH>Kontakt</TH>
               <TH>Företag</TH>
               <TH>Mejl</TH>
+              <TH>Telefon</TH>
               <TH>Meddelande</TH>
               <TH>Villkor</TH>
               <TH className="w-[1%] whitespace-nowrap">Åtgärder</TH>
@@ -67,6 +69,18 @@ export function CompanyApplicationQueue({ rows }: Props) {
                   >
                     {r.contact_email}
                   </a>
+                </TD>
+                <TD className="text-sm">
+                  {r.contact_phone?.trim() ? (
+                    <a
+                      href={`tel:${r.contact_phone.replace(/\s+/g, "")}`}
+                      className="text-coral-600 hover:underline"
+                    >
+                      {r.contact_phone}
+                    </a>
+                  ) : (
+                    <span className="text-slate-400">—</span>
+                  )}
                 </TD>
                 <TD
                   className="max-w-[14rem] truncate text-sm text-slate-600"

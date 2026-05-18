@@ -79,6 +79,21 @@ export function ContactForm({ className }: { className?: string }) {
             autoComplete="email"
           />
         </div>
+        <div>
+          <Label htmlFor="phone">Telefon</Label>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            required
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="t.ex. 070-123 45 67"
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            Så vi snabbt kan nå er vid frågor om er förfrågan.
+          </p>
+        </div>
         <div className="flex min-h-0 flex-1 flex-col gap-2">
           <Label htmlFor="message">Meddelande</Label>
           <Textarea

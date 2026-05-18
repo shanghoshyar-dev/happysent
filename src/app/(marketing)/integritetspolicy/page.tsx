@@ -47,8 +47,11 @@ export default function IntegritetspolicyPage() {
               bakery can bake and deliver to the correct person.
             </li>
             <li>
-              <strong>Date of birth</strong> (day and month; year is not
-              required) – so we know when to deliver the cake.
+              <strong>Date of birth</strong> – so we know when to deliver the
+              cake. When someone submits add/remove requests via our website,
+              we collect the full calendar date so we can tell employees apart
+              in confirmations; you do not need to enter a complete national ID
+              number.
             </li>
             <li>
               <strong>Delivery address</strong> – your workplace visit address.
@@ -58,16 +61,13 @@ export default function IntegritetspolicyPage() {
               order.
             </li>
             <li>
-              <strong>Birth date as six digits (YYMMDD)</strong> – only when
-              someone at your company submits an add/remove employee request via
-              our website (you do <em>not</em> need to provide a full national ID):
-              we use it to tell employees apart in the automated summary email to
-              your company&apos;s registered contact address. It is stored only
-              briefly in our technical queue until that confirmation is sent.
-            </li>
-            <li>
               <strong>Contact person&apos;s email</strong> at the customer
               company – for confirmations and invoices.
+            </li>
+            <li>
+              <strong>Phone number</strong> – when you reach out as a potential new
+              customer via our contact form, so we can call or message you about
+              your enquiry.
             </li>
           </ul>
         </section>

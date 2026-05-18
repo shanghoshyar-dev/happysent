@@ -35,7 +35,7 @@ export default async function NyttForetagPage({
   if (rawApplication) {
     const { data: app } = await supabase
       .from("company_applications")
-      .select("id, contact_name, company_name, contact_email, message")
+      .select("id, contact_name, company_name, contact_email, contact_phone, message")
       .eq("id", rawApplication)
       .eq("status", "pending")
       .maybeSingle();
@@ -45,6 +45,7 @@ export default async function NyttForetagPage({
         applicationId: app.id,
         companyName: app.company_name,
         contactEmail: app.contact_email,
+        contactPhone: app.contact_phone,
         contactName: app.contact_name,
         message: app.message,
       };
@@ -76,6 +77,18 @@ export default async function NyttForetagPage({
             >
               {applicationPrefill.contactEmail}
             </a>
+            {applicationPrefill.contactPhone?.trim() ? (
+              <>
+                {" "}
+                ·{" "}
+                <a
+                  href={`tel:${applicationPrefill.contactPhone.replace(/\s+/g, "")}`}
+                  className="font-medium text-coral-600 hover:underline"
+                >
+                  {applicationPrefill.contactPhone}
+                </a>
+              </>
+            ) : null}
           </p>
           {applicationPrefill.message?.trim() ? (
             <p className="mt-2 whitespace-pre-wrap rounded-lg bg-white/80 px-3 py-2 text-slate-600 ring-1 ring-candy-100/80">

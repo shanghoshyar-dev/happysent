@@ -13,6 +13,7 @@ import {
 import {
   appendEmployeeAddDigestEntries,
   findCompanyIdForContactMatch,
+  type DigestChangeEntry,
 } from "@/lib/cron/employee-add-digest";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -26,32 +27,81 @@ function getStr(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function getOptStr(formData: FormData, key: string): string | null {
-  const v = getStr(formData, key);
-  return v === "" ? null : v;
-}
-
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-/** Endast sex siffror ÅÅMMDD (t.ex. 971219 eller 97-12-19). */
-function extractSixDigitYYMMDD(raw: string): string | null {
+/** Minimikrav: tillräckligt många siffror för ett rimligt telefonnummer (även +46). */
+function isPlausiblePhone(raw: string): boolean {
   const digits = raw.replace(/\D/g, "");
-  return digits.length === 6 ? digits : null;
+  return digits.length >= 8 && digits.length <= 15;
 }
 
-function isValidYYMMDD(digits: string): boolean {
-  const yy = Number.parseInt(digits.slice(0, 2), 10);
-  const mm = Number.parseInt(digits.slice(2, 4), 10);
-  const dd = Number.parseInt(digits.slice(4, 6), 10);
-  const yyyy = yy >= 50 ? 1900 + yy : 2000 + yy;
-  const d = new Date(Date.UTC(yyyy, mm - 1, dd));
-  return (
-    d.getUTCFullYear() === yyyy &&
-    d.getUTCMonth() === mm - 1 &&
-    d.getUTCDate() === dd
-  );
+function parseIsoDateYYYYMMDD(iso: string): string | null {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  if (
+    dt.getUTCFullYear() !== y ||
+    dt.getUTCMonth() !== mo - 1 ||
+    dt.getUTCDate() !== d
+  ) {
+    return null;
+  }
+  return iso;
+}
+
+/** ÅÅMMDD för kö/digest (bakåtkompabilitet), härlett ur fullständigt datum. */
+function isoDateToYYMMDD(iso: string): string | null {
+  if (!parseIsoDateYYYYMMDD(iso)) return null;
+  const y = Number(iso.slice(0, 4));
+  const yy = String(y % 100).padStart(2, "0");
+  return `${yy}${iso.slice(5, 7)}${iso.slice(8, 10)}`;
+}
+
+function collectTrimmed(formData: FormData, key: string): string[] {
+  return formData.getAll(key).flatMap((v) => {
+    if (typeof v !== "string") return [];
+    const t = v.trim();
+    return t ? [t] : [];
+  });
+}
+
+function parseEmployeeRowsFromFormData(formData: FormData):
+  | { ok: true; rows: Array<{ first: string; last: string; birthday: string }> }
+  | { ok: false; message: string } {
+  const firsts = collectTrimmed(formData, "emp_first_name");
+  const lasts = collectTrimmed(formData, "emp_last_name");
+  const birthdays = collectTrimmed(formData, "emp_birthday");
+
+  if (firsts.length === 0) {
+    return {
+      ok: false,
+      message: "Lägg till minst en anställd med förnamn, efternamn och födelsedatum.",
+    };
+  }
+  if (firsts.length !== lasts.length || firsts.length !== birthdays.length) {
+    return {
+      ok: false,
+      message: "Varje anställd behöver förnamn, efternamn och födelsedatum.",
+    };
+  }
+
+  const rows: Array<{ first: string; last: string; birthday: string }> = [];
+  for (let i = 0; i < firsts.length; i++) {
+    const birthday = parseIsoDateYYYYMMDD(birthdays[i]);
+    if (!birthday) {
+      return {
+        ok: false,
+        message: `Ogiltigt födelsedatum för rad ${i + 1}.`,
+      };
+    }
+    rows.push({ first: firsts[i], last: lasts[i], birthday });
+  }
+  return { ok: true, rows };
 }
 
 /** Måste matcha default i migration `terms_document_version`. */
@@ -64,15 +114,26 @@ export async function submitContactForm(
   const name = getStr(formData, "name");
   const company = getStr(formData, "company");
   const email = getStr(formData, "email");
+  const phone = getStr(formData, "phone");
   const message = getStr(formData, "message");
   const consent = formData.get("consent") === "on";
   const termsAccept = formData.get("terms_accept") === "on";
 
-  if (!name || !company || !email) {
-    return { status: "error", message: "Fyll i namn, företag och mejl." };
+  if (!name || !company || !email || !phone) {
+    return {
+      status: "error",
+      message: "Fyll i namn, företag, mejl och telefon.",
+    };
   }
   if (!isValidEmail(email)) {
     return { status: "error", message: "Mejladressen ser inte giltig ut." };
+  }
+  if (!isPlausiblePhone(phone)) {
+    return {
+      status: "error",
+      message:
+        "Telefonnumret ser inte giltigt ut. Ange minst 8 siffror (t.ex. 070-123 45 67 eller +46 …).",
+    };
   }
   if (!consent) {
     return {
@@ -105,6 +166,7 @@ export async function submitContactForm(
         contact_name: name,
         company_name: company,
         contact_email: email,
+        contact_phone: phone,
         message: message || null,
         terms_accepted_at: new Date().toISOString(),
         terms_document_version: TERMS_DOCUMENT_VERSION,
@@ -116,7 +178,7 @@ export async function submitContactForm(
       console.error("[submitContactForm] kö-rad oväntat fel:", e);
     }
 
-    await sendContactAdminNotification({ name, company, email, message });
+    await sendContactAdminNotification({ name, company, email, phone, message });
     await sendContactConfirmation({ to: email, name });
     return { status: "success" };
   } catch (err) {
@@ -142,21 +204,23 @@ export async function submitEmployeeRequest(
   const address = getStr(formData, "address");
   const city = getStr(formData, "city");
   const postalCode = getStr(formData, "postal_code");
-  const firstName = getStr(formData, "first_name");
-  const lastName = getStr(formData, "last_name");
   const submittedByEmail = getStr(formData, "submitted_by_email");
   const message = getStr(formData, "message");
 
-  const birthday = action === "add" ? getOptStr(formData, "birthday") : null;
-  const personalNumberRaw = getStr(formData, "personal_number");
+  const parsedRows = parseEmployeeRowsFromFormData(formData);
+  if (!parsedRows.ok) {
+    return { status: "error", message: parsedRows.message };
+  }
+  const employeeRows = parsedRows.rows;
+
   const rawNumber = getStr(formData, "number_of_people");
   const numberOfPeople =
     action === "add" && rawNumber !== "" ? Number(rawNumber) : null;
 
-  if (!companyName || !address || !city || !postalCode || !firstName || !lastName) {
+  if (!companyName || !address || !city || !postalCode) {
     return {
       status: "error",
-      message: "Fyll i företagsuppgifter och anställdas namn.",
+      message: "Fyll i alla företagsuppgifter.",
     };
   }
   if (!isValidEmail(submittedByEmail)) {
@@ -165,29 +229,11 @@ export async function submitEmployeeRequest(
       message: "Vi behöver en giltig mejladress att svara på.",
     };
   }
-  const yyMmDd = extractSixDigitYYMMDD(personalNumberRaw);
-  if (!yyMmDd) {
-    return {
-      status: "error",
-      message:
-        "Ange sex siffror för födelsedatum (ÅÅMMDD), t.ex. 971219 eller 97-12-19. Du behöver inte fylla i hela personnumret.",
-    };
-  }
-  if (!isValidYYMMDD(yyMmDd)) {
-    return {
-      status: "error",
-      message:
-        "Datumet verkar ogiltigt. Ange ÅÅMMDD med sex siffror (t.ex. 97-12-19).",
-    };
-  }
   if (action === "add") {
-    if (!birthday) {
-      return { status: "error", message: "Födelsedag krävs när du lägger till." };
-    }
     if (numberOfPeople === null || Number.isNaN(numberOfPeople) || numberOfPeople < 1) {
       return {
         status: "error",
-        message: "Antal personer måste vara minst 1.",
+        message: "Antal personer på avdelningen måste vara minst 1.",
       };
     }
   }
@@ -208,17 +254,18 @@ export async function submitEmployeeRequest(
       address,
       city,
       postalCode,
-      employeeFirstName: firstName,
-      employeeLastName: lastName,
-      birthday,
-      personalNumber: yyMmDd,
+      employees: employeeRows.map((r) => ({
+        first_name: r.first,
+        last_name: r.last,
+        birthday_iso: r.birthday,
+      })),
       numberOfPeople,
       message,
       submittedByEmail,
     });
     await sendContactConfirmation({
       to: submittedByEmail,
-      name: firstName || companyName,
+      name: employeeRows[0]?.first || companyName,
     });
 
     const matchedCompanyId = await findCompanyIdForContactMatch({
@@ -227,15 +274,14 @@ export async function submitEmployeeRequest(
       city,
     });
     if (matchedCompanyId) {
-      await appendEmployeeAddDigestEntries(matchedCompanyId, [
-        {
-          kind: action,
-          first_name: firstName,
-          last_name: lastName,
-          birthday,
-          personal_number: yyMmDd,
-        },
-      ]);
+      const digestEntries: DigestChangeEntry[] = employeeRows.map((r) => ({
+        kind: action === "remove" ? "remove" : "add",
+        first_name: r.first,
+        last_name: r.last,
+        birthday: r.birthday,
+        personal_number: isoDateToYYMMDD(r.birthday)!,
+      }));
+      await appendEmployeeAddDigestEntries(matchedCompanyId, digestEntries);
     } else {
       console.warn(
         "[submitEmployeeRequest] inget företag matchade för digest-mejl",

@@ -16,6 +16,7 @@ export interface CompanyFormProps {
     applicationId: string;
     companyName: string;
     contactEmail: string;
+    contactPhone?: string | null;
     contactName: string;
     message: string | null;
   };

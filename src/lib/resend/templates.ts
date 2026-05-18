@@ -164,6 +164,7 @@ export interface ContactAdminArgs {
   name: string;
   company: string;
   email: string;
+  phone: string;
   message: string;
 }
 export async function sendContactAdminNotification(a: ContactAdminArgs) {
@@ -172,7 +173,8 @@ export async function sendContactAdminNotification(a: ContactAdminArgs) {
     `Ny förfrågan via happysent.com/kontakt:\n\n` +
     `Namn:     ${a.name}\n` +
     `Företag:  ${a.company}\n` +
-    `Mejl:     ${a.email}\n\n` +
+    `Mejl:     ${a.email}\n` +
+    `Telefon:  ${a.phone}\n\n` +
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
 
   return getResend().emails.send({
@@ -184,16 +186,19 @@ export async function sendContactAdminNotification(a: ContactAdminArgs) {
   });
 }
 
+export interface EmployeeRequestAdminRow {
+  first_name: string;
+  last_name: string;
+  birthday_iso: string; // YYYY-MM-DD
+}
+
 export interface EmployeeRequestAdminArgs {
   action: "add" | "remove";
   companyName: string;
   address: string;
   city: string;
   postalCode: string;
-  employeeFirstName: string;
-  employeeLastName: string;
-  birthday: string | null;
-  personalNumber: string | null;
+  employees: EmployeeRequestAdminRow[];
   numberOfPeople: number | null;
   message: string;
   submittedByEmail: string;
@@ -202,26 +207,34 @@ export async function sendEmployeeRequestAdminNotification(
   a: EmployeeRequestAdminArgs,
 ) {
   const actionLabel = a.action === "add" ? "Lägg till anställd" : "Ta bort anställd";
-  const subject = `${actionLabel}: ${a.employeeFirstName} ${a.employeeLastName} (${a.companyName})`;
+  const count = a.employees.length;
+  const names = a.employees.map((e) => `${e.first_name} ${e.last_name}`).join(", ");
+  const subject =
+    count === 1
+      ? `${actionLabel}: ${names} (${a.companyName})`
+      : `${actionLabel}: ${count} personer (${a.companyName})`;
+
+  const peopleBlock = a.employees
+    .map(
+      (e, i) =>
+        `${i + 1}. ${e.first_name} ${e.last_name} — födelsedatum ${formatSwedishDate(e.birthday_iso)}`,
+    )
+    .join("\n");
+
   const extraFields =
     a.action === "add"
-      ? `Födelsedag:       ${a.birthday ?? "(saknas)"}\n` +
-        `Antal personer:   ${a.numberOfPeople ?? "(saknas)"}\n`
+      ? `Antal personer på avdelningen: ${a.numberOfPeople ?? "(saknas)"}\n`
       : "";
-  const pn =
-    a.personalNumber?.trim()
-      ? `ÅÅMMDD:           ${formatPersonalIdentifierForMail(a.personalNumber.trim())}\n`
-      : "";
+
   const text =
     `Ny ${actionLabel.toLowerCase()}-förfrågan via happysent.com/kontakt:\n\n` +
     `Företag:          ${a.companyName}\n` +
     `Adress:           ${a.address}\n` +
     `Postnummer:       ${a.postalCode}\n` +
     `Ort:              ${a.city}\n\n` +
-    `Anställd:         ${a.employeeFirstName} ${a.employeeLastName}\n` +
-    pn +
+    `Personer (${count}):\n${peopleBlock}\n\n` +
     extraFields +
-    `\nAvsändarens mejl: ${a.submittedByEmail}\n\n` +
+    `Avsändarens mejl: ${a.submittedByEmail}\n\n` +
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
 
   return getResend().emails.send({
@@ -303,8 +316,9 @@ function formatPersonalIdentifierForMail(raw: string): string {
 function formatDigestDetailLine(e: EmployeeChangesDigestArgs["entries"][number]): string {
   const name = `${e.first_name} ${e.last_name}`;
   const bits: string[] = [];
-  if (e.birthday) bits.push(`födelsedatum ${formatSwedishDate(e.birthday)}`);
-  if (e.personal_number?.trim()) {
+  if (e.birthday) {
+    bits.push(`födelsedatum ${formatSwedishDate(e.birthday)}`);
+  } else if (e.personal_number?.trim()) {
     bits.push(`ÅÅMMDD ${formatPersonalIdentifierForMail(e.personal_number.trim())}`);
   }
   const extra = bits.length > 0 ? ` (${bits.join(", ")})` : "";

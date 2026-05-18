@@ -15,9 +15,17 @@ import { submitEmployeeRequest, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
 
-function SubmitButton({ action }: { action: "add" | "remove" }) {
+function SubmitButton({
+  action,
+  rowCount,
+}: {
+  action: "add" | "remove";
+  rowCount: number;
+}) {
   const { pending } = useFormStatus();
-  const label = action === "add" ? "Skicka tillägg" : "Skicka borttagning";
+  const base = action === "add" ? "Skicka tillägg" : "Skicka borttagning";
+  const label =
+    rowCount > 1 ? `${base} (${rowCount} personer)` : base;
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? (
@@ -35,6 +43,7 @@ function SubmitButton({ action }: { action: "add" | "remove" }) {
 export function EmployeeRequestForm({ className }: { className?: string }) {
   const [state, formAction] = useFormState(submitEmployeeRequest, initialState);
   const [action, setAction] = useState<"add" | "remove">("add");
+  const [rowKeys, setRowKeys] = useState<string[]>(() => ["0"]);
 
   if (state.status === "success") {
     return (
@@ -70,7 +79,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
         </h2>
         <p className="mt-2 text-sm text-slate-600">
           Är ni redan kund? Skicka in ändringar i personalen här så uppdaterar
-          vi listan åt er.
+          vi listan åt er. Ni kan ange <strong>flera personer i samma formulär</strong>.
         </p>
       </div>
 
@@ -112,52 +121,100 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
             <Label htmlFor="city">Ort</Label>
             <Input id="city" name="city" required autoComplete="address-level2" />
           </div>
-          <div>
-            <Label htmlFor="first_name">Anställdas förnamn</Label>
-            <Input id="first_name" name="first_name" required />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <p className="text-sm font-medium text-slate-800">Anställda</p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  setRowKeys((keys) => [...keys, `${Date.now()}-${keys.length}`])
+                }
+              >
+                + Lägg till rad
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={rowKeys.length <= 1}
+                onClick={() =>
+                  setRowKeys((keys) =>
+                    keys.length <= 1 ? keys : keys.slice(0, -1),
+                  )
+                }
+              >
+                Ta bort sista raden
+              </Button>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="last_name">Anställdas efternamn</Label>
-            <Input id="last_name" name="last_name" required />
-          </div>
-          <div className="sm:col-span-2">
-            <Label htmlFor="personal_number">Födelsedatum (ÅÅMMDD)</Label>
+
+          {rowKeys.map((key, index) => (
+            <div
+              key={key}
+              className="grid gap-4 rounded-2xl border border-candy-100 bg-candy-50/40 p-4 sm:grid-cols-2"
+            >
+              <p className="sm:col-span-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                Person {index + 1}
+              </p>
+              <div>
+                <Label htmlFor={`emp_first_${key}`}>Förnamn</Label>
+                <Input
+                  id={`emp_first_${key}`}
+                  name="emp_first_name"
+                  required
+                  autoComplete="given-name"
+                />
+              </div>
+              <div>
+                <Label htmlFor={`emp_last_${key}`}>Efternamn</Label>
+                <Input
+                  id={`emp_last_${key}`}
+                  name="emp_last_name"
+                  required
+                  autoComplete="family-name"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor={`emp_birth_${key}`}>Födelsedatum</Label>
+                <Input
+                  id={`emp_birth_${key}`}
+                  name="emp_birthday"
+                  type="date"
+                  required
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Ett datum per person — vi behöver inte hela personnumret.
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {action === "add" && (
+          <div className="max-w-md">
+            <Label htmlFor="number_of_people">
+              Antal personer på avdelningen
+            </Label>
             <Input
-              id="personal_number"
-              name="personal_number"
+              id="number_of_people"
+              name="number_of_people"
+              type="number"
+              min={1}
+              defaultValue={10}
               required
-              autoComplete="off"
-              placeholder="t.ex. 97-12-19 eller 971219"
               inputMode="numeric"
             />
             <p className="mt-1 text-xs text-slate-500">
-              Sex siffror för födelsedatum räcker — ni behöver inte ange hela
-              personnumret. Används i bekräftelsen till ert företags mejl.
+              Gäller er avdelning som helhet (samma värde för alla som läggs till
+              i detta ärende).
             </p>
           </div>
-          {action === "add" && (
-            <>
-              <div>
-                <Label htmlFor="birthday">Födelsedag</Label>
-                <Input id="birthday" name="birthday" type="date" required />
-              </div>
-              <div>
-                <Label htmlFor="number_of_people">
-                  Antal personer på avdelningen
-                </Label>
-                <Input
-                  id="number_of_people"
-                  name="number_of_people"
-                  type="number"
-                  min={1}
-                  defaultValue={10}
-                  required
-                  inputMode="numeric"
-                />
-              </div>
-            </>
-          )}
-        </div>
+        )}
 
         <div>
           <Label htmlFor="submitted_by_email">Din mejl (för bekräftelse)</Label>
@@ -187,7 +244,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
         </p>
       )}
 
-      <SubmitButton action={action} />
+      <SubmitButton action={action} rowCount={rowKeys.length} />
     </form>
   );
 }
