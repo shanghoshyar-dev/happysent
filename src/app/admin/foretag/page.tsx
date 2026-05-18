@@ -5,10 +5,6 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { createClient } from "@/lib/supabase/server";
 
-import {
-  CompanyApplicationQueue,
-  type ApplicationQueueRow,
-} from "./application-queue";
 import { CompaniesTable, type CompanyTableRow } from "./companies-table";
 
 export const dynamic = "force-dynamic";
@@ -16,34 +12,12 @@ export const dynamic = "force-dynamic";
 export default async function ForetagPage() {
   const supabase = createClient();
 
-  const [{ data: pendingApps }, { data: companies }] = await Promise.all([
-    supabase
-      .from("company_applications")
-      .select(
-        "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version, employees_import_storage_path",
-      )
-      .eq("status", "pending")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("companies")
-      .select(
-        "id, name, city, contact_email, price_per_cake, status, bakeries:bakery_id ( name )",
-      )
-      .order("created_at", { ascending: false }),
-  ]);
-
-  const queueRows: ApplicationQueueRow[] = (pendingApps ?? []).map((r) => ({
-    id: r.id,
-    contact_name: r.contact_name,
-    company_name: r.company_name,
-    contact_email: r.contact_email,
-    contact_phone: r.contact_phone,
-    message: r.message,
-    created_at: r.created_at,
-    terms_accepted_at: r.terms_accepted_at,
-    terms_document_version: r.terms_document_version,
-    employees_import_storage_path: r.employees_import_storage_path,
-  }));
+  const { data: companies } = await supabase
+    .from("companies")
+    .select(
+      "id, name, city, contact_email, price_per_cake, status, bakeries:bakery_id ( name )",
+    )
+    .order("created_at", { ascending: false });
 
   const rows: CompanyTableRow[] = (companies ?? []).map((c) => {
     const bakeryName = (c.bakeries as { name: string } | null)?.name ?? "—";
@@ -59,42 +33,41 @@ export default async function ForetagPage() {
   });
 
   const hasCompanies = (companies?.length ?? 0) > 0;
-  const hasQueue = queueRows.length > 0;
 
   return (
     <div>
       <PageHeader
         title="Företag"
-        description="Företagen som vi levererar tårtor till."
+        description="Företagen som vi levererar tårtor till. Väntande nykundsansökningar hanterar du under Kölista."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Företag" },
         ]}
         action={
-          <Link href="/admin/foretag/nytt">
-            <Button>Nytt företag</Button>
-          </Link>
+          <>
+            <Link href="/admin/kolista">
+              <Button variant="secondary">Kölista</Button>
+            </Link>
+            <Link href="/admin/foretag/nytt">
+              <Button>Nytt företag</Button>
+            </Link>
+          </>
         }
       />
-
-      {hasQueue ? (
-        <div className="mb-10">
-          <CompanyApplicationQueue rows={queueRows} />
-        </div>
-      ) : null}
 
       {!hasCompanies ? (
         <EmptyState
           title="Inga företag ännu"
-          description={
-            hasQueue
-              ? "Godkänn förfrågningar i kön ovan för att skapa era första kunder, eller lägg till ett företag manuellt."
-              : "Lägg till ert första företag för att komma igång."
-          }
+          description="Lägg till ert första företag, eller öppna Kölista om ni har inkomna förfrågningar från webben."
           action={
-            <Link href="/admin/foretag/nytt">
-              <Button>Lägg till företag</Button>
-            </Link>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Link href="/admin/kolista">
+                <Button variant="secondary">Öppna Kölista</Button>
+              </Link>
+              <Link href="/admin/foretag/nytt">
+                <Button>Lägg till företag</Button>
+              </Link>
+            </div>
           }
         />
       ) : (

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/admin", label: "Översikt", icon: "📊" },
+  { href: "/admin/kolista", label: "Kölista", icon: "📋" },
   { href: "/admin/foretag", label: "Företag", icon: "🏢" },
   { href: "/admin/anstallda", label: "Anställda", icon: "🎂" },
   { href: "/admin/bagerier", label: "Bagerier", icon: "🥐" },

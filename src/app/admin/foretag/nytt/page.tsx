@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/admin/page-header";
 import { Card } from "@/components/ui/card";
+import { fetchPendingApplicationById } from "@/lib/admin/pending-company-applications";
 import { getAppSettings } from "@/lib/app-settings";
 import { createClient } from "@/lib/supabase/server";
 
@@ -33,14 +34,7 @@ export default async function NyttForetagPage({
   let applicationPrefill: CompanyFormProps["applicationPrefill"];
 
   if (rawApplication) {
-    const { data: app } = await supabase
-      .from("company_applications")
-      .select(
-        "id, contact_name, company_name, contact_email, contact_phone, message, employees_import_storage_path",
-      )
-      .eq("id", rawApplication)
-      .eq("status", "pending")
-      .maybeSingle();
+    const app = await fetchPendingApplicationById(supabase, rawApplication);
 
     if (app) {
       applicationPrefill = {

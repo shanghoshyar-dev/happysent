@@ -9,20 +9,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 
+import type { PendingApplicationQueueRow } from "@/lib/admin/pending-company-applications";
+
 import { rejectCompanyApplication } from "./application-actions";
 
-export type ApplicationQueueRow = {
-  id: string;
-  contact_name: string;
-  company_name: string;
-  contact_email: string;
-  contact_phone: string | null;
-  message: string | null;
-  created_at: string;
-  terms_accepted_at: string | null;
-  terms_document_version: string;
-  employees_import_storage_path: string | null;
-};
+export type ApplicationQueueRow = PendingApplicationQueueRow;
 
 interface Props {
   rows: ApplicationQueueRow[];
