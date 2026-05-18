@@ -14,6 +14,8 @@ export type CompanyTableRow = {
   name: string;
   city: string;
   bakeryName: string;
+  offers_flowers: boolean;
+  floristName: string;
   contact_email: string;
   price_per_cake: number;
   status: "active" | "paused";
@@ -57,6 +59,22 @@ export function CompaniesTable({ rows }: Props) {
       cell: (r) => r.bakeryName,
     },
     {
+      id: "flowers",
+      header: "Blommor",
+      sortable: true,
+      sortValue: (r) => (r.offers_flowers ? "ja" : "nej"),
+      searchText: (r) => (r.offers_flowers ? "Ja blommor" : "Nej"),
+      cell: (r) => (r.offers_flowers ? "Ja" : "Nej"),
+    },
+    {
+      id: "florist",
+      header: "Blomsterbutik",
+      sortable: true,
+      sortValue: (r) => r.floristName.toLowerCase(),
+      searchText: (r) => r.floristName,
+      cell: (r) => r.floristName,
+    },
+    {
       id: "contact",
       header: "Kontakt",
       sortable: true,
@@ -91,7 +109,7 @@ export function CompaniesTable({ rows }: Props) {
       rows={rows}
       columns={columns}
       rowKey={(r) => r.id}
-      searchPlaceholder="Sök på namn, stad, bageri eller mejl…"
+      searchPlaceholder="Sök på namn, stad, bageri, blomsterbutik eller mejl…"
       pageSize={20}
     />
   );

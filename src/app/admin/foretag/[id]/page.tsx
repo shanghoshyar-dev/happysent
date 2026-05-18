@@ -17,10 +17,11 @@ interface Props {
 
 export default async function ForetagDetailPage({ params }: Props) {
   const supabase = createClient();
-  const [{ data: company }, { data: bakeries }, { data: employees }] =
+  const [{ data: company }, { data: bakeries }, { data: florists }, { data: employees }] =
     await Promise.all([
       supabase.from("companies").select("*").eq("id", params.id).maybeSingle(),
       supabase.from("bakeries").select("id, name, city").order("name"),
+      supabase.from("florists").select("id, name, city").order("name"),
       supabase
         .from("employees")
         .select("id, first_name, last_name, birthday, is_active")
@@ -28,7 +29,7 @@ export default async function ForetagDetailPage({ params }: Props) {
         .order("birthday"),
     ]);
 
-  if (!company || !bakeries) notFound();
+  if (!company || !bakeries || !florists) notFound();
 
   const updateAction = updateCompany.bind(null, company.id);
   const deleteAction = deleteCompany.bind(null, company.id);
@@ -48,6 +49,7 @@ export default async function ForetagDetailPage({ params }: Props) {
       <Card className="max-w-3xl">
         <CompanyForm
           bakeries={bakeries}
+          florists={florists}
           company={company}
           action={updateAction}
           submitLabel="Spara ändringar"

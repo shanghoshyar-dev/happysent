@@ -6,6 +6,7 @@ import type { Tables } from "@/types/database";
 
 export interface CompanyFormProps {
   bakeries: Pick<Tables<"bakeries">, "id" | "name" | "city">[];
+  florists: Pick<Tables<"florists">, "id" | "name" | "city">[];
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
@@ -25,6 +26,7 @@ export interface CompanyFormProps {
 
 export function CompanyForm({
   bakeries,
+  florists,
   company,
   action,
   submitLabel,
@@ -73,6 +75,38 @@ export function CompanyForm({
           {bakeries.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name} ({b.city})
+            </option>
+          ))}
+        </Select>
+      </div>
+      <div className="md:col-span-2 rounded-xl border border-candy-100 bg-cream-50/80 p-4 ring-1 ring-candy-100/60">
+        <label className="flex items-start gap-3 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            name="offers_flowers"
+            defaultChecked={company?.offers_flowers ?? false}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
+          />
+          <span>
+            <span className="font-medium text-slate-900">Levererar blommor</span>
+            <span className="mt-1 block text-slate-600">
+              Obligatoriskt att välja blomsterbutik nedan. Partner finns under{" "}
+              <span className="font-medium text-slate-800">Bagerier</span>.
+            </span>
+          </span>
+        </label>
+      </div>
+      <div className="md:col-span-2">
+        <Label htmlFor="florist_id">Blomsterbutik</Label>
+        <Select
+          id="florist_id"
+          name="florist_id"
+          defaultValue={company?.florist_id ?? ""}
+        >
+          <option value="">— Ingen / inte aktiverat ovan —</option>
+          {florists.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name} ({f.city})
             </option>
           ))}
         </Select>

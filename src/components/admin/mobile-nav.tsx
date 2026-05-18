@@ -46,7 +46,10 @@ export function MobileAdminNav() {
               const isActive =
                 item.href === "/admin"
                   ? pathname === "/admin"
-                  : pathname.startsWith(item.href);
+                  : item.href === "/admin/bagerier"
+                    ? pathname.startsWith("/admin/bagerier") ||
+                      pathname.startsWith("/admin/blomsterbutiker")
+                    : pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}

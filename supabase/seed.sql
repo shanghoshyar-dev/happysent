@@ -20,6 +20,20 @@ values (
 )
 on conflict (id) do nothing;
 
+-- Sample florist (Malmö)
+insert into public.florists (id, name, email, phone, city, opening_hours, days_notice, notes)
+values (
+  '00000000-0000-0000-0000-000000000002',
+  'Blomsterateljén Exempel',
+  'order@blomsterateljen.example',
+  '+46 40 987 65 43',
+  'Malmö',
+  'Mån–Lör 09:00–18:00',
+  5,
+  'Beställ blombuketter via mejl minst 5 vardagar i förväg.'
+)
+on conflict (id) do nothing;
+
 -- One sample company
 insert into public.companies (id, name, address, city, contact_email, billing_email, bakery_id, price_per_cake, status)
 values (

@@ -78,6 +78,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      florists: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          phone: string | null;
+          city: string;
+          opening_hours: string | null;
+          days_notice: number;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          email: string;
+          phone?: string | null;
+          city: string;
+          opening_hours?: string | null;
+          days_notice?: number;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          email?: string;
+          phone?: string | null;
+          city?: string;
+          opening_hours?: string | null;
+          days_notice?: number;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       employee_add_digest: {
         Row: {
           id: string;
@@ -122,6 +158,8 @@ export type Database = {
           contact_email: string;
           billing_email: string;
           bakery_id: string;
+          offers_flowers: boolean;
+          florist_id: string | null;
           price_per_cake: number;
           status: CompanyStatus;
           created_at: string;
@@ -134,6 +172,8 @@ export type Database = {
           contact_email: string;
           billing_email: string;
           bakery_id: string;
+          offers_flowers?: boolean;
+          florist_id?: string | null;
           price_per_cake: number;
           status?: CompanyStatus;
           created_at?: string;
@@ -146,6 +186,8 @@ export type Database = {
           contact_email?: string;
           billing_email?: string;
           bakery_id?: string;
+          offers_flowers?: boolean;
+          florist_id?: string | null;
           price_per_cake?: number;
           status?: CompanyStatus;
           created_at?: string;
@@ -156,6 +198,13 @@ export type Database = {
             columns: ["bakery_id"];
             isOneToOne: false;
             referencedRelation: "bakeries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "companies_florist_id_fkey";
+            columns: ["florist_id"];
+            isOneToOne: false;
+            referencedRelation: "florists";
             referencedColumns: ["id"];
           },
         ];

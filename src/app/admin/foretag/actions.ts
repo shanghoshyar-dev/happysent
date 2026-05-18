@@ -9,6 +9,23 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendCompanyWelcome } from "@/lib/resend/templates";
 
+function parseFlowerPartnerFields(formData: FormData): {
+  offers_flowers: boolean;
+  florist_id: string | null;
+} {
+  const offersFlowers = formData.get("offers_flowers") === "on";
+  const floristRaw = String(formData.get("florist_id") ?? "").trim();
+  if (offersFlowers && !floristRaw) {
+    throw new Error(
+      "Välj en blomsterbutik om företaget ska leverera blommor (eller avmarkera leverans av blommor).",
+    );
+  }
+  return {
+    offers_flowers: offersFlowers,
+    florist_id: offersFlowers ? floristRaw : null,
+  };
+}
+
 export async function createCompany(formData: FormData) {
   const supabase = createClient();
   const applicationId = String(formData.get("application_id") ?? "").trim();
@@ -30,6 +47,7 @@ export async function createCompany(formData: FormData) {
     excelStoragePath = pending.employees_import_storage_path ?? null;
   }
 
+  const flowers = parseFlowerPartnerFields(formData);
   const payload = {
     name: String(formData.get("name") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
@@ -37,6 +55,8 @@ export async function createCompany(formData: FormData) {
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
     bakery_id: String(formData.get("bakery_id") ?? ""),
+    offers_flowers: flowers.offers_flowers,
+    florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
@@ -124,6 +144,7 @@ export async function createCompany(formData: FormData) {
 
 export async function updateCompany(id: string, formData: FormData) {
   const supabase = createClient();
+  const flowers = parseFlowerPartnerFields(formData);
   const payload = {
     name: String(formData.get("name") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
@@ -131,6 +152,8 @@ export async function updateCompany(id: string, formData: FormData) {
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
     bakery_id: String(formData.get("bakery_id") ?? ""),
+    offers_flowers: flowers.offers_flowers,
+    florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };

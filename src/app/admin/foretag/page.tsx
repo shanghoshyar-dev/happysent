@@ -15,17 +15,21 @@ export default async function ForetagPage() {
   const { data: companies } = await supabase
     .from("companies")
     .select(
-      "id, name, city, contact_email, price_per_cake, status, bakeries:bakery_id ( name )",
+      "id, name, city, contact_email, price_per_cake, status, offers_flowers, bakeries:bakery_id ( name ), florists:florist_id ( name )",
     )
     .order("created_at", { ascending: false });
 
   const rows: CompanyTableRow[] = (companies ?? []).map((c) => {
     const bakeryName = (c.bakeries as { name: string } | null)?.name ?? "—";
+    const floristName =
+      (c.florists as { name: string } | null)?.name ?? "—";
     return {
       id: c.id,
       name: c.name,
       city: c.city,
       bakeryName,
+      offers_flowers: Boolean(c.offers_flowers),
+      floristName,
       contact_email: c.contact_email,
       price_per_cake: c.price_per_cake,
       status: c.status as "active" | "paused",
