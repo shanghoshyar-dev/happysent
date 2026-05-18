@@ -4,135 +4,141 @@ import Link from "next/link";
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Integritetspolicy – Happysent",
+  title: "Privacy Policy – Happysent",
   description:
-    "Hur Happysent hanterar personuppgifter enligt GDPR – vad vi samlar in, varför, och hur länge.",
+    "How Happysent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
   path: "/integritetspolicy",
+  locale: "en_US",
 });
 
 export default function IntegritetspolicyPage() {
   return (
     <article className="mx-auto max-w-3xl px-6 py-20">
-      <h1 className="font-display text-5xl text-slate-900">
-        Integritetspolicy
-      </h1>
+      <h1 className="font-display text-5xl text-slate-900">Privacy Policy</h1>
       <p className="mt-4 text-sm text-slate-500">
-        Senast uppdaterad: {new Date().toLocaleDateString("sv-SE")}
+        Last updated:{" "}
+        {new Date().toLocaleDateString("en-GB", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
       </p>
 
       <div className="prose-happysent mt-10 space-y-8 text-base leading-relaxed text-slate-700">
         <section>
           <h2 className="font-display text-2xl text-slate-900">
-            Kort sammanfattning
+            Summary
           </h2>
           <p className="mt-3">
-            Happysent (vi) är personuppgiftsansvarig för de uppgifter som
-            registreras av våra kundföretag. Vi följer GDPR och samlar bara in
-            det vi måste för att kunna leverera en tårta till rätt person, på
-            rätt dag, till rätt adress.
+            Happysent (“we”, “us”) is the controller for the personal data
+            submitted by our customer companies. We comply with the GDPR and
+            only collect what we need to deliver a cake to the right person, on
+            the right day, at the right address.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-2xl text-slate-900">
-            Vad vi samlar in
+            What we collect
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-6">
             <li>
-              <strong>Den anställdes förnamn och efternamn</strong> – för att
-              bageriet ska kunna baka och leverera till rätt person.
+              <strong>The employee&apos;s first and last name</strong> – so the
+              bakery can bake and deliver to the correct person.
             </li>
             <li>
-              <strong>Födelsedag</strong> (datum, ej år är obligatoriskt) – för
-              att veta när tårtan ska levereras.
+              <strong>Date of birth</strong> (day and month; year is not
+              required) – so we know when to deliver the cake.
             </li>
             <li>
-              <strong>Leveransadress</strong> – arbetsplatsens besöksadress.
+              <strong>Delivery address</strong> – your workplace visit address.
             </li>
             <li>
-              <strong>Avdelningens storlek</strong> – för att veta hur stor
-              tårta som ska bakas.
+              <strong>Department size</strong> – so we know what size of cake to
+              order.
             </li>
             <li>
-              <strong>Kontaktpersonens mejladress</strong> hos kundföretaget –
-              för bekräftelser och fakturor.
+              <strong>Contact person&apos;s email</strong> at the customer
+              company – for confirmations and invoices.
             </li>
           </ul>
         </section>
 
         <section>
           <h2 className="font-display text-2xl text-slate-900">
-            Vad vi <em>inte</em> sparar
+            What we do <em>not</em> store
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>Personnummer</li>
-            <li>Löne- eller HR-uppgifter</li>
-            <li>Hälsouppgifter eller andra känsliga personuppgifter</li>
-            <li>Bank- eller kortuppgifter (fakturor skickas via PDF)</li>
+            <li>National identity numbers</li>
+            <li>Salary or HR records</li>
+            <li>Health data or other special categories of personal data</li>
+            <li>
+              Bank or card details (invoices are sent as PDF to your billing
+              email)
+            </li>
           </ul>
         </section>
 
         <section>
           <h2 className="font-display text-2xl text-slate-900">
-            Varför vi samlar in det
+            Legal basis
           </h2>
           <p className="mt-3">
-            Den rättsliga grunden är ett <strong>berättigat intresse</strong>{" "}
-            (artikel 6.1 f GDPR): kundföretaget vill att vi firar deras
-            anställda, och utan namn, datum och adress kan vi inte leverera
-            tjänsten. Vi har gjort en intresseavvägning där behandlingen är
-            minimal och i linje med vad den anställde rimligen kan förvänta sig
-            i ett arbetsförhållande.
+            We rely on{" "}
+            <strong>legitimate interests</strong> (Article 6(1)(f) GDPR): your
+            employer wants us to celebrate employees, and we cannot provide
+            the service without name, birth date, and address. We have balanced
+            those interests against employee privacy; processing is minimal and
+            in line with what employees can reasonably expect in a workplace
+            context.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-2xl text-slate-900">
-            Vem vi delar med
+            Who we share with
           </h2>
           <p className="mt-3">
-            Vi delar enbart uppgifterna med det <strong>lokala bageri</strong>{" "}
-            som är kopplat till företagets adress, och bara så mycket som
-            behövs för att kunna leverera (namn, adress, datum, antal personer).
-            Vi säljer aldrig data, vi använder dem inte till marknadsföring,
-            och vi för inte över dem utanför EU/EES.
+            We only share data with the <strong>local bakery</strong> assigned
+            to your company&apos;s delivery area, and only what is needed to
+            fulfil delivery (name, address, date, party size). We never sell
+            data, we do not use it for marketing, and we do not transfer it
+            outside the EU/EEA for processing.
           </p>
-          <p className="mt-3">
-            Våra underbiträden för teknisk drift:
-          </p>
+          <p className="mt-3">Sub-processors for technical operations:</p>
           <ul className="mt-3 list-disc space-y-2 pl-6">
             <li>
-              <strong>Supabase</strong> (databas, EU-region) –
-              personuppgiftsbiträdesavtal finns.
+              <strong>Supabase</strong> (database, EU region) – data processing
+              agreement in place.
             </li>
             <li>
-              <strong>Resend</strong> (mejlleverans) – för bekräftelser och
-              beställningar till bageri.
+              <strong>Resend</strong> (email delivery) – for confirmations and
+              bakery orders.
             </li>
             <li>
-              <strong>Vercel</strong> (hosting, EU-region).
+              <strong>Vercel</strong> (hosting, EU region).
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-slate-900">Hur länge</h2>
+          <h2 className="font-display text-2xl text-slate-900">Retention</h2>
           <p className="mt-3">
-            Vi sparar personuppgifter så länge ni är kund hos oss. När en
-            anställd tas bort raderas personuppgifterna inom 30 dagar.
-            Bokföringsunderlag (fakturor) sparas i 7 år enligt
-            bokföringslagen.
+            We keep personal data for as long as you remain a customer. When an
+            employee is removed, their personal data is deleted within 30 days.
+            Accounting records (invoices) are retained for 7 years as required
+            by Swedish bookkeeping law.
           </p>
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-slate-900">Dina rättigheter</h2>
+          <h2 className="font-display text-2xl text-slate-900">Your rights</h2>
           <p className="mt-3">
-            Som registrerad har du rätt att begära{" "}
-            <strong>registerutdrag</strong>, <strong>rättelse</strong>,{" "}
-            <strong>radering</strong>, <strong>begränsning</strong> eller{" "}
-            <strong>dataportabilitet</strong> av dina uppgifter. Du har också
-            rätt att invända mot vår behandling. Skicka en förfrågan till{" "}
+            You have the right to request{" "}
+            <strong>access</strong>, <strong>rectification</strong>,{" "}
+            <strong>erasure</strong>, <strong>restriction</strong>, or{" "}
+            <strong>data portability</strong>, and to object to our processing.
+            Contact us at{" "}
             <a
               href="mailto:info@happysent.com"
               className="font-medium text-candy-600 hover:underline"
@@ -142,44 +148,45 @@ export default function IntegritetspolicyPage() {
             .
           </p>
           <p className="mt-3">
-            Är du missnöjd med hur vi hanterar dina uppgifter kan du klaga hos{" "}
+            If you are unhappy with how we handle your data, you may lodge a
+            complaint with the{" "}
             <a
               href="https://www.imy.se/"
               target="_blank"
               rel="noreferrer"
               className="font-medium text-candy-600 hover:underline"
             >
-              Integritetsskyddsmyndigheten (IMY)
+              Swedish Authority for Privacy Protection (IMY)
             </a>
             .
           </p>
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-slate-900">Säkerhet</h2>
+          <h2 className="font-display text-2xl text-slate-900">Security</h2>
           <p className="mt-3">
-            All data lagras krypterat i databaser inom EU. Endast behörig
-            personal hos Happysent har tillgång, och tillgången är skyddad med
-            tvåfaktorsautentisering.
+            Data is stored in encrypted databases in the EU. Only authorised
+            Happysent staff can access it, and access is protected with
+            multi-factor authentication.
           </p>
         </section>
 
         <section>
-          <h2 className="font-display text-2xl text-slate-900">Kontakt</h2>
+          <h2 className="font-display text-2xl text-slate-900">Contact</h2>
           <p className="mt-3">
-            Frågor? Skriv till{" "}
+            Questions? Email{" "}
             <a
               href="mailto:info@happysent.com"
               className="font-medium text-candy-600 hover:underline"
             >
               info@happysent.com
             </a>{" "}
-            eller via vårt{" "}
+            or use our{" "}
             <Link
               href="/kontakt"
               className="font-medium text-candy-600 hover:underline"
             >
-              kontaktformulär
+              contact form
             </Link>
             .
           </p>

@@ -27,7 +27,7 @@ export function MarketingFooter() {
             Kontakt
           </Link>
           <Link href="/integritetspolicy" className="hover:text-candy-600">
-            Integritetspolicy
+            Privacy policy
           </Link>
           <Link href="/anvandarvillkor" className="hover:text-candy-600">
             Användarvillkor

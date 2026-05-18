@@ -55,7 +55,7 @@ export async function submitContactForm(
     return {
       status: "error",
       message:
-        "Du behöver godkänna integritetspolicyn och databehandlingsavtalet.",
+        "Du behöver godkänna privacy policy och databehandlingsavtalet.",
     };
   }
   if (!termsAccept) {

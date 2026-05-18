@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 
 import { getSiteUrl } from "@/lib/site-url";
 
-/** Canonical Swedish titles + Open Graph for marketing routes (absolute titles). */
+/** Canonical titles + Open Graph for marketing routes (absolute titles). */
 export function svMarketingPageMeta(opts: {
   title: string;
   description: string;
   path: string;
+  /** Open Graph locale (default Swedish). */
+  locale?: string;
 }): Metadata {
   const base = getSiteUrl().replace(/\/$/, "");
   const url = `${base}${opts.path.startsWith("/") ? opts.path : `/${opts.path}`}`;
@@ -18,7 +20,7 @@ export function svMarketingPageMeta(opts: {
       title: opts.title,
       description: opts.description,
       url,
-      locale: "sv_SE",
+      locale: opts.locale ?? "sv_SE",
       siteName: "Happysent",
       type: "website",
       images: [{ url: `${base}/opengraph-image`, width: 1200, height: 630 }],

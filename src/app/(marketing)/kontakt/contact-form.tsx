@@ -102,7 +102,7 @@ export function ContactForm({ className }: { className?: string }) {
               href="/integritetspolicy"
               className="font-medium text-candy-600 hover:underline"
             >
-              integritetspolicy
+              privacy policy
             </Link>{" "}
             och databehandlingsavtal.
           </span>
