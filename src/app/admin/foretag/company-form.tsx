@@ -19,6 +19,7 @@ export interface CompanyFormProps {
     contactPhone?: string | null;
     contactName: string;
     message: string | null;
+    hasEmployeesExcel?: boolean;
   };
 }
 

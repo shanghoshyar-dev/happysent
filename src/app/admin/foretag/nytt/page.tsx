@@ -35,7 +35,9 @@ export default async function NyttForetagPage({
   if (rawApplication) {
     const { data: app } = await supabase
       .from("company_applications")
-      .select("id, contact_name, company_name, contact_email, contact_phone, message")
+      .select(
+        "id, contact_name, company_name, contact_email, contact_phone, message, employees_import_storage_path",
+      )
       .eq("id", rawApplication)
       .eq("status", "pending")
       .maybeSingle();
@@ -48,6 +50,7 @@ export default async function NyttForetagPage({
         contactPhone: app.contact_phone,
         contactName: app.contact_name,
         message: app.message,
+        hasEmployeesExcel: Boolean(app.employees_import_storage_path),
       };
     }
   }
@@ -98,6 +101,13 @@ export default async function NyttForetagPage({
           <p className="mt-2 text-slate-600">
             Fyll i adress, stad och bageri nedan. När du sparas flyttas kunden
             från kön till aktiva företag.
+            {applicationPrefill.hasEmployeesExcel ? (
+              <>
+                {" "}
+                De bifogade Excel-raderna för personal läggs in automatiskt vid
+                godkännande (samma mall som under Anställda).
+              </>
+            ) : null}
           </p>
         </div>
       ) : rawApplication ? (

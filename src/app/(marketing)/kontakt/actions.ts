@@ -15,6 +15,7 @@ import {
   findCompanyIdForContactMatch,
   type DigestChangeEntry,
 } from "@/lib/cron/employee-add-digest";
+import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ContactState =
@@ -146,7 +147,10 @@ async function insertCompanyApplicationRow(
     phone: string;
     message: string;
   },
-): Promise<{ ok: true } | { ok: false; error: { message: string; code?: string } }> {
+): Promise<
+  | { ok: true; applicationId: string }
+  | { ok: false; error: { message: string; code?: string } }
+> {
   const baseMessage = row.message.trim() === "" ? null : row.message.trim();
 
   const fullPayload = {
@@ -159,13 +163,18 @@ async function insertCompanyApplicationRow(
     terms_document_version: TERMS_DOCUMENT_VERSION,
   };
 
-  const { error: fullErr } = await admin
+  const { data: createdFull, error: fullErr } = await admin
     .from("company_applications")
-    .insert(fullPayload as never);
+    .insert(fullPayload as never)
+    .select("id")
+    .single();
 
-  if (!fullErr) return { ok: true };
+  if (!fullErr && createdFull?.id) {
+    return { ok: true, applicationId: createdFull.id };
+  }
 
   const retryWithoutTerms =
+    fullErr &&
     isLikelyMissingColumnError(fullErr) &&
     errorMentionsTermsColumns(fullErr) &&
     !errorMentionsContactPhone(fullErr);
@@ -181,14 +190,18 @@ async function insertCompanyApplicationRow(
       contact_phone: row.phone,
       message: baseMessage,
     };
-    const { error: slimErr } = await admin
+    const { data: createdSlim, error: slimErr } = await admin
       .from("company_applications")
-      .insert(slimPayload as never);
-    if (!slimErr) return { ok: true };
-    return { ok: false, error: slimErr };
+      .insert(slimPayload as never)
+      .select("id")
+      .single();
+    if (!slimErr && createdSlim?.id) {
+      return { ok: true, applicationId: createdSlim.id };
+    }
+    return { ok: false, error: slimErr ?? fullErr };
   }
 
-  return { ok: false, error: fullErr };
+  return { ok: false, error: fullErr ?? { message: "Insert misslyckades" } };
 }
 
 export async function submitContactForm(
@@ -280,7 +293,81 @@ export async function submitContactForm(
       };
     }
 
-    await sendContactAdminNotification({ name, company, email, phone, message });
+    const applicationId = inserted.applicationId;
+    const excelMaxBytes = 5 * 1024 * 1024;
+    const excelFile = formData.get("employees_xlsx");
+    let excelUploadedPath: string | null = null;
+
+    if (excelFile instanceof File && excelFile.size > 0) {
+      if (excelFile.size > excelMaxBytes) {
+        await admin.from("company_applications").delete().eq("id", applicationId);
+        return {
+          status: "error",
+          message: "Excel-filen får vara högst 5 MB.",
+        };
+      }
+      const lower = excelFile.name.toLowerCase();
+      if (!lower.endsWith(".xlsx")) {
+        await admin.from("company_applications").delete().eq("id", applicationId);
+        return {
+          status: "error",
+          message:
+            "Bifogad personalfil måste vara .xlsx enligt vår mall (samma som för befintliga kunder).",
+        };
+      }
+
+      excelUploadedPath = `${applicationId}/employees.xlsx`;
+      const { error: upErr } = await admin.storage
+        .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
+        .upload(excelUploadedPath, excelFile, {
+          contentType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          upsert: true,
+        });
+
+      if (upErr) {
+        console.error("[submitContactForm] storage upload:", upErr);
+        await admin.from("company_applications").delete().eq("id", applicationId);
+        return {
+          status: "error",
+          message:
+            "Kunde inte ladda upp Excel-filen. Försök utan bilaga eller kontakta oss.",
+        };
+      }
+
+      const { error: pathErr } = await admin
+        .from("company_applications")
+        .update({ employees_import_storage_path: excelUploadedPath })
+        .eq("id", applicationId);
+
+      if (pathErr) {
+        console.error("[submitContactForm] path update:", pathErr);
+        await admin.storage
+          .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
+          .remove([excelUploadedPath]);
+        await admin.from("company_applications").delete().eq("id", applicationId);
+        return {
+          status: "error",
+          message:
+            "Kunde inte koppla Excel-filen till er förfrågan. Försök igen eller kontakta oss.",
+        };
+      }
+    }
+
+    let adminMessage = message.trim();
+    if (excelUploadedPath) {
+      adminMessage =
+        (adminMessage ? `${adminMessage}\n\n` : "") +
+        "[Excel enligt Happysent-mall bifogad — personal importeras automatiskt när ansökan godkänns i admin.]";
+    }
+
+    await sendContactAdminNotification({
+      name,
+      company,
+      email,
+      phone,
+      message: adminMessage || "(inget meddelande)",
+    });
     await sendContactConfirmation({ to: email, name });
     return { status: "success" };
   } catch (err) {

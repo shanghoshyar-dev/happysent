@@ -3,17 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
+import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendCompanyWelcome } from "@/lib/resend/templates";
 
 export async function createCompany(formData: FormData) {
   const supabase = createClient();
   const applicationId = String(formData.get("application_id") ?? "").trim();
+  let excelStoragePath: string | null = null;
 
   if (applicationId) {
     const { data: pending, error: pendErr } = await supabase
       .from("company_applications")
-      .select("id")
+      .select("id, employees_import_storage_path")
       .eq("id", applicationId)
       .eq("status", "pending")
       .maybeSingle();
@@ -23,6 +27,7 @@ export async function createCompany(formData: FormData) {
         "Förfrågan finns inte eller är redan hanterad. Uppdatera sidan.",
       );
     }
+    excelStoragePath = pending.employees_import_storage_path ?? null;
   }
 
   const payload = {
@@ -42,6 +47,49 @@ export async function createCompany(formData: FormData) {
     .single();
   if (error) throw new Error(error.message);
 
+  const admin = createAdminClient();
+
+  if (excelStoragePath && created?.id) {
+    const { data: bin, error: dlErr } = await admin.storage
+      .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
+      .download(excelStoragePath);
+
+    if (dlErr || !bin) {
+      await supabase.from("companies").delete().eq("id", created.id);
+      throw new Error(
+        `Kunde inte hämta bifogad Excel: ${dlErr?.message ?? "saknad fil"}`,
+      );
+    }
+
+    const buf = await bin.arrayBuffer();
+    const importResult = await importEmployeesExcelBuffer(
+      supabase,
+      created.id,
+      buf,
+    );
+
+    const importFailed =
+      !importResult.ok ||
+      importResult.globalError ||
+      importResult.imported < 1;
+
+    if (importFailed) {
+      await supabase.from("companies").delete().eq("id", created.id);
+      const detail =
+        importResult.globalError ??
+        (importResult.imported < 1
+          ? "Excel innehöll inga giltiga rader att importera."
+          : "Importen misslyckades.");
+      throw new Error(detail);
+    }
+
+    await admin.storage
+      .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
+      .remove([excelStoragePath]);
+
+    revalidatePath("/admin/anstallda");
+  }
+
   if (applicationId && created?.id) {
     const { error: upErr } = await supabase
       .from("company_applications")
@@ -49,6 +97,7 @@ export async function createCompany(formData: FormData) {
         status: "approved",
         processed_at: new Date().toISOString(),
         created_company_id: created.id,
+        employees_import_storage_path: null,
       })
       .eq("id", applicationId)
       .eq("status", "pending");

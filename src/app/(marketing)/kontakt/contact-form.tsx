@@ -55,6 +55,7 @@ export function ContactForm({ className }: { className?: string }) {
   return (
     <form
       action={formAction}
+      encType="multipart/form-data"
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-5 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm",
         className,
@@ -103,6 +104,29 @@ export function ContactForm({ className }: { className?: string }) {
             rows={5}
             className="min-h-[8rem] flex-1 resize-y xl:min-h-0"
           />
+        </div>
+        <div>
+          <Label htmlFor="employees_xlsx">
+            Personal lista (valfritt, Excel)
+          </Label>
+          <Input
+            id="employees_xlsx"
+            name="employees_xlsx"
+            type="file"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-candy-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-candy-800 hover:file:bg-candy-100"
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            Ladda ner{" "}
+            <Link
+              href="/happysent-mall.xlsx"
+              className="font-medium text-candy-600 hover:underline"
+            >
+              Happysent-mallen
+            </Link>
+            , fyll i och bifoga här. Vid godkänd ansökan importeras raderna till
+            ert företag automatiskt.
+          </p>
         </div>
         <label className="flex items-start gap-3 text-sm text-slate-600">
           <input

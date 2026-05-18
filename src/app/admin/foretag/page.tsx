@@ -20,7 +20,7 @@ export default async function ForetagPage() {
     supabase
       .from("company_applications")
       .select(
-        "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version",
+        "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version, employees_import_storage_path",
       )
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
@@ -42,6 +42,7 @@ export default async function ForetagPage() {
     created_at: r.created_at,
     terms_accepted_at: r.terms_accepted_at,
     terms_document_version: r.terms_document_version,
+    employees_import_storage_path: r.employees_import_storage_path,
   }));
 
   const rows: CompanyTableRow[] = (companies ?? []).map((c) => {

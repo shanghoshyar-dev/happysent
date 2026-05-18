@@ -167,6 +167,7 @@ export type Database = {
           company_name: string;
           contact_email: string;
           contact_phone: string | null;
+          employees_import_storage_path: string | null;
           message: string | null;
           status: "pending" | "approved" | "rejected";
           processed_at: string | null;
@@ -181,6 +182,7 @@ export type Database = {
           company_name: string;
           contact_email: string;
           contact_phone?: string | null;
+          employees_import_storage_path?: string | null;
           message?: string | null;
           status?: "pending" | "approved" | "rejected";
           processed_at?: string | null;
@@ -195,6 +197,7 @@ export type Database = {
           company_name?: string;
           contact_email?: string;
           contact_phone?: string | null;
+          employees_import_storage_path?: string | null;
           message?: string | null;
           status?: "pending" | "approved" | "rejected";
           processed_at?: string | null;

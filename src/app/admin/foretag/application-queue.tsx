@@ -21,6 +21,7 @@ export type ApplicationQueueRow = {
   created_at: string;
   terms_accepted_at: string | null;
   terms_document_version: string;
+  employees_import_storage_path: string | null;
 };
 
 interface Props {
@@ -51,6 +52,7 @@ export function CompanyApplicationQueue({ rows }: Props) {
               <TH>Mejl</TH>
               <TH>Telefon</TH>
               <TH>Meddelande</TH>
+              <TH>Excel</TH>
               <TH>Villkor</TH>
               <TH className="w-[1%] whitespace-nowrap">Åtgärder</TH>
             </TR>
@@ -88,6 +90,15 @@ export function CompanyApplicationQueue({ rows }: Props) {
                   title={r.message ?? undefined}
                 >
                   {r.message?.trim() ? r.message : "—"}
+                </TD>
+                <TD className="text-sm">
+                  {r.employees_import_storage_path ? (
+                    <span className="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-emerald-100">
+                      Mall bifogad
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">—</span>
+                  )}
                 </TD>
                 <TD className="whitespace-nowrap text-sm text-slate-600">
                   {r.terms_accepted_at ? (
