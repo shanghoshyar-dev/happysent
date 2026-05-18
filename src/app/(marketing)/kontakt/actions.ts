@@ -107,6 +107,96 @@ function parseEmployeeRowsFromFormData(formData: FormData):
 /** Måste matcha default i migration `terms_document_version`. */
 const TERMS_DOCUMENT_VERSION = "May 2026";
 
+/** När DB inte har alla kolumner (migration inte körd) — PostgREST/Postgres feltext. */
+function isLikelyMissingColumnError(error: {
+  message?: string;
+  code?: string;
+}): boolean {
+  const msg = (error.message ?? "").toLowerCase();
+  const code = String(error.code ?? "");
+  if (code === "42703") return true;
+  if (msg.includes("schema cache")) return true;
+  if (msg.includes("could not find")) return true;
+  return (
+    msg.includes("column") &&
+    (msg.includes("does not exist") || msg.includes("unknown column"))
+  );
+}
+
+function messagePrefixedWithPhone(message: string, phone: string): string {
+  const phoneLine = `Telefon: ${phone}`;
+  const trimmed = message.trim();
+  return trimmed ? `${phoneLine}\n\n${trimmed}` : phoneLine;
+}
+
+/**
+ * Försök full rad (telefon + villkor), sedan utan contact_phone (telefon i message),
+ * sedan äldsta tabellen utan villkorskolumner i payload.
+ */
+async function insertCompanyApplicationBestEffort(
+  admin: ReturnType<typeof createAdminClient>,
+  row: {
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    message: string;
+  },
+): Promise<{ ok: true } | { ok: false; error: { message: string; code?: string } }> {
+  const baseMessage = row.message.trim() === "" ? null : row.message.trim();
+  const messageWithPhone = messagePrefixedWithPhone(row.message, row.phone);
+
+  const payloads: Record<string, unknown>[] = [
+    {
+      contact_name: row.name,
+      company_name: row.company,
+      contact_email: row.email,
+      contact_phone: row.phone,
+      message: baseMessage,
+      terms_accepted_at: new Date().toISOString(),
+      terms_document_version: TERMS_DOCUMENT_VERSION,
+    },
+    {
+      contact_name: row.name,
+      company_name: row.company,
+      contact_email: row.email,
+      message: messageWithPhone,
+      terms_accepted_at: new Date().toISOString(),
+      terms_document_version: TERMS_DOCUMENT_VERSION,
+    },
+    {
+      contact_name: row.name,
+      company_name: row.company,
+      contact_email: row.email,
+      message: messageWithPhone,
+    },
+  ];
+
+  let lastErr: { message: string; code?: string } | null = null;
+
+  for (let i = 0; i < payloads.length; i++) {
+    const { error } = await admin
+      .from("company_applications")
+      .insert(payloads[i] as never);
+    if (!error) {
+      if (i > 0) {
+        console.warn(
+          "[submitContactForm] körad sparad med bakåtkompatibel payload — kör pending migration(er) mot Supabase (contact_phone / terms).",
+        );
+      }
+      return { ok: true };
+    }
+    lastErr = error;
+    if (!isLikelyMissingColumnError(error)) break;
+    console.warn(
+      "[submitContactForm] insert misslyckades, provar enklare payload:",
+      error.message,
+    );
+  }
+
+  return { ok: false, error: lastErr ?? { message: "Okänt fel" } };
+}
+
 export async function submitContactForm(
   _prev: ContactState,
   formData: FormData,
@@ -161,17 +251,16 @@ export async function submitContactForm(
 
   try {
     const admin = createAdminClient();
-    const { error: qErr } = await admin.from("company_applications").insert({
-      contact_name: name,
-      company_name: company,
-      contact_email: email,
-      contact_phone: phone,
-      message: message || null,
-      terms_accepted_at: new Date().toISOString(),
-      terms_document_version: TERMS_DOCUMENT_VERSION,
+    const inserted = await insertCompanyApplicationBestEffort(admin, {
+      name,
+      company,
+      email,
+      phone,
+      message,
     });
 
-    if (qErr) {
+    if (!inserted.ok) {
+      const qErr = inserted.error;
       console.error("[submitContactForm] kö-rad misslyckades:", qErr.message);
       try {
         await sendContactAdminNotification({
