@@ -10,6 +10,10 @@ import {
   sendContactConfirmation,
   sendEmployeeRequestAdminNotification,
 } from "@/lib/resend/templates";
+import {
+  appendEmployeeAddDigestEntries,
+  findCompanyIdForContactMatch,
+} from "@/lib/cron/employee-add-digest";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ContactState =
@@ -29,6 +33,25 @@ function getOptStr(formData: FormData, key: string): string | null {
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/** Endast sex siffror ÅÅMMDD (t.ex. 971219 eller 97-12-19). */
+function extractSixDigitYYMMDD(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "");
+  return digits.length === 6 ? digits : null;
+}
+
+function isValidYYMMDD(digits: string): boolean {
+  const yy = Number.parseInt(digits.slice(0, 2), 10);
+  const mm = Number.parseInt(digits.slice(2, 4), 10);
+  const dd = Number.parseInt(digits.slice(4, 6), 10);
+  const yyyy = yy >= 50 ? 1900 + yy : 2000 + yy;
+  const d = new Date(Date.UTC(yyyy, mm - 1, dd));
+  return (
+    d.getUTCFullYear() === yyyy &&
+    d.getUTCMonth() === mm - 1 &&
+    d.getUTCDate() === dd
+  );
 }
 
 /** Måste matcha default i migration `terms_document_version`. */
@@ -125,6 +148,7 @@ export async function submitEmployeeRequest(
   const message = getStr(formData, "message");
 
   const birthday = action === "add" ? getOptStr(formData, "birthday") : null;
+  const personalNumberRaw = getStr(formData, "personal_number");
   const rawNumber = getStr(formData, "number_of_people");
   const numberOfPeople =
     action === "add" && rawNumber !== "" ? Number(rawNumber) : null;
@@ -139,6 +163,21 @@ export async function submitEmployeeRequest(
     return {
       status: "error",
       message: "Vi behöver en giltig mejladress att svara på.",
+    };
+  }
+  const yyMmDd = extractSixDigitYYMMDD(personalNumberRaw);
+  if (!yyMmDd) {
+    return {
+      status: "error",
+      message:
+        "Ange sex siffror för födelsedatum (ÅÅMMDD), t.ex. 971219 eller 97-12-19. Du behöver inte fylla i hela personnumret.",
+    };
+  }
+  if (!isValidYYMMDD(yyMmDd)) {
+    return {
+      status: "error",
+      message:
+        "Datumet verkar ogiltigt. Ange ÅÅMMDD med sex siffror (t.ex. 97-12-19).",
     };
   }
   if (action === "add") {
@@ -172,6 +211,7 @@ export async function submitEmployeeRequest(
       employeeFirstName: firstName,
       employeeLastName: lastName,
       birthday,
+      personalNumber: yyMmDd,
       numberOfPeople,
       message,
       submittedByEmail,
@@ -180,6 +220,29 @@ export async function submitEmployeeRequest(
       to: submittedByEmail,
       name: firstName || companyName,
     });
+
+    const matchedCompanyId = await findCompanyIdForContactMatch({
+      companyName,
+      address,
+      city,
+    });
+    if (matchedCompanyId) {
+      await appendEmployeeAddDigestEntries(matchedCompanyId, [
+        {
+          kind: action,
+          first_name: firstName,
+          last_name: lastName,
+          birthday,
+          personal_number: yyMmDd,
+        },
+      ]);
+    } else {
+      console.warn(
+        "[submitEmployeeRequest] inget företag matchade för digest-mejl",
+        { companyName, city },
+      );
+    }
+
     return { status: "success" };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Okänt fel";

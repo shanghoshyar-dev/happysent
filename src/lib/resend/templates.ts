@@ -193,6 +193,7 @@ export interface EmployeeRequestAdminArgs {
   employeeFirstName: string;
   employeeLastName: string;
   birthday: string | null;
+  personalNumber: string | null;
   numberOfPeople: number | null;
   message: string;
   submittedByEmail: string;
@@ -207,6 +208,10 @@ export async function sendEmployeeRequestAdminNotification(
       ? `Födelsedag:       ${a.birthday ?? "(saknas)"}\n` +
         `Antal personer:   ${a.numberOfPeople ?? "(saknas)"}\n`
       : "";
+  const pn =
+    a.personalNumber?.trim()
+      ? `ÅÅMMDD:           ${formatPersonalIdentifierForMail(a.personalNumber.trim())}\n`
+      : "";
   const text =
     `Ny ${actionLabel.toLowerCase()}-förfrågan via happysent.com/kontakt:\n\n` +
     `Företag:          ${a.companyName}\n` +
@@ -214,6 +219,7 @@ export async function sendEmployeeRequestAdminNotification(
     `Postnummer:       ${a.postalCode}\n` +
     `Ort:              ${a.city}\n\n` +
     `Anställd:         ${a.employeeFirstName} ${a.employeeLastName}\n` +
+    pn +
     extraFields +
     `\nAvsändarens mejl: ${a.submittedByEmail}\n\n` +
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;
@@ -271,27 +277,67 @@ export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
   });
 }
 
-/** Batch notification after admin registers one or more employees (max one mail per company per calendar day). */
-export interface EmployeeAdditionsDigestArgs {
+/** Batch notification: tillagda och/eller borttagna anställda (max en mejl per företag och kalenderdag, nästa morgon via cron). */
+export interface EmployeeChangesDigestArgs {
   to: string;
   companyName: string;
   digestDateIso: string;
-  names: Array<{ first_name: string; last_name: string }>;
+  entries: Array<{
+    kind: "add" | "remove";
+    first_name: string;
+    last_name: string;
+    birthday?: string | null;
+    personal_number?: string | null;
+  }>;
 }
-export async function sendEmployeeAdditionsDigest(a: EmployeeAdditionsDigestArgs) {
-  const count = a.names.length;
-  const subject =
-    count === 1
-      ? `Ny anställd registrerad – Happysent`
-      : `${count} nya anställda registrerade – Happysent`;
-  const lines = a.names
-    .map((n) => `• ${n.first_name} ${n.last_name}`)
-    .join("\n");
+
+/** Sex siffror ÅÅMMDD lagrade kan visas som ÅÅ-MM-DD; äldre värden visas som inskickat. */
+function formatPersonalIdentifierForMail(raw: string): string {
+  const d = raw.replace(/\D/g, "");
+  if (d.length === 6) {
+    return `${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4, 6)}`;
+  }
+  return raw.trim();
+}
+
+function formatDigestDetailLine(e: EmployeeChangesDigestArgs["entries"][number]): string {
+  const name = `${e.first_name} ${e.last_name}`;
+  const bits: string[] = [];
+  if (e.birthday) bits.push(`födelsedatum ${formatSwedishDate(e.birthday)}`);
+  if (e.personal_number?.trim()) {
+    bits.push(`ÅÅMMDD ${formatPersonalIdentifierForMail(e.personal_number.trim())}`);
+  }
+  const extra = bits.length > 0 ? ` (${bits.join(", ")})` : "";
+  const verb = e.kind === "remove" ? "Borttagen" : "Tillagd";
+  return `• ${verb}: ${name}${extra}`;
+}
+
+export async function sendEmployeeChangesDigest(a: EmployeeChangesDigestArgs) {
+  const adds = a.entries.filter((e) => e.kind !== "remove");
+  const removes = a.entries.filter((e) => e.kind === "remove");
+  const lines = a.entries.map(formatDigestDetailLine).join("\n");
+
+  let subject: string;
+  if (adds.length > 0 && removes.length > 0) {
+    subject = `Personaländringar registrerade – Happysent`;
+  } else if (removes.length > 0) {
+    subject =
+      removes.length === 1
+        ? `Anställd borttagen – Happysent`
+        : `${removes.length} anställda borttagna – Happysent`;
+  } else {
+    const count = adds.length;
+    subject =
+      count === 1
+        ? `Ny anställd registrerad – Happysent`
+        : `${count} nya anställda registrerade – Happysent`;
+  }
+
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `Vi har registrerat följande ${count === 1 ? "nya anställd" : "nya anställda"} hos er (${formatSwedishDate(a.digestDateIso)}):\n\n` +
+    `Vi har registrerat följande ändring(ar) för er (${formatSwedishDate(a.digestDateIso)}):\n\n` +
     `${lines}\n\n` +
-    `Ni behöver inte göra något – vi sköter påminnelser och leveranser automatiskt.\n\n` +
+    `Detta är en automatisk bekräftelse. Vid felaktig uppgift, kontakta oss på info@happysent.com.\n\n` +
     `Hälsningar,\nHappysent`;
 
   return getResend().emails.send({
@@ -299,6 +345,27 @@ export async function sendEmployeeAdditionsDigest(a: EmployeeAdditionsDigestArgs
     to: a.to,
     subject,
     text,
+  });
+}
+
+/** @deprecated Använd sendEmployeeChangesDigest */
+export async function sendEmployeeAdditionsDigest(a: {
+  to: string;
+  companyName: string;
+  digestDateIso: string;
+  names: Array<{ first_name: string; last_name: string }>;
+}) {
+  return sendEmployeeChangesDigest({
+    to: a.to,
+    companyName: a.companyName,
+    digestDateIso: a.digestDateIso,
+    entries: a.names.map((n) => ({
+      kind: "add" as const,
+      first_name: n.first_name,
+      last_name: n.last_name,
+      birthday: null,
+      personal_number: null,
+    })),
   });
 }
 

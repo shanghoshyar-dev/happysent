@@ -58,6 +58,14 @@ export default function IntegritetspolicyPage() {
               order.
             </li>
             <li>
+              <strong>Birth date as six digits (YYMMDD)</strong> – only when
+              someone at your company submits an add/remove employee request via
+              our website (you do <em>not</em> need to provide a full national ID):
+              we use it to tell employees apart in the automated summary email to
+              your company&apos;s registered contact address. It is stored only
+              briefly in our technical queue until that confirmation is sent.
+            </li>
+            <li>
               <strong>Contact person&apos;s email</strong> at the customer
               company – for confirmations and invoices.
             </li>
@@ -69,7 +77,11 @@ export default function IntegritetspolicyPage() {
             What we do <em>not</em> store
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>National identity numbers</li>
+            <li>
+              Long-term storage of national identity numbers as general HR
+              payroll records (we do not maintain personnel files beyond what is
+              needed for deliveries)
+            </li>
             <li>Salary or HR records</li>
             <li>Health data or other special categories of personal data</li>
             <li>
@@ -105,20 +117,6 @@ export default function IntegritetspolicyPage() {
             data, we do not use it for marketing, and we do not transfer it
             outside the EU/EEA for processing.
           </p>
-          <p className="mt-3">Sub-processors for technical operations:</p>
-          <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>
-              <strong>Supabase</strong> (database, EU region) – data processing
-              agreement in place.
-            </li>
-            <li>
-              <strong>Resend</strong> (email delivery) – for confirmations and
-              bakery orders.
-            </li>
-            <li>
-              <strong>Vercel</strong> (hosting, EU region).
-            </li>
-          </ul>
         </section>
 
         <section>

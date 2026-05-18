@@ -1,19 +1,74 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmployeeAdditionsDigest } from "@/lib/resend/templates";
+import { sendEmployeeChangesDigest } from "@/lib/resend/templates";
 import { todayInStockholm, toDateString } from "@/lib/holidays/swedish";
 
-export interface DigestAddition {
+/** Rad i employee_add_digest.additions (JSON). */
+export type DigestChangeEntry = {
+  kind: "add" | "remove";
   first_name: string;
   last_name: string;
+  birthday?: string | null;
+  personal_number?: string | null;
+};
+
+function normalizeEntry(raw: unknown): DigestChangeEntry | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const first_name = String(o.first_name ?? "").trim();
+  const last_name = String(o.last_name ?? "").trim();
+  if (!first_name || !last_name) return null;
+  const kind = o.kind === "remove" ? "remove" : "add";
+  const birthday =
+    typeof o.birthday === "string" && o.birthday.trim() !== ""
+      ? o.birthday.trim()
+      : null;
+  const personal_number =
+    typeof o.personal_number === "string" && o.personal_number.trim() !== ""
+      ? o.personal_number.trim()
+      : null;
+  return {
+    kind,
+    first_name,
+    last_name,
+    birthday,
+    personal_number,
+  };
+}
+
+export async function findCompanyIdForContactMatch(params: {
+  companyName: string;
+  address: string;
+  city: string;
+}): Promise<string | null> {
+  const supabase = createAdminClient();
+  const name = params.companyName.trim();
+  const address = params.address.trim();
+  const city = params.city.trim();
+  if (!name || !address || !city) return null;
+
+  const { data, error } = await supabase
+    .from("companies")
+    .select("id")
+    .ilike("name", name)
+    .ilike("address", address)
+    .ilike("city", city)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[employee-add-digest] company lookup failed:", error.message);
+    return null;
+  }
+  return data?.id ?? null;
 }
 
 export async function appendEmployeeAddDigestEntries(
   companyId: string,
-  names: DigestAddition[],
+  entries: DigestChangeEntry[],
 ): Promise<void> {
-  if (names.length === 0) return;
+  if (entries.length === 0) return;
 
   const digestDate = toDateString(todayInStockholm());
   const supabase = createAdminClient();
@@ -40,7 +95,7 @@ export async function appendEmployeeAddDigestEntries(
   }
 
   const prev = parseAdditions(existing?.additions);
-  const merged = [...prev, ...names];
+  const merged = [...prev, ...entries];
 
   const { error: upsertErr } = await supabase.from("employee_add_digest").upsert(
     {
@@ -64,8 +119,8 @@ export interface FlushEmployeeDigestResult {
 }
 
 /**
- * Email digests for any pending buckets strictly before today's Stockholm date.
- * Called from the 07:00 cron so "yesterday's" bulk registrations become one mail per company.
+ * Skickar digest för gårdagens bucket (digest_date &lt; idag Stockholm).
+ * En kombinerad mejl med tillagda och borttagna anställda.
  */
 export async function flushPendingEmployeeAddDigests(
   today: Date,
@@ -93,8 +148,8 @@ export async function flushPendingEmployeeAddDigests(
   }
 
   for (const row of pending ?? []) {
-    const names = parseAdditions(row.additions);
-    if (names.length === 0) {
+    const entries = parseAdditions(row.additions);
+    if (entries.length === 0) {
       result.digestsSkippedEmpty++;
       await supabase
         .from("employee_add_digest")
@@ -114,18 +169,26 @@ export async function flushPendingEmployeeAddDigests(
     }
 
     try {
-      await sendEmployeeAdditionsDigest({
+      await sendEmployeeChangesDigest({
         to: company.contact_email,
         companyName: company.name,
         digestDateIso: row.digest_date,
-        names,
+        entries: entries.map((e) => ({
+          kind: e.kind,
+          first_name: e.first_name,
+          last_name: e.last_name,
+          birthday: e.birthday ?? null,
+          personal_number: e.personal_number ?? null,
+        })),
       });
       const { error: upErr } = await supabase
         .from("employee_add_digest")
         .update({ notified_at: new Date().toISOString() })
         .eq("id", row.id);
       if (upErr) {
-        result.errors.push(`Digest ${row.id}: kunde inte markera som skickad: ${upErr.message}`);
+        result.errors.push(
+          `Digest ${row.id}: kunde inte markera som skickad: ${upErr.message}`,
+        );
       } else {
         result.digestsSent++;
       }
@@ -138,21 +201,12 @@ export async function flushPendingEmployeeAddDigests(
   return result;
 }
 
-function parseAdditions(raw: unknown): DigestAddition[] {
+function parseAdditions(raw: unknown): DigestChangeEntry[] {
   if (!Array.isArray(raw)) return [];
-  const out: DigestAddition[] = [];
+  const out: DigestChangeEntry[] = [];
   for (const item of raw) {
-    if (
-      item &&
-      typeof item === "object" &&
-      "first_name" in item &&
-      "last_name" in item
-    ) {
-      out.push({
-        first_name: String((item as DigestAddition).first_name ?? ""),
-        last_name: String((item as DigestAddition).last_name ?? ""),
-      });
-    }
+    const n = normalizeEntry(item);
+    if (n) out.push(n);
   }
   return out;
 }

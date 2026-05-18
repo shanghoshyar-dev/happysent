@@ -47,7 +47,10 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
         <h2 className="font-display text-2xl text-slate-900">Tack!</h2>
         <p className="text-slate-600">
           Vi har tagit emot din förfrågan och uppdaterar listan inom en
-          arbetsdag. En bekräftelse är skickad till din mejl.
+          arbetsdag. En bekräftelse är skickad till din mejl. Om vi känner igen
+          ert företag i systemet får ni även en sammanfattning till företagets
+          registrerade kontaktmejl vid nästa planerade utskick (vanligtvis
+          följande vardagsmorgon).
         </p>
       </div>
     );
@@ -116,6 +119,21 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
           <div>
             <Label htmlFor="last_name">Anställdas efternamn</Label>
             <Input id="last_name" name="last_name" required />
+          </div>
+          <div className="sm:col-span-2">
+            <Label htmlFor="personal_number">Födelsedatum (ÅÅMMDD)</Label>
+            <Input
+              id="personal_number"
+              name="personal_number"
+              required
+              autoComplete="off"
+              placeholder="t.ex. 97-12-19 eller 971219"
+              inputMode="numeric"
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Sex siffror för födelsedatum räcker — ni behöver inte ange hela
+              personnumret. Används i bekräftelsen till ert företags mejl.
+            </p>
           </div>
           {action === "add" && (
             <>

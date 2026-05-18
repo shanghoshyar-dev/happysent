@@ -19,7 +19,13 @@ export async function createEmployee(formData: FormData) {
   const { error } = await supabase.from("employees").insert(payload);
   if (error) throw new Error(error.message);
   await appendEmployeeAddDigestEntries(payload.company_id, [
-    { first_name: payload.first_name, last_name: payload.last_name },
+    {
+      kind: "add",
+      first_name: payload.first_name,
+      last_name: payload.last_name,
+      birthday: payload.birthday.trim() || null,
+      personal_number: null,
+    },
   ]);
   revalidatePath("/admin/anstallda");
 }
@@ -248,8 +254,11 @@ export async function importEmployeesExcel(
     await appendEmployeeAddDigestEntries(
       companyId,
       validRows.map((r) => ({
+        kind: "add" as const,
         first_name: r.first_name,
         last_name: r.last_name,
+        birthday: r.birthday,
+        personal_number: null,
       })),
     );
   }
