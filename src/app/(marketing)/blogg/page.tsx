@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
 export const metadata: Metadata = svMarketingPageMeta({
@@ -16,7 +16,7 @@ export const metadata: Metadata = svMarketingPageMeta({
 export const revalidate = 60;
 
 export default async function BloggPage() {
-  const supabase = createClient();
+  const supabase = createAdminClient();
   const { data: posts } = await supabase
     .from("blog_posts")
     .select("id, slug, title, excerpt, author, published_at")
