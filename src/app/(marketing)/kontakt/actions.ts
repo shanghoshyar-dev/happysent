@@ -160,22 +160,41 @@ export async function submitContactForm(
   }
 
   try {
-    try {
-      const admin = createAdminClient();
-      const { error: qErr } = await admin.from("company_applications").insert({
-        contact_name: name,
-        company_name: company,
-        contact_email: email,
-        contact_phone: phone,
-        message: message || null,
-        terms_accepted_at: new Date().toISOString(),
-        terms_document_version: TERMS_DOCUMENT_VERSION,
-      });
-      if (qErr) {
-        console.error("[submitContactForm] kö-rad misslyckades:", qErr.message);
+    const admin = createAdminClient();
+    const { error: qErr } = await admin.from("company_applications").insert({
+      contact_name: name,
+      company_name: company,
+      contact_email: email,
+      contact_phone: phone,
+      message: message || null,
+      terms_accepted_at: new Date().toISOString(),
+      terms_document_version: TERMS_DOCUMENT_VERSION,
+    });
+
+    if (qErr) {
+      console.error("[submitContactForm] kö-rad misslyckades:", qErr.message);
+      try {
+        await sendContactAdminNotification({
+          name,
+          company,
+          email,
+          phone,
+          message:
+            `[Tekniskt fel — förfrågan sparades inte i admin-kön och syns inte under Företag: ${qErr.message}]\n\n` +
+            (message || "(inget meddelande)"),
+          subjectPrefix: "[KÖ SPARADES EJ] ",
+        });
+      } catch (notifyErr) {
+        console.error(
+          "[submitContactForm] kunde inte mejla admin om köfel:",
+          notifyErr,
+        );
       }
-    } catch (e) {
-      console.error("[submitContactForm] kö-rad oväntat fel:", e);
+      return {
+        status: "error",
+        message:
+          "Vi kunde inte spara er förfrågan i systemet just nu. Försök gärna igen om en liten stund eller kontakta oss direkt.",
+      };
     }
 
     await sendContactAdminNotification({ name, company, email, phone, message });

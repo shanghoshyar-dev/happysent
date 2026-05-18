@@ -36,8 +36,9 @@ export function CompanyApplicationQueue({ rows }: Props) {
         </h2>
         <p className="mt-1 text-sm text-slate-600">
           Här hamnar intresseanmälningar från kontaktformuläret (&quot;Ny
-          kund?&quot;). Ring och verifiera innan du godkänner och skapar
-          företaget.
+          kund?&quot;). Varje rad ligger kvar som <strong>väntande</strong> tills
+          ni godkänner (skapa företag) eller avvisar — inget försvinner av sig
+          själv.
         </p>
       </div>
       <div className="overflow-x-auto">

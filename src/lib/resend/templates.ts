@@ -166,9 +166,12 @@ export interface ContactAdminArgs {
   email: string;
   phone: string;
   message: string;
+  /** Läggs före standardämnesraden (t.ex. vid fel som hindrar körad). */
+  subjectPrefix?: string;
 }
 export async function sendContactAdminNotification(a: ContactAdminArgs) {
-  const subject = `Nytt kontaktmeddelande från ${a.name} (${a.company})`;
+  const subject =
+    `${a.subjectPrefix ?? ""}Nytt kontaktmeddelande från ${a.name} (${a.company})`.trim();
   const text =
     `Ny förfrågan via happysent.com/kontakt:\n\n` +
     `Namn:     ${a.name}\n` +
