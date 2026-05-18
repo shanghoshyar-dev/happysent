@@ -29,6 +29,9 @@ export function MarketingFooter() {
           <Link href="/integritetspolicy" className="hover:text-candy-600">
             Integritetspolicy
           </Link>
+          <Link href="/anvandarvillkor" className="hover:text-candy-600">
+            Användarvillkor
+          </Link>
           <Link href="/login" className="hover:text-candy-600">
             Logga in
           </Link>

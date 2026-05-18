@@ -31,6 +31,9 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/** Måste matcha default i migration `terms_document_version`. */
+const TERMS_DOCUMENT_VERSION = "May 2026";
+
 export async function submitContactForm(
   _prev: ContactState,
   formData: FormData,
@@ -40,6 +43,7 @@ export async function submitContactForm(
   const email = getStr(formData, "email");
   const message = getStr(formData, "message");
   const consent = formData.get("consent") === "on";
+  const termsAccept = formData.get("terms_accept") === "on";
 
   if (!name || !company || !email) {
     return { status: "error", message: "Fyll i namn, företag och mejl." };
@@ -52,6 +56,13 @@ export async function submitContactForm(
       status: "error",
       message:
         "Du behöver godkänna integritetspolicyn och databehandlingsavtalet.",
+    };
+  }
+  if (!termsAccept) {
+    return {
+      status: "error",
+      message:
+        "Du behöver godkänna användarvillkoren för att skicka en förfrågan som ny kund.",
     };
   }
 
@@ -72,6 +83,8 @@ export async function submitContactForm(
         company_name: company,
         contact_email: email,
         message: message || null,
+        terms_accepted_at: new Date().toISOString(),
+        terms_document_version: TERMS_DOCUMENT_VERSION,
       });
       if (qErr) {
         console.error("[submitContactForm] kö-rad misslyckades:", qErr.message);

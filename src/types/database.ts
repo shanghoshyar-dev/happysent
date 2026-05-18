@@ -171,6 +171,8 @@ export type Database = {
           processed_at: string | null;
           created_company_id: string | null;
           created_at: string;
+          terms_accepted_at: string | null;
+          terms_document_version: string;
         };
         Insert: {
           id?: string;
@@ -182,6 +184,8 @@ export type Database = {
           processed_at?: string | null;
           created_company_id?: string | null;
           created_at?: string;
+          terms_accepted_at?: string | null;
+          terms_document_version?: string;
         };
         Update: {
           id?: string;
@@ -193,6 +197,8 @@ export type Database = {
           processed_at?: string | null;
           created_company_id?: string | null;
           created_at?: string;
+          terms_accepted_at?: string | null;
+          terms_document_version?: string;
         };
         Relationships: [
           {

@@ -107,6 +107,26 @@ export function ContactForm({ className }: { className?: string }) {
             och databehandlingsavtal.
           </span>
         </label>
+        <label className="flex items-start gap-3 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            name="terms_accept"
+            required
+            className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
+          />
+          <span>
+            Jag har läst och godkänner Happysents{" "}
+            <Link
+              href="/anvandarvillkor"
+              className="font-medium text-candy-600 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              användarvillkor (Terms and Conditions)
+            </Link>
+            .
+          </span>
+        </label>
       </div>
       {state.status === "error" && (
         <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">

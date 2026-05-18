@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/blogg",
     "/kontakt",
     "/integritetspolicy",
+    "/anvandarvillkor",
   ].map((path) => ({
     url: `${base}${path}`,
     changeFrequency: path === "" ? "weekly" : "monthly",

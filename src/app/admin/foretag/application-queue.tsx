@@ -18,6 +18,8 @@ export type ApplicationQueueRow = {
   contact_email: string;
   message: string | null;
   created_at: string;
+  terms_accepted_at: string | null;
+  terms_document_version: string;
 };
 
 interface Props {
@@ -46,6 +48,7 @@ export function CompanyApplicationQueue({ rows }: Props) {
               <TH>Företag</TH>
               <TH>Mejl</TH>
               <TH>Meddelande</TH>
+              <TH>Villkor</TH>
               <TH className="w-[1%] whitespace-nowrap">Åtgärder</TH>
             </TR>
           </THead>
@@ -65,8 +68,23 @@ export function CompanyApplicationQueue({ rows }: Props) {
                     {r.contact_email}
                   </a>
                 </TD>
-                <TD className="max-w-[14rem] truncate text-sm text-slate-600" title={r.message ?? undefined}>
+                <TD
+                  className="max-w-[14rem] truncate text-sm text-slate-600"
+                  title={r.message ?? undefined}
+                >
                   {r.message?.trim() ? r.message : "—"}
+                </TD>
+                <TD className="whitespace-nowrap text-sm text-slate-600">
+                  {r.terms_accepted_at ? (
+                    <>
+                      {formatDate(r.terms_accepted_at.slice(0, 10))}
+                      <span className="block text-xs text-slate-500">
+                        {r.terms_document_version}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-amber-700">Saknas</span>
+                  )}
                 </TD>
                 <TD>
                   <div className="flex flex-wrap gap-2">
