@@ -136,6 +136,8 @@ body {
   line-height: 1;
   transform-origin: center bottom;
   will-change: transform;
+  /* Ligger lite ovanpå knappkanten vertikalt */
+  margin-top: -0.15em;
 }
 
 .cta-decor--cake {
