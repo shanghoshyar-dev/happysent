@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
+import { HoneypotField } from "@/components/marketing/honeypot-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,11 +58,9 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
       >
         <h2 className="font-display text-2xl text-slate-900">Tack!</h2>
         <p className="text-slate-600">
-          Vi har tagit emot din förfrågan och uppdaterar listan inom en
-          arbetsdag. En bekräftelse är skickad till din mejl. Om vi känner igen
-          ert företag i systemet får ni även en sammanfattning till företagets
-          registrerade kontaktmejl vid nästa planerade utskick (vanligtvis
-          följande vardagsmorgon).
+          Vi har tagit emot din förfrågan och skickat en bekräftelse till din
+          mejl. Ändringen granskas i vår kölista och görs i systemet när den är
+          godkänd, vanligtvis inom en arbetsdag.
         </p>
       </div>
     );
@@ -71,10 +70,11 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
     <form
       action={formAction}
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-5 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm",
+        "relative flex min-h-0 flex-1 flex-col gap-5 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm",
         className,
       )}
     >
+      <HoneypotField />
       <div className="shrink-0">
         <h2 className="font-display text-2xl text-slate-900">
           Lägg till eller ta bort anställd

@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 
 import { BrandName } from "@/components/brand-name";
+import { HoneypotField } from "@/components/marketing/honeypot-field";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { useLocale } from "@/i18n/locale-provider";
 import { Button } from "@/components/ui/button";
@@ -58,10 +59,11 @@ export function ContactForm({ className }: { className?: string }) {
       action={formAction}
       encType="multipart/form-data"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-5 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm",
+        "relative flex min-h-0 flex-1 flex-col gap-5 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm",
         className,
       )}
     >
+      <HoneypotField />
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div>
           <Label htmlFor="name">{f.name}</Label>

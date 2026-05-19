@@ -153,6 +153,65 @@ export type Database = {
           },
         ];
       };
+      employee_change_requests: {
+        Row: {
+          id: string;
+          status: "pending" | "approved" | "rejected";
+          action_type: "add" | "remove";
+          company_name: string;
+          address: string;
+          city: string;
+          postal_code: string;
+          submitted_by_email: string;
+          message: string | null;
+          number_of_people: number | null;
+          employees: Json;
+          matched_company_id: string | null;
+          processed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          status?: "pending" | "approved" | "rejected";
+          action_type: "add" | "remove";
+          company_name: string;
+          address: string;
+          city: string;
+          postal_code: string;
+          submitted_by_email: string;
+          message?: string | null;
+          number_of_people?: number | null;
+          employees?: Json;
+          matched_company_id?: string | null;
+          processed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          status?: "pending" | "approved" | "rejected";
+          action_type?: "add" | "remove";
+          company_name?: string;
+          address?: string;
+          city?: string;
+          postal_code?: string;
+          submitted_by_email?: string;
+          message?: string | null;
+          number_of_people?: number | null;
+          employees?: Json;
+          matched_company_id?: string | null;
+          processed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_requests_matched_company_id_fkey";
+            columns: ["matched_company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       companies: {
         Row: {
           id: string;

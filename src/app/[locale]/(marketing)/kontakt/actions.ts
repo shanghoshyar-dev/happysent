@@ -10,17 +10,15 @@ import {
   sendContactConfirmation,
   sendEmployeeRequestAdminNotification,
 } from "@/lib/resend/templates";
-import {
-  appendEmployeeAddDigestEntries,
-  findCompanyIdForContactMatch,
-  type DigestChangeEntry,
-} from "@/lib/cron/employee-add-digest";
+import { findCompanyIdForContactMatch } from "@/lib/cron/employee-add-digest";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
+import { isHoneypotFilled } from "@/lib/honeypot";
 import {
   formatOrganizationNumber,
   normalizeOrganizationNumber,
 } from "@/lib/organization-number";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Json } from "@/types/database";
 
 export type ContactState =
   | { status: "idle" }
@@ -57,14 +55,6 @@ function parseIsoDateYYYYMMDD(iso: string): string | null {
     return null;
   }
   return iso;
-}
-
-/** ÅÅMMDD för kö/digest (bakåtkompabilitet), härlett ur fullständigt datum. */
-function isoDateToYYMMDD(iso: string): string | null {
-  if (!parseIsoDateYYYYMMDD(iso)) return null;
-  const y = Number(iso.slice(0, 4));
-  const yy = String(y % 100).padStart(2, "0");
-  return `${yy}${iso.slice(5, 7)}${iso.slice(8, 10)}`;
 }
 
 function collectTrimmed(formData: FormData, key: string): string[] {
@@ -252,6 +242,10 @@ export async function submitContactForm(
   _prev: ContactState,
   formData: FormData,
 ): Promise<ContactState> {
+  if (isHoneypotFilled(formData)) {
+    return { status: "success" };
+  }
+
   const name = getStr(formData, "name");
   const company = getStr(formData, "company");
   const organizationNumberRaw = getStr(formData, "organization_number");
@@ -440,6 +434,10 @@ export async function submitEmployeeRequest(
   _prev: ContactState,
   formData: FormData,
 ): Promise<ContactState> {
+  if (isHoneypotFilled(formData)) {
+    return { status: "success" };
+  }
+
   const rawAction = getStr(formData, "action_type");
   if (rawAction !== "add" && rawAction !== "remove") {
     return { status: "error", message: "Välj om du vill lägga till eller ta bort." };
@@ -494,6 +492,43 @@ export async function submitEmployeeRequest(
   }
 
   try {
+    const matchedCompanyId = await findCompanyIdForContactMatch({
+      companyName,
+      address,
+      city,
+    });
+
+    const admin = createAdminClient();
+    const employeesJson: Json = employeeRows.map((r) => ({
+      first_name: r.first,
+      last_name: r.last,
+      birthday: r.birthday,
+    }));
+
+    const { error: queueErr } = await admin
+      .from("employee_change_requests")
+      .insert({
+        action_type: action,
+        company_name: companyName,
+        address,
+        city,
+        postal_code: postalCode,
+        submitted_by_email: submittedByEmail,
+        message: message.trim() === "" ? null : message.trim(),
+        number_of_people: action === "add" ? numberOfPeople : null,
+        employees: employeesJson,
+        matched_company_id: matchedCompanyId,
+      });
+
+    if (queueErr) {
+      console.error("[submitEmployeeRequest] kö-rad misslyckades:", queueErr);
+      return {
+        status: "error",
+        message:
+          "Vi kunde inte spara er förfrågan just nu. Försök igen om en stund eller mejla oss.",
+      };
+    }
+
     await sendEmployeeRequestAdminNotification({
       action,
       companyName,
@@ -513,27 +548,6 @@ export async function submitEmployeeRequest(
       to: submittedByEmail,
       name: employeeRows[0]?.first || companyName,
     });
-
-    const matchedCompanyId = await findCompanyIdForContactMatch({
-      companyName,
-      address,
-      city,
-    });
-    if (matchedCompanyId) {
-      const digestEntries: DigestChangeEntry[] = employeeRows.map((r) => ({
-        kind: action === "remove" ? "remove" : "add",
-        first_name: r.first,
-        last_name: r.last,
-        birthday: r.birthday,
-        personal_number: isoDateToYYMMDD(r.birthday)!,
-      }));
-      await appendEmployeeAddDigestEntries(matchedCompanyId, digestEntries);
-    } else {
-      console.warn(
-        "[submitEmployeeRequest] inget företag matchade för digest-mejl",
-        { companyName, city },
-      );
-    }
 
     return { status: "success" };
   } catch (err) {
