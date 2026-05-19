@@ -112,6 +112,37 @@ body {
       max-width: min(52rem, 62vw);
     }
   }
+
+  /** Hero: läsbar vit text ovanpå foto. */
+  .hero-text-shadow {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.55),
+      0 8px 28px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero-text-shadow-soft {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /** Hero: vertikala slats (tunna linjer + lätt kolumnvariation). */
+  .hero-vertical-slats {
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.04) 0,
+        rgba(255, 255, 255, 0.04) 5rem,
+        rgba(0, 0, 0, 0.05) 5rem,
+        rgba(0, 0, 0, 0.05) 10rem
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0,
+        transparent calc(5rem - 1px),
+        rgba(255, 255, 255, 0.11) calc(5rem - 1px),
+        rgba(255, 255, 255, 0.11) 5rem
+      );
+    background-size: 10rem 100%;
+  }
 }
 
 /* CTA-dekoration: lätt wiggle på tårta/blomma, inte på knappen */

@@ -16,22 +16,27 @@ export function Hero() {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-[#2c1f1a]/60" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#2c1f1a]/35 via-[#2c1f1a]/45 to-[#2c1f1a]/70" />
+        <div className="absolute inset-0 bg-[#2c1f1a]/42" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2c1f1a]/22 via-[#2c1f1a]/32 to-[#2c1f1a]/52" />
+        <div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_42%,rgba(20,12,10,0.58)_0%,rgba(20,12,10,0.22)_55%,transparent_78%)]"
+          aria-hidden
+        />
+        <div className="hero-vertical-slats absolute inset-0" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[min(88vh,44rem)] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center sm:min-h-[min(92vh,48rem)] sm:py-20 md:py-24">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-black/35 px-4 py-1.5 text-xs font-medium text-white shadow-sm backdrop-blur-md">
           <span aria-hidden>✨</span> Ny i Malmö
         </span>
 
-        <h1 className="mt-8 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
+        <h1 className="hero-text-shadow mt-8 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
           Glöm aldrig en
           <br />
-          <span className="text-candy-300">födelsedag</span> igen.
+          <span className="text-candy-200">födelsedag</span> igen.
         </h1>
 
-        <p className="mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
+        <p className="hero-text-shadow-soft mt-6 max-w-xl text-base leading-relaxed text-white sm:text-lg">
           Happysent bokar och levererar färska tårtor från lokala bagerier till ditt
           kontor – på rätt dag, varje gång. Lägg till dina anställda, luta dig tillbaka
           och låt oss sköta resten.
@@ -54,7 +59,7 @@ export function Hero() {
           </Link>
         </div>
 
-        <p className="mt-8 text-sm text-white/75">
+        <p className="hero-text-shadow-soft mt-8 text-sm text-white/90">
           Inga uppstartsavgifter · Pausa när som helst
         </p>
       </div>
