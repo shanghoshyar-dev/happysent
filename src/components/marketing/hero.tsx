@@ -6,85 +6,57 @@ import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-candy-gradient">
-      <div className="mx-auto max-w-6xl px-6 pb-20 pt-24 md:pb-24">
-        <div className="grid gap-12 md:grid-cols-2 md:items-center">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-candy-700 shadow-sm">
-              <span aria-hidden>✨</span> Ny i Malmö
-            </span>
-            <h1 className="mt-6 font-display text-5xl leading-tight tracking-tight text-slate-900 md:text-6xl">
-              Glöm aldrig en
-              <br />
-              <span className="text-candy-500">födelsedag</span> igen.
-            </h1>
-            <p className="mt-6 max-w-lg text-lg text-slate-600">
-              Happysent bokar och levererar färska tårtor från lokala bagerier till
-              ditt kontor – på rätt dag, varje gång. Lägg till dina anställda,
-              luta dig tillbaka och låt oss sköta resten.
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href="/kontakt">
-                <CtaButton size="lg">Kom igång</CtaButton>
-              </Link>
-              <Link href="/priser">
-                <Button size="lg" variant="secondary">
-                  Se priser
-                </Button>
-              </Link>
-            </div>
-            <p className="mt-6 text-sm text-slate-500">
-              Inga uppstartsavgifter · Pausa när som helst
-            </p>
-          </div>
-          <div className="relative">
-            <div className="rotate-2 rounded-3xl bg-white p-8 shadow-soft">
-              <div className="flex items-center gap-3 border-b border-candy-100 pb-4">
-                <span aria-hidden className="text-3xl">🎂</span>
-                <div>
-                  <p className="font-semibold text-slate-900">Kalle fyller år!</p>
-                  <p className="text-xs text-slate-500">14 dagar kvar</p>
-                </div>
-              </div>
-              <ul className="mt-4 space-y-3 text-sm text-slate-600">
-                <li className="flex justify-between">
-                  <span>Bageri</span>
-                  <span className="font-medium text-slate-900">Söderbergs</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Antal personer</span>
-                  <span className="font-medium text-slate-900">8</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Leverans</span>
-                  <span className="font-medium text-slate-900">Tor 09:00</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Status</span>
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
-                    Bokad
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div className="absolute -bottom-6 -left-6 rotate-[-6deg] rounded-2xl bg-sprinkle-lemon px-4 py-3 text-sm font-medium text-slate-800 shadow">
-              Levererad: 47 tårtor i år
-            </div>
-          </div>
+    <section className="relative min-h-[min(88vh,44rem)] overflow-hidden sm:min-h-[min(92vh,48rem)]">
+      <div className="absolute inset-0" aria-hidden>
+        <Image
+          src="/marketing/hero-cakes-flowers.avif"
+          alt=""
+          fill
+          className="object-cover object-[center_42%]"
+          sizes="100vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-[#2c1f1a]/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2c1f1a]/35 via-[#2c1f1a]/45 to-[#2c1f1a]/70" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[min(88vh,44rem)] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center sm:min-h-[min(92vh,48rem)] sm:py-20 md:py-24">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+          <span aria-hidden>✨</span> Ny i Malmö
+        </span>
+
+        <h1 className="mt-8 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
+          Glöm aldrig en
+          <br />
+          <span className="text-candy-300">födelsedag</span> igen.
+        </h1>
+
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
+          Happysent bokar och levererar färska tårtor från lokala bagerier till ditt
+          kontor – på rätt dag, varje gång. Lägg till dina anställda, luta dig tillbaka
+          och låt oss sköta resten.
+        </p>
+
+        <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+          <Link href="/kontakt" className="sm:w-auto">
+            <CtaButton size="lg" fullWidth className="sm:!w-auto">
+              Kom igång
+            </CtaButton>
+          </Link>
+          <Link href="/priser" className="sm:w-auto">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-full border-white/25 bg-white/95 text-slate-900 hover:bg-white sm:w-auto"
+            >
+              Se priser
+            </Button>
+          </Link>
         </div>
 
-        <div className="relative mt-10 w-full overflow-hidden rounded-3xl shadow-soft ring-1 ring-white/60 md:mt-14">
-          <div className="relative aspect-[21/9] w-full min-h-[12rem] sm:min-h-[14rem] md:aspect-[2.4/1]">
-            <Image
-              src="/marketing/hero-cakes-flowers.avif"
-              alt="Närbild av dekorerade födelsedagstårtor bland rosa blommor"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 1152px"
-              priority
-            />
-          </div>
-        </div>
+        <p className="mt-8 text-sm text-white/75">
+          Inga uppstartsavgifter · Pausa när som helst
+        </p>
       </div>
     </section>
   );
