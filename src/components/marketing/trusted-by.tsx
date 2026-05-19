@@ -1,24 +1,21 @@
+"use client";
+
 import Image from "next/image";
 
+import { useLocale } from "@/i18n/locale-provider";
+
 const logos = [
-  {
-    src: "/marketing/logos/crisha.png",
-    alt: "Crisha Marketing",
-  },
-  {
-    src: "/marketing/logos/carpathian.png",
-    alt: "Carpathian Marketing Agency",
-  },
-  {
-    src: "/marketing/logos/shang-taxi.svg",
-    alt: "Shang Taxi",
-  },
+  { src: "/marketing/logos/crisha.png", alt: "Crisha Marketing" },
+  { src: "/marketing/logos/carpathian.png", alt: "Carpathian Marketing Agency" },
+  { src: "/marketing/logos/shang-taxi.svg", alt: "Shang Taxi" },
 ] as const;
 
-/** Dubbel lista så `translate3d(-50%,0,0)` loopar sömlöst. */
 const marqueeLogos = [...logos, ...logos];
 
 export function TrustedBy() {
+  const { messages } = useLocale();
+  const t = messages.trustedBy;
+
   return (
     <section
       aria-labelledby="trusted-by-heading"
@@ -29,10 +26,10 @@ export function TrustedBy() {
           id="trusted-by-heading"
           className="text-center font-display text-lg font-semibold text-slate-700"
         >
-          Kunder vi jobbar med
+          {t.heading}
         </h2>
         <p className="sr-only">
-          Samarbetspartners: {logos.map((l) => l.alt).join(", ")}.
+          {t.srPartners}: {logos.map((l) => l.alt).join(", ")}.
         </p>
       </div>
 

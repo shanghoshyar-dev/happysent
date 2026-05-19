@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { BrandName } from "@/components/brand-name";
+import { LocalizedLink } from "@/components/marketing/localized-link";
+import { useLocale } from "@/i18n/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,15 +18,17 @@ const initialState: ContactState = { status: "idle" };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const { messages } = useLocale();
+  const f = messages.forms.contact;
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? (
         <span className="inline-flex items-center justify-center gap-2">
           <Spinner />
-          Skickar…
+          {f.sending}
         </span>
       ) : (
-        "Skicka"
+        f.submit
       )}
     </Button>
   );
@@ -33,6 +36,8 @@ function SubmitButton() {
 
 export function ContactForm({ className }: { className?: string }) {
   const [state, formAction] = useFormState(submitContactForm, initialState);
+  const { messages } = useLocale();
+  const f = messages.forms.contact;
 
   if (state.status === "success") {
     return (
@@ -42,13 +47,8 @@ export function ContactForm({ className }: { className?: string }) {
           className,
         )}
       >
-        <h2 className="font-display text-2xl text-slate-900">
-          Tack för ditt meddelande!
-        </h2>
-        <p className="text-slate-600">
-          Vi har skickat en bekräftelse till din inkorg och återkommer inom en
-          arbetsdag.
-        </p>
+        <h2 className="font-display text-2xl text-slate-900">{f.successTitle}</h2>
+        <p className="text-slate-600">{f.successBody}</p>
       </div>
     );
   }
@@ -64,15 +64,15 @@ export function ContactForm({ className }: { className?: string }) {
     >
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div>
-          <Label htmlFor="name">Namn</Label>
+          <Label htmlFor="name">{f.name}</Label>
           <Input id="name" name="name" required autoComplete="name" />
         </div>
         <div>
-          <Label htmlFor="company">Företag</Label>
+          <Label htmlFor="company">{f.company}</Label>
           <Input id="company" name="company" required />
         </div>
         <div>
-          <Label htmlFor="email">Mejl</Label>
+          <Label htmlFor="email">{f.email}</Label>
           <Input
             id="email"
             name="email"
@@ -82,7 +82,7 @@ export function ContactForm({ className }: { className?: string }) {
           />
         </div>
         <div>
-          <Label htmlFor="phone">Telefon</Label>
+          <Label htmlFor="phone">{f.phone}</Label>
           <Input
             id="phone"
             name="phone"
@@ -92,24 +92,20 @@ export function ContactForm({ className }: { className?: string }) {
             inputMode="tel"
             placeholder="t.ex. 070-123 45 67"
           />
-          <p className="mt-1 text-xs text-slate-500">
-            Så vi snabbt kan nå er vid frågor om er förfrågan.
-          </p>
+          <p className="mt-1 text-xs text-slate-500">{f.phoneHint}</p>
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-2">
-          <Label htmlFor="message">Meddelande</Label>
+          <Label htmlFor="message">{f.message}</Label>
           <Textarea
             id="message"
             name="message"
-            placeholder="Berätta lite om ert team..."
+            placeholder={f.messagePlaceholder}
             rows={5}
             className="min-h-[8rem] flex-1 resize-y xl:min-h-0"
           />
         </div>
         <div>
-          <Label htmlFor="employees_xlsx">
-            Personal lista (valfritt, Excel)
-          </Label>
+          <Label htmlFor="employees_xlsx">{f.employeesFile}</Label>
           <Input
             id="employees_xlsx"
             name="employees_xlsx"
@@ -118,15 +114,15 @@ export function ContactForm({ className }: { className?: string }) {
             className="cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-candy-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-candy-800 hover:file:bg-candy-100"
           />
           <p className="mt-1 text-xs text-slate-500">
-            Ladda ner{" "}
-            <Link
+            {f.employeesHintBefore}{" "}
+            <a
               href="/happysent-mall.xlsx"
               className="font-medium text-candy-600 hover:underline"
             >
-              <BrandName />-mallen
-            </Link>
-            , fyll i och bifoga här. Vid godkänd ansökan importeras raderna till
-            ert företag automatiskt.
+              <BrandName />
+              {f.templateSuffix}
+            </a>
+            {f.employeesHintAfter}
           </p>
         </div>
         <label className="flex items-start gap-3 text-sm text-slate-600">
@@ -137,14 +133,14 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            Jag godkänner <BrandName>Happysents</BrandName>{" "}
-            <Link
+            {f.consentBefore} <BrandName>Happysents</BrandName>{" "}
+            <LocalizedLink
               href="/integritetspolicy"
               className="font-medium text-candy-600 hover:underline"
             >
-              privacy policy
-            </Link>{" "}
-            och databehandlingsavtal.
+              {f.consentPrivacy}
+            </LocalizedLink>{" "}
+            {f.consentAfter}
           </span>
         </label>
         <label className="flex items-start gap-3 text-sm text-slate-600">
@@ -155,15 +151,15 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            Jag har läst och godkänner <BrandName>Happysents</BrandName>{" "}
-            <Link
+            {f.termsBefore} <BrandName>Happysents</BrandName>{" "}
+            <LocalizedLink
               href="/anvandarvillkor"
               className="font-medium text-candy-600 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              användarvillkor (Terms and Conditions)
-            </Link>
+              {f.termsLink}
+            </LocalizedLink>
             .
           </span>
         </label>

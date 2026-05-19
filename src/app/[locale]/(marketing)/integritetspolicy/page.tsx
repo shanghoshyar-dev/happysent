@@ -2,17 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { brandify } from "@/lib/brandify";
-import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+import { parseLocaleParam } from "@/lib/parse-locale";
+import { marketingPageMeta } from "@/lib/marketing-metadata";
 
-export const metadata: Metadata = svMarketingPageMeta({
-  title: "Privacy Policy | Happysent",
-  description:
-    "How Happysent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
-  path: "/integritetspolicy",
-  locale: "en_US",
-});
+type Props = { params: { locale: string } };
 
-export default function IntegritetspolicyPage() {
+export function generateMetadata({ params }: Props): Metadata {
+  const locale = parseLocaleParam(params.locale);
+  return marketingPageMeta({
+    title: "Privacy Policy | Happysent",
+    description:
+      "How Happysent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
+    path: "/integritetspolicy",
+    locale,
+    ogLocale: "en_US",
+  });
+}
+
+export default function IntegritetspolicyPage(_props: Props) {
   return (
     <article className="font-legal mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-5xl text-slate-900">Privacy Policy</h1>

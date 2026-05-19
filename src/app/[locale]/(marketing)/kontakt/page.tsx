@@ -1,30 +1,40 @@
 import type { Metadata } from "next";
 
-import { svMarketingPageMeta } from "@/lib/marketing-metadata";
-
 import { BrandName } from "@/components/brand-name";
+import { getMessages } from "@/i18n/get-messages";
+import { parseLocaleParam } from "@/lib/parse-locale";
+import { marketingPageMeta } from "@/lib/marketing-metadata";
 
 import { ContactForm } from "./contact-form";
 import { EmployeeRequestForm } from "./employee-request-form";
 
-export const metadata: Metadata = svMarketingPageMeta({
-  title: "Kontakta Happysent | Bli kund idag",
-  description:
-    "Hör av dig så bokar vi en kort demo och ser om Happysent passar er.",
-  path: "/kontakt",
-});
+type Props = { params: { locale: string } };
 
-export default function KontaktPage() {
+export function generateMetadata({ params }: Props): Metadata {
+  const locale = parseLocaleParam(params.locale);
+  const p = getMessages(locale).pages.contact;
+  return marketingPageMeta({
+    title: p.metaTitle,
+    description: p.metaDescription,
+    path: "/kontakt",
+    locale,
+  });
+}
+
+export default function KontaktPage({ params }: Props) {
+  const locale = parseLocaleParam(params.locale);
+  const p = getMessages(locale).pages.contact;
+
   return (
     <section className="py-20">
       <div className="mx-auto w-full max-w-6xl space-y-14 px-6">
         <div className="max-w-3xl">
           <h1 className="font-display text-5xl text-slate-900">
-            Säg hej till <BrandName className="text-slate-900" />.
+            {p.h1Before} <BrandName className="text-slate-900" />
+            {p.h1After}
           </h1>
           <p className="mt-4 text-lg text-slate-600">
-            Skriv några rader om ert företag så hör vi av oss inom en
-            arbetsdag. Eller mejla oss direkt på{" "}
+            {p.intro}{" "}
             <a
               href="mailto:info@happysent.com"
               className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
@@ -39,18 +49,18 @@ export default function KontaktPage() {
               download
               className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
             >
-              Ladda ner vår Excel-mall här
+              {p.excelLink}
             </a>{" "}
-            om du vill förbereda din personallista i förväg.
+            {p.excelAfter}
           </p>
           <dl className="mt-10 space-y-4 text-sm text-slate-600">
             <div>
-              <dt className="font-semibold text-slate-900">Mejl</dt>
+              <dt className="font-semibold text-slate-900">{p.emailLabel}</dt>
               <dd>info@happysent.com</dd>
             </div>
             <div>
-              <dt className="font-semibold text-slate-900">Just nu i</dt>
-              <dd>Malmö (fler städer på gång)</dd>
+              <dt className="font-semibold text-slate-900">{p.locationLabel}</dt>
+              <dd>{p.locationValue}</dd>
             </div>
           </dl>
         </div>
@@ -58,39 +68,26 @@ export default function KontaktPage() {
         <div className="grid min-w-0 gap-10 rounded-3xl bg-cream-50 p-6 ring-1 ring-candy-100/50 sm:p-8 xl:grid-cols-2 xl:items-stretch xl:gap-12 xl:p-10">
           <div className="flex min-h-0 min-w-0 flex-col gap-4 xl:h-full">
             <h2 className="font-display text-2xl text-slate-900 xl:text-3xl">
-              Ny kund?
+              {p.newCustomerTitle}
             </h2>
-            <p className="text-sm text-slate-600">
-              Berätta kort om ert team så återkommer vi inom en arbetsdag.
-            </p>
+            <p className="text-sm text-slate-600">{p.newCustomerBody}</p>
             <ContactForm className="min-h-0 flex-1" />
           </div>
           <div className="flex min-h-0 min-w-0 flex-col gap-6 xl:h-full">
             <div className="shrink-0">
               <h2 className="font-display text-2xl text-slate-900 xl:text-3xl">
-                Redan kund?
+                {p.existingTitle}
               </h2>
-              <p className="mt-4 text-lg text-slate-600">
-                Skicka in när någon börjar eller slutar så uppdaterar vi
-                personallistan åt er. Du behöver inte logga in någonstans.
-              </p>
+              <p className="mt-4 text-lg text-slate-600">{p.existingBody}</p>
               <p className="mt-4 text-sm text-slate-600">
                 <a
                   href="/happysent-mall.xlsx"
                   download
                   className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
                 >
-                  Ladda ner vår Excel-mall här
+                  {p.excelLink}
                 </a>
               </p>
-              <ul className="mt-6 space-y-3 text-sm text-slate-600">
-                <li>• Vi svarar inom en arbetsdag</li>
-                <li>• Bekräftelse skickas direkt till din mejl</li>
-                <li>
-                  • Inga ändringar i pågående beställningar utan att vi hör av
-                  oss
-                </li>
-              </ul>
             </div>
             <EmployeeRequestForm className="min-h-0 flex-1" />
           </div>

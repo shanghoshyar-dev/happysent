@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Inter, Kalam } from "next/font/google";
 
 import "@fontsource-variable/host-grotesk/wght.css";
@@ -51,9 +52,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const localeHeader = headers().get("x-happysent-locale");
+  const lang = localeHeader === "en" ? "en" : "sv";
+
   return (
     <html
-      lang="sv"
+      lang={lang}
       className={`${inter.variable} ${kalam.variable}`}
     >
       <body className="min-h-screen bg-cream font-sans antialiased transition-colors duration-200">

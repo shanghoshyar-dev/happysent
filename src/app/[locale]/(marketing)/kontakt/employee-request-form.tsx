@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useLocale } from "@/i18n/locale-provider";
 import { cn } from "@/lib/utils";
 
 import { submitEmployeeRequest, type ContactState } from "./actions";
@@ -41,6 +42,7 @@ function SubmitButton({
 }
 
 export function EmployeeRequestForm({ className }: { className?: string }) {
+  const { messages } = useLocale();
   const [state, formAction] = useFormState(submitEmployeeRequest, initialState);
   const [action, setAction] = useState<"add" | "remove">("add");
   const [rowKeys, setRowKeys] = useState<string[]>(() => ["0"]);
@@ -188,7 +190,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                   required
                 />
                 <p className="mt-1 text-xs text-slate-500">
-                  Ett datum per person. Vi behöver inte hela personnumret.
+                  {messages.forms.employee.birthdateHint}
                 </p>
               </div>
             </div>

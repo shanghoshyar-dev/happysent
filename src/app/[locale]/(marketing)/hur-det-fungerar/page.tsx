@@ -1,84 +1,34 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-
-import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
 import { BrandName } from "@/components/brand-name";
+import { LocalizedLink } from "@/components/marketing/localized-link";
 import { CtaButton } from "@/components/marketing/cta-button";
+import { getMessages } from "@/i18n/get-messages";
+import { parseLocaleParam } from "@/lib/parse-locale";
+import { marketingPageMeta } from "@/lib/marketing-metadata";
 
-export const metadata: Metadata = svMarketingPageMeta({
-  title: "Hur Happysent fungerar | Enkel automatisk tårtaleverans",
-  description:
-    "Från första registrering till färsk tårta på kontoret. Så jobbar Happysent steg för steg.",
-  path: "/hur-det-fungerar",
-});
+type Props = { params: { locale: string } };
 
-const steps = [
-  {
-    n: "01",
-    title: "Vi tar emot din lista",
-    body:
-      "Du mejlar oss namn, födelsedag och avdelningens storlek på alla anställda du vill fira. Det räcker med ett mejl eller en enkel Excel-fil. Vi sköter resten av administrationen.",
-  },
-  {
-    n: "02",
-    title: "Vi väljer ett lokalt bageri",
-    body:
-      "Vi matchar er adress med ett av våra lokala partnerbagerier. I Malmö samarbetar vi redan med några av stadens bästa konditorier, och fler städer är på väg.",
-  },
-  {
-    n: "03",
-    title: "Två veckor innan: ni får en bekräftelse",
-    body:
-      "Exakt 14 dagar innan födelsedagen får er kontaktperson ett mejl: ”Kalle fyller år om två veckor, tårtan är bokad.” Då vet ni att det är på gång.",
-  },
-  {
-    n: "04",
-    title: "En vecka innan: bageriet får beställningen",
-    body:
-      "Sju dagar innan skickar vi en beställning till bageriet med adress, namn, datum och antal personer. Samtidigt får ni en påminnelse: ”En vecka kvar. Tårtan är beställd.”",
-  },
-  {
-    n: "05",
-    title: "Dagen innan: sista påminnelsen",
-    body:
-      "Dagen innan födelsedagen får ni ett kort mejl: ”Imorgon levereras tårtan mellan 08:00 och 11:00.” Inga överraskningar, ingen oro.",
-  },
-  {
-    n: "06",
-    title: "På födelsedagen: tårtan står på kontoret",
-    body:
-      "Mellan 08:00 och 11:00 dyker den färska tårtan upp i ert kök. Ni samlas, sjunger och firar. Vi tar hand om resten i bakgrunden.",
-  },
-  {
-    n: "07",
-    title: "I slutet av månaden: en faktura",
-    body:
-      "Ni får en samlingsfaktura per månad för alla levererade tårtor. Inga abonnemangsavgifter, inget krångel. Bara en rad per födelsedag.",
-  },
-];
+export function generateMetadata({ params }: Props): Metadata {
+  const locale = parseLocaleParam(params.locale);
+  const p = getMessages(locale).pages.howItWorks;
+  return marketingPageMeta({
+    title: p.metaTitle,
+    description: p.metaDescription,
+    path: "/hur-det-fungerar",
+    locale,
+  });
+}
 
-const faqs = [
-  {
-    q: "Vad händer om födelsedagen är på en helg eller röd dag?",
-    a: "Vi levererar närmaste vardag innan. Du behöver inte tänka på det, vi har koll på alla svenska helgdagar.",
-  },
-  {
-    q: "Måste vi logga in någonstans?",
-    a: "Nej. Du mejlar oss ändringar via vårt kontaktformulär, så uppdaterar vi listan. Inga lösenord, ingen portal att lära sig.",
-  },
-  {
-    q: "Vad kostar det?",
-    a: "Priset sätts per tårta och kan justeras utifrån avdelningens storlek. Hör av dig så ger vi en offert anpassad för er.",
-  },
-  {
-    q: "Vad händer om någon slutar?",
-    a: "Skicka in en borttagning via formuläret på kontaktsidan. Vi tar bort personen direkt och fakturerar bara för tårtor som faktiskt levereras.",
-  },
-];
-
-export default function HurDetFungerarPage() {
+export default function HurDetFungerarPage({ params }: Props) {
+  const locale = parseLocaleParam(params.locale);
+  const page = getMessages(locale).pages.howItWorks;
+  const steps = page.steps.map((step, index) => ({
+    n: String(index + 1).padStart(2, "0"),
+    ...step,
+  }));
+  const faqs = page.faqs;
   const [
     firstStep,
     secondStep,
@@ -94,13 +44,10 @@ export default function HurDetFungerarPage() {
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h1 className="font-display text-5xl text-slate-900">
-            Så funkar <BrandName className="text-slate-900" />, från start till
-            tårta
+            {page.h1Before} <BrandName className="text-slate-900" />
+            {page.h1After}
           </h1>
-          <p className="mt-6 text-lg text-slate-600">
-            Vi tar bort hela det administrativa kring födelsedagar. Här är hela
-            kedjan, steg för steg, så ni vet precis vad som händer.
-          </p>
+          <p className="mt-6 text-lg text-slate-600">{page.intro}</p>
         </div>
       </section>
 
@@ -112,7 +59,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step1.avif"
-                    alt="Kontaktadministratör som skickar in medarbetarlista till Happysent på kontoret"
+                    alt={firstStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -152,7 +99,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step2.avif"
-                    alt="Bagare dekorerar en tvåvånings födelsedagstårta i ett lokalt bageri"
+                    alt={secondStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -165,7 +112,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step3.avif"
-                    alt="Mobil på skrivbord som visar mejl med bekräftelse att födelsedagstårta är bokad två veckor innan"
+                    alt={thirdStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -204,7 +151,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step4.png"
-                    alt="Bagare i bageri som tar emot och läser en Happysent-beställning på surfplatta"
+                    alt={fourthStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -217,7 +164,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step5.avif"
-                    alt="Person på kontoret som läser en påminnelse på mobilen om att tårtleverans sker nästa dag"
+                    alt={fifthStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -256,7 +203,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step6.avif"
-                    alt="Kollegor firar födelsedag med tårta på kontoret"
+                    alt={sixthStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -269,7 +216,7 @@ export default function HurDetFungerarPage() {
                 <div className="relative min-h-[14rem] w-full md:min-h-[17rem]">
                   <Image
                     src="/marketing/how-it-works-step7.avif"
-                    alt="Ekonomiansvarig som granskar månadens Happysent-faktura på laptop på kontoret"
+                    alt={lastStep.imageAlt}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -297,7 +244,7 @@ export default function HurDetFungerarPage() {
       <section className="bg-cream-50 py-20">
         <div className="mx-auto max-w-3xl px-6">
           <h2 className="font-display text-4xl text-slate-900">
-            Vanliga frågor
+            {page.faqTitle}
           </h2>
           <dl className="mt-10 space-y-8">
             {faqs.map((f) => (
@@ -308,9 +255,9 @@ export default function HurDetFungerarPage() {
             ))}
           </dl>
           <div className="mt-12 text-center">
-            <Link href="/kontakt">
-              <CtaButton size="lg">Hör av dig så ses vi</CtaButton>
-            </Link>
+            <LocalizedLink href="/kontakt">
+              <CtaButton size="lg">{page.cta}</CtaButton>
+            </LocalizedLink>
           </div>
         </div>
       </section>

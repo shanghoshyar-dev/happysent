@@ -1,31 +1,13 @@
-import { cn } from "@/lib/utils";
+"use client";
 
-const steps = [
-  {
-    n: "01",
-    title: "Registrera ditt team",
-    body:
-      "Lägg till anställdas namn, mail och födelsedag. Det tar några minuter.",
-  },
-  {
-    n: "02",
-    title: "Vi bokar tårtan",
-    body:
-      "Två veckor innan får du en bekräftelse. En vecka innan skickas beställningen till bageriet.",
-  },
-  {
-    n: "03",
-    title: "Tårtan levereras",
-    body:
-      "På födelsedagen står den färska tårtan på kontoret mellan 08:00 och 11:00.",
-  },
-];
+import { cn } from "@/lib/utils";
+import { useLocale } from "@/i18n/locale-provider";
 
 function StepCard({
   step,
   className,
 }: {
-  step: (typeof steps)[number];
+  step: { n: string; title: string; body: string };
   className?: string;
 }) {
   return (
@@ -43,14 +25,21 @@ function StepCard({
 }
 
 export function HowItWorks() {
+  const { messages } = useLocale();
+  const section = messages.howItWorksHome;
+  const steps = section.steps.map((s, i) => ({
+    n: String(i + 1).padStart(2, "0"),
+    ...s,
+  }));
+
   return (
     <section className="bg-cream-50 py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="max-w-2xl">
-          <h2 className="font-display text-4xl text-slate-900">Så funkar det</h2>
-          <p className="mt-4 text-lg text-slate-600">
-            Tre steg från första registrering till första tårtan på bordet.
-          </p>
+          <h2 className="font-display text-4xl text-slate-900">
+            {section.heading}
+          </h2>
+          <p className="mt-4 text-lg text-slate-600">{section.intro}</p>
         </div>
 
         <ol className="mt-16 grid list-none gap-6 p-0 md:grid-cols-3">

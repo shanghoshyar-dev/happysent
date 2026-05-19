@@ -1,21 +1,31 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
+import { LocalizedLink } from "@/components/marketing/localized-link";
 import { EmptyState } from "@/components/ui/empty-state";
-import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+import { getMessages } from "@/i18n/get-messages";
+import { parseLocaleParam } from "@/lib/parse-locale";
+import { marketingPageMeta } from "@/lib/marketing-metadata";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
-export const metadata: Metadata = svMarketingPageMeta({
-  title: "Blogg om anställdas välmående | Happysent",
-  description:
-    "Tankar om företagskultur, personalförmåner och firande på jobbet, med fokus på Malmö och nordiska kontor.",
-  path: "/blogg",
-});
+type Props = { params: { locale: string } };
+
+export function generateMetadata({ params }: Props): Metadata {
+  const locale = parseLocaleParam(params.locale);
+  const p = getMessages(locale).pages.blog;
+  return marketingPageMeta({
+    title: p.metaTitle,
+    description: p.metaDescription,
+    path: "/blogg",
+    locale,
+  });
+}
 
 export const revalidate = 60;
 
-export default async function BloggPage() {
+export default async function BloggPage({ params }: Props) {
+  const locale = parseLocaleParam(params.locale);
+  const p = getMessages(locale).pages.blog;
   const supabase = createAdminClient();
   const { data: posts } = await supabase
     .from("blog_posts")
@@ -26,18 +36,12 @@ export default async function BloggPage() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-4xl px-6">
-        <h1 className="font-display text-5xl text-forest-800">Bloggen</h1>
-        <p className="mt-4 max-w-xl text-lg text-slate-600">
-          Inspiration för HR och chefer som vill lyfta{" "}
-          <strong>anställdas välmående</strong>, stärka{" "}
-          <strong>företagskultur</strong> och göra{" "}
-          <strong>födelsedag på jobbet</strong> en självklarhet, inte minst i{" "}
-          <strong>Malmö</strong>.
-        </p>
+        <h1 className="font-display text-5xl text-forest-800">{p.h1}</h1>
+        <p className="mt-4 max-w-xl text-lg text-slate-600">{p.intro}</p>
         <div className="mt-12 space-y-4">
           {posts && posts.length > 0 ? (
             posts.map((post) => (
-              <Link
+              <LocalizedLink
                 key={post.id}
                 href={`/blogg/${post.slug}`}
                 className="group block rounded-2xl border border-cream-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-coral-200 hover:shadow-md"
@@ -55,12 +59,12 @@ export default async function BloggPage() {
                     : ""}
                   {post.author ? ` · ${post.author}` : ""}
                 </p>
-              </Link>
+              </LocalizedLink>
             ))
           ) : (
             <EmptyState
-              title="Inga inlägg ännu"
-              description="Vi publicerar snart texter om motivation och firande på jobbet."
+              title={p.emptyTitle}
+              description={p.emptyDescription}
             />
           )}
         </div>

@@ -7,20 +7,34 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 
 import { BrandName } from "@/components/brand-name";
+import { LanguageSwitcher } from "@/components/marketing/language-switcher";
+import { LocalizedLink } from "@/components/marketing/localized-link";
 import { CtaButton } from "@/components/marketing/cta-button";
+import { useLocale } from "@/i18n/locale-provider";
+import { stripLocalePrefix } from "@/i18n/routing";
 
-const links = [
-  { href: "/om-oss", label: "Om oss" },
-  { href: "/hur-det-fungerar", label: "Hur det fungerar" },
-  { href: "/priser", label: "Priser" },
-  { href: "/blogg", label: "Blogg" },
-  { href: "/kontakt", label: "Kontakt" },
+const linkHrefs = [
+  "/om-oss",
+  "/hur-det-fungerar",
+  "/priser",
+  "/blogg",
+  "/kontakt",
 ] as const;
 
 export function MarketingNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
+  const { messages } = useLocale();
+  const basePath = stripLocalePrefix(pathname);
+
+  const navLabels = [
+    messages.nav.about,
+    messages.nav.howItWorks,
+    messages.nav.pricing,
+    messages.nav.blog,
+    messages.nav.contact,
+  ];
 
   useEffect(() => {
     setIsOpen(false);
@@ -36,7 +50,7 @@ export function MarketingNav() {
   const linkClass = (href: string) =>
     [
       "text-sm font-medium transition-colors",
-      pathname === href
+      basePath === href
         ? "text-candy-600"
         : "text-slate-700 hover:text-candy-600",
     ].join(" ");
@@ -52,15 +66,15 @@ export function MarketingNav() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 py-4 md:py-6">
       <motion.div
-        className="pointer-events-auto relative flex w-full max-w-5xl items-center justify-between gap-3 rounded-full border border-candy-100/80 bg-white/95 px-4 py-2.5 shadow-soft backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:px-6 sm:py-3"
+        className="pointer-events-auto relative flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-candy-100/80 bg-white/95 px-3 py-2.5 shadow-soft backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:gap-3 sm:px-5 sm:py-3 lg:px-6"
         initial={reduceMotion ? false : { opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
-        <Link
+        <LocalizedLink
           href="/"
-          className="flex min-w-0 shrink-0 items-center gap-2 pr-2"
-          aria-label="Happysent startsida"
+          className="flex min-w-0 shrink-0 items-center gap-2 pr-1 sm:pr-2"
+          aria-label={messages.nav.homeAria}
         >
           <motion.span
             aria-hidden
@@ -71,44 +85,48 @@ export function MarketingNav() {
             🎂
           </motion.span>
           <BrandName size="logo" className="truncate text-slate-900" />
-        </Link>
+        </LocalizedLink>
 
         <nav
-          className="hidden items-center gap-5 lg:flex xl:gap-7"
-          aria-label="Huvudnavigation"
+          className="hidden items-center gap-4 lg:flex xl:gap-6"
+          aria-label={messages.nav.mainAria}
         >
-          {links.map((item) => (
-            <motion.div key={item.href} {...motionProps}>
-              <Link href={item.href} className={linkClass(item.href)}>
-                {item.label}
-              </Link>
+          {linkHrefs.map((href, i) => (
+            <motion.div key={href} {...motionProps}>
+              <LocalizedLink href={href} className={linkClass(href)}>
+                {navLabels[i]}
+              </LocalizedLink>
             </motion.div>
           ))}
         </nav>
 
         <motion.div
-          className="hidden shrink-0 items-center gap-3 lg:flex"
+          className="hidden shrink-0 items-center gap-2 lg:flex xl:gap-3"
           {...motionProps}
         >
+          <LanguageSwitcher />
           <Link href="/login" className={linkClass("/login")}>
-            Logga in
+            {messages.nav.login}
           </Link>
-          <Link href="/kontakt">
-            <CtaButton size="sm">Kom igång</CtaButton>
-          </Link>
+          <LocalizedLink href="/kontakt">
+            <CtaButton size="sm">{messages.nav.getStarted}</CtaButton>
+          </LocalizedLink>
         </motion.div>
 
-        <motion.button
-          type="button"
-          className="flex items-center rounded-full p-2 text-slate-800 hover:bg-cream-50 lg:hidden"
-          onClick={() => setIsOpen((open) => !open)}
-          aria-expanded={isOpen}
-          aria-controls="marketing-mobile-menu"
-          aria-label={isOpen ? "Stäng meny" : "Öppna meny"}
-          whileTap={reduceMotion ? undefined : { scale: 0.92 }}
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </motion.button>
+        <div className="flex items-center gap-1 lg:hidden">
+          <LanguageSwitcher />
+          <motion.button
+            type="button"
+            className="flex items-center rounded-full p-2 text-slate-800 hover:bg-cream-50"
+            onClick={() => setIsOpen((open) => !open)}
+            aria-expanded={isOpen}
+            aria-controls="marketing-mobile-menu"
+            aria-label={isOpen ? messages.nav.closeMenu : messages.nav.openMenu}
+            whileTap={reduceMotion ? undefined : { scale: 0.92 }}
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </motion.button>
+        </div>
       </motion.div>
 
       <AnimatePresence>
@@ -127,11 +145,11 @@ export function MarketingNav() {
           >
             <nav
               className="mx-auto flex max-w-md flex-col gap-1"
-              aria-label="Mobilnavigation"
+              aria-label={messages.nav.mobileAria}
             >
-              {links.map((item, i) => (
+              {linkHrefs.map((href, i) => (
                 <motion.div
-                  key={item.href}
+                  key={href}
                   initial={reduceMotion ? false : { opacity: 0, x: 16 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={reduceMotion ? undefined : { opacity: 0, x: 16 }}
@@ -139,13 +157,13 @@ export function MarketingNav() {
                     reduceMotion ? { duration: 0 } : { delay: i * 0.05 + 0.08 }
                   }
                 >
-                  <Link
-                    href={item.href}
+                  <LocalizedLink
+                    href={href}
                     className="block rounded-2xl px-4 py-3 text-lg font-medium text-slate-900 hover:bg-white"
                     onClick={() => setIsOpen(false)}
                   >
-                    {item.label}
-                  </Link>
+                    {navLabels[i]}
+                  </LocalizedLink>
                 </motion.div>
               ))}
 
@@ -160,13 +178,13 @@ export function MarketingNav() {
                   className="block rounded-2xl px-4 py-3 text-lg font-medium text-slate-700 hover:bg-white"
                   onClick={() => setIsOpen(false)}
                 >
-                  Logga in
+                  {messages.nav.login}
                 </Link>
-                <Link href="/kontakt" onClick={() => setIsOpen(false)}>
+                <LocalizedLink href="/kontakt" onClick={() => setIsOpen(false)}>
                   <CtaButton size="md" fullWidth>
-                    Kom igång
+                    {messages.nav.getStarted}
                   </CtaButton>
-                </Link>
+                </LocalizedLink>
               </motion.div>
             </nav>
           </motion.div>

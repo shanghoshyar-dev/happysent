@@ -2,16 +2,24 @@ import type { Metadata } from "next";
 
 import { BrandName } from "@/components/brand-name";
 import { brandify } from "@/lib/brandify";
-import { svMarketingPageMeta } from "@/lib/marketing-metadata";
+import { parseLocaleParam } from "@/lib/parse-locale";
+import { marketingPageMeta } from "@/lib/marketing-metadata";
 
-export const metadata: Metadata = svMarketingPageMeta({
-  title: "Terms and Conditions | Happysent",
-  description:
-    "Användarvillkor för Happysents tjänst för företagskunder: leveranser, avbokning, priser och ansvar.",
-  path: "/anvandarvillkor",
-});
+type Props = { params: { locale: string } };
 
-export default function AnvandarvillkorPage() {
+export function generateMetadata({ params }: Props): Metadata {
+  const locale = parseLocaleParam(params.locale);
+  return marketingPageMeta({
+    title: "Terms and Conditions | Happysent",
+    description:
+      "Terms for Happysent's service for business customers: deliveries, cancellation, pricing, and liability.",
+    path: "/anvandarvillkor",
+    locale,
+    ogLocale: "en_US",
+  });
+}
+
+export default function AnvandarvillkorPage(_props: Props) {
   return (
     <article className="font-legal mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-5xl text-slate-900">
