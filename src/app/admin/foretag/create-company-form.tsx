@@ -1,28 +1,30 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { isNextNavigationError } from "@/lib/next-navigation-errors";
-
+import type { CreateCompanyResult } from "./actions";
 import { CompanyForm, type CompanyFormProps } from "./company-form";
 
 type Props = Omit<CompanyFormProps, "action"> & {
-  saveAction: (formData: FormData) => Promise<void>;
+  saveAction: (formData: FormData) => Promise<CreateCompanyResult>;
 };
 
 export function CreateCompanyForm({ saveAction, ...formProps }: Props) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function action(formData: FormData) {
     setError(null);
     startTransition(async () => {
-      try {
-        await saveAction(formData);
-      } catch (err) {
-        if (isNextNavigationError(err)) throw err;
-        setError(err instanceof Error ? err.message : "Något gick fel");
+      const result = await saveAction(formData);
+      if (!result.ok) {
+        setError(result.error);
+        return;
       }
+      router.push("/admin/foretag");
+      router.refresh();
     });
   }
 

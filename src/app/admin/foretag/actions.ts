@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+export type CreateCompanyResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
 import {
@@ -45,7 +49,22 @@ function parseFlowerPartnerFields(formData: FormData): {
   };
 }
 
-export async function createCompany(formData: FormData) {
+export async function createCompany(
+  formData: FormData,
+): Promise<CreateCompanyResult> {
+  try {
+    return await createCompanyInternal(formData);
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Något gick fel",
+    };
+  }
+}
+
+async function createCompanyInternal(
+  formData: FormData,
+): Promise<CreateCompanyResult> {
   const supabase = createClient();
   const applicationId = String(formData.get("application_id") ?? "").trim();
   let excelStoragePath: string | null = null;
@@ -57,11 +76,13 @@ export async function createCompany(formData: FormData) {
       .eq("id", applicationId)
       .eq("status", "pending")
       .maybeSingle();
-    if (pendErr) throw new Error(pendErr.message);
+    if (pendErr) return { ok: false, error: pendErr.message };
     if (!pending) {
-      throw new Error(
-        "Förfrågan finns inte eller är redan hanterad. Uppdatera sidan.",
-      );
+      return {
+        ok: false,
+        error:
+          "Förfrågan finns inte eller är redan hanterad. Uppdatera sidan.",
+      };
     }
     excelStoragePath = pending.employees_import_storage_path ?? null;
   }
@@ -102,7 +123,7 @@ export async function createCompany(formData: FormData) {
     error = retry.error;
   }
 
-  if (error) throw new Error(error.message);
+  if (error) return { ok: false, error: error.message };
 
   const admin = createAdminClient();
 
@@ -113,9 +134,10 @@ export async function createCompany(formData: FormData) {
 
     if (dlErr || !bin) {
       await supabase.from("companies").delete().eq("id", created.id);
-      throw new Error(
-        `Kunde inte hämta bifogad Excel: ${dlErr?.message ?? "saknad fil"}`,
-      );
+      return {
+        ok: false,
+        error: `Kunde inte hämta bifogad Excel: ${dlErr?.message ?? "saknad fil"}`,
+      };
     }
 
     const buf = await bin.arrayBuffer();
@@ -137,7 +159,7 @@ export async function createCompany(formData: FormData) {
         (importResult.imported < 1
           ? "Excel innehöll inga giltiga rader att importera."
           : "Importen misslyckades.");
-      throw new Error(detail);
+      return { ok: false, error: detail };
     }
 
     await admin.storage
@@ -163,7 +185,7 @@ export async function createCompany(formData: FormData) {
     }
   }
 
-  // Fire-and-forget welcome email — don't block the redirect if it fails.
+  // Fire-and-forget welcome email — don't block navigation if it fails.
   if (payload.contact_email) {
     try {
       await sendCompanyWelcome({
@@ -176,7 +198,8 @@ export async function createCompany(formData: FormData) {
   }
 
   revalidatePath("/admin/foretag");
-  redirect("/admin/foretag");
+  revalidatePath("/admin/kolista");
+  return { ok: true };
 }
 
 export async function updateCompany(id: string, formData: FormData) {
