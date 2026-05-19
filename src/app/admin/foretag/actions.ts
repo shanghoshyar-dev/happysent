@@ -9,11 +9,11 @@ export type CreateCompanyResult =
 
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
-import {
-  errorMentionsColumn,
-  isMissingColumnError,
-} from "@/lib/supabase/db-errors";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  insertCompanyRow,
+  updateCompanyRow,
+} from "@/lib/supabase/companies-write";
 import { createClient } from "@/lib/supabase/server";
 import { sendCompanyWelcome } from "@/lib/resend/templates";
 
@@ -102,28 +102,22 @@ async function createCompanyInternal(
     price_per_flowers: parsePricePerFlowers(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
-  let { data: created, error } = await supabase
-    .from("companies")
-    .insert(payload)
-    .select("id")
-    .single();
+  const {
+    data: created,
+    error,
+    strippedColumns,
+  } = await insertCompanyRow(supabase, payload);
 
-  if (
-    error &&
-    isMissingColumnError(error) &&
-    errorMentionsColumn(error, "price_per_flowers")
-  ) {
-    const { price_per_flowers: _pf, ...legacyPayload } = payload;
-    const retry = await supabase
-      .from("companies")
-      .insert(legacyPayload)
-      .select("id")
-      .single();
-    created = retry.data;
-    error = retry.error;
+  if (strippedColumns.length > 0) {
+    console.warn(
+      "[createCompany] saknade kolumner i companies — sparade utan:",
+      strippedColumns.join(", "),
+    );
   }
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    return { ok: false, error: error.message ?? "Kunde inte spara företaget." };
+  }
 
   const admin = createAdminClient();
 
@@ -219,7 +213,17 @@ export async function updateCompany(id: string, formData: FormData) {
     price_per_flowers: parsePricePerFlowers(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
-  const { error } = await supabase.from("companies").update(payload).eq("id", id);
+  const { error, strippedColumns } = await updateCompanyRow(
+    supabase,
+    id,
+    payload,
+  );
+  if (strippedColumns.length > 0) {
+    console.warn(
+      "[updateCompany] saknade kolumner i companies — sparade utan:",
+      strippedColumns.join(", "),
+    );
+  }
   if (error) throw new Error(error.message);
   revalidatePath("/admin/foretag");
   revalidatePath(`/admin/foretag/${id}`);
