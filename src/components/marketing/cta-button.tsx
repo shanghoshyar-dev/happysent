@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { forwardRef, type ComponentProps } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,13 @@ import { cn } from "@/lib/utils";
 
 type BaseButtonProps = ComponentProps<typeof Button>;
 
-const decorSize: Record<NonNullable<BaseButtonProps["size"]>, string> = {
-  sm: "text-base",
-  md: "text-lg",
-  lg: "text-2xl",
+const decorImageSize: Record<NonNullable<BaseButtonProps["size"]>, number> = {
+  sm: 32,
+  md: 40,
+  lg: 52,
 };
 
-/** Emojis ska ligga delvis ovanpå knappens rundade kanter. */
+/** Dekorationerna ska ligga delvis ovanpå knappens rundade kanter. */
 const decorOverlap: Record<
   NonNullable<BaseButtonProps["size"]>,
   { cake: string; flower: string; buttonPad: string }
@@ -48,6 +49,7 @@ export const CtaButton = forwardRef<HTMLButtonElement, CtaButtonProps>(
   ) {
     const resolvedSize = size ?? "md";
     const overlap = decorOverlap[resolvedSize];
+    const decorPx = decorImageSize[resolvedSize];
 
     return (
       <span
@@ -59,12 +61,19 @@ export const CtaButton = forwardRef<HTMLButtonElement, CtaButtonProps>(
         <span
           aria-hidden
           className={cn(
-            "cta-decor cta-decor--cake relative z-10 shrink-0 select-none",
-            decorSize[resolvedSize],
+            "cta-decor cta-decor--cake relative z-10 flex shrink-0 items-center justify-center select-none",
             overlap.cake,
           )}
         >
-          🎂
+          <Image
+            src="/marketing/cta/cake.png"
+            alt=""
+            width={decorPx}
+            height={decorPx}
+            className="h-auto w-auto object-contain"
+            style={{ width: decorPx, height: decorPx }}
+            priority={false}
+          />
         </span>
         <Button
           ref={ref}
@@ -82,12 +91,19 @@ export const CtaButton = forwardRef<HTMLButtonElement, CtaButtonProps>(
         <span
           aria-hidden
           className={cn(
-            "cta-decor cta-decor--flower relative z-10 shrink-0 select-none",
-            decorSize[resolvedSize],
+            "cta-decor cta-decor--flower relative z-10 flex shrink-0 items-center justify-center select-none",
             overlap.flower,
           )}
         >
-          💐
+          <Image
+            src="/marketing/cta/flower.png"
+            alt=""
+            width={decorPx}
+            height={decorPx}
+            className="h-auto w-auto object-contain"
+            style={{ width: decorPx, height: decorPx }}
+            priority={false}
+          />
         </span>
       </span>
     );
