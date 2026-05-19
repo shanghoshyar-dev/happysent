@@ -5,9 +5,9 @@ import { brandify } from "@/lib/brandify";
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Terms and Conditions – Happysent",
+  title: "Terms and Conditions | Happysent",
   description:
-    "Användarvillkor för Happysents tjänst för företagskunder – leveranser, avbokning, priser och ansvar.",
+    "Användarvillkor för Happysents tjänst för företagskunder: leveranser, avbokning, priser och ansvar.",
   path: "/anvandarvillkor",
 });
 
@@ -15,7 +15,7 @@ export default function AnvandarvillkorPage() {
   return (
     <article className="font-legal mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-5xl text-slate-900">
-        Terms and Conditions – <BrandName className="text-slate-900" />
+        Terms and Conditions: <BrandName className="text-slate-900" />
       </h1>
       <p className="mt-4 text-sm text-slate-500">Last updated: May 2026</p>
 

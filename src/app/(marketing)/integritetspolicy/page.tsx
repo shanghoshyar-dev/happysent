@@ -5,7 +5,7 @@ import { brandify } from "@/lib/brandify";
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Privacy Policy – Happysent",
+  title: "Privacy Policy | Happysent",
   description:
     "How Happysent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
   path: "/integritetspolicy",
@@ -43,29 +43,29 @@ export default function IntegritetspolicyPage() {
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-6">
             <li>
-              <strong>The employee&apos;s first and last name</strong> – so the
+              <strong>The employee&apos;s first and last name</strong>, so the
               bakery can bake and deliver to the correct person.
             </li>
             <li>
-              <strong>Date of birth</strong> – so we know when to deliver the
+              <strong>Date of birth</strong>, so we know when to deliver the
               cake. When someone submits add/remove requests via our website,
               we collect the full calendar date so we can tell employees apart
               in confirmations; you do not need to enter a complete national ID
               number.
             </li>
             <li>
-              <strong>Delivery address</strong> – your workplace visit address.
+              <strong>Delivery address</strong>, your workplace visit address.
             </li>
             <li>
-              <strong>Department size</strong> – so we know what size of cake to
+              <strong>Department size</strong>, so we know what size of cake to
               order.
             </li>
             <li>
               <strong>Contact person&apos;s email</strong> at the customer
-              company – for confirmations and invoices.
+              company, for confirmations and invoices.
             </li>
             <li>
-              <strong>Phone number</strong> – when you reach out as a potential new
+              <strong>Phone number</strong>, when you reach out as a potential new
               customer via our contact form, so we can call or message you about
               your enquiry.
             </li>

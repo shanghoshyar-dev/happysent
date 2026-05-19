@@ -8,7 +8,7 @@ import { ContactForm } from "./contact-form";
 import { EmployeeRequestForm } from "./employee-request-form";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Kontakta Happysent – Bli kund idag",
+  title: "Kontakta Happysent | Bli kund idag",
   description:
     "Hör av dig så bokar vi en kort demo och ser om Happysent passar er.",
   path: "/kontakt",

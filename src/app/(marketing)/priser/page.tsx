@@ -6,7 +6,7 @@ import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 import { CtaButton } from "@/components/marketing/cta-button";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Priser – Happysent",
+  title: "Priser | Happysent",
   description:
     "Transparenta priser per levererad tårta. Inga uppstartsavgifter, ingen bindningstid.",
   path: "/priser",

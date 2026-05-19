@@ -8,9 +8,9 @@ import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Om oss – Happysent",
+  title: "Om oss | Happysent",
   description:
-    "Shang och Danny grundade Happysent i Malmö – läs hur idén föddes och varför vi vill att alla anställda ska kännas sedda på jobbet.",
+    "Shang och Danny grundade Happysent i Malmö. Läs hur idén föddes och varför vi vill att alla anställda ska kännas sedda på jobbet.",
   path: "/om-oss",
 });
 

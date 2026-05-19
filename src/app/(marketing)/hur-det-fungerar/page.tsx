@@ -8,9 +8,9 @@ import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Hur Happysent fungerar – Enkel automatisk tårtaleverans",
+  title: "Hur Happysent fungerar | Enkel automatisk tårtaleverans",
   description:
-    "Från första registrering till färsk tårta på kontoret — så jobbar Happysent steg för steg.",
+    "Från första registrering till färsk tårta på kontoret. Så jobbar Happysent steg för steg.",
   path: "/hur-det-fungerar",
 });
 
@@ -19,7 +19,7 @@ const steps = [
     n: "01",
     title: "Vi tar emot din lista",
     body:
-      "Du mejlar oss namn, födelsedag och avdelningens storlek på alla anställda du vill fira. Det räcker med ett mejl eller en enkel Excel-fil – vi sköter resten av administrationen.",
+      "Du mejlar oss namn, födelsedag och avdelningens storlek på alla anställda du vill fira. Det räcker med ett mejl eller en enkel Excel-fil. Vi sköter resten av administrationen.",
   },
   {
     n: "02",
@@ -29,31 +29,31 @@ const steps = [
   },
   {
     n: "03",
-    title: "Två veckor innan – ni får en bekräftelse",
+    title: "Två veckor innan: ni får en bekräftelse",
     body:
       "Exakt 14 dagar innan födelsedagen får er kontaktperson ett mejl: ”Kalle fyller år om två veckor, tårtan är bokad.” Då vet ni att det är på gång.",
   },
   {
     n: "04",
-    title: "En vecka innan – bageriet får beställningen",
+    title: "En vecka innan: bageriet får beställningen",
     body:
-      "Sju dagar innan skickar vi en beställning till bageriet med adress, namn, datum och antal personer. Samtidigt får ni en påminnelse: ”En vecka kvar – tårtan är beställd.”",
+      "Sju dagar innan skickar vi en beställning till bageriet med adress, namn, datum och antal personer. Samtidigt får ni en påminnelse: ”En vecka kvar. Tårtan är beställd.”",
   },
   {
     n: "05",
-    title: "Dagen innan – sista påminnelsen",
+    title: "Dagen innan: sista påminnelsen",
     body:
       "Dagen innan födelsedagen får ni ett kort mejl: ”Imorgon levereras tårtan mellan 08:00 och 11:00.” Inga överraskningar, ingen oro.",
   },
   {
     n: "06",
-    title: "På födelsedagen – tårtan står på kontoret",
+    title: "På födelsedagen: tårtan står på kontoret",
     body:
       "Mellan 08:00 och 11:00 dyker den färska tårtan upp i ert kök. Ni samlas, sjunger och firar. Vi tar hand om resten i bakgrunden.",
   },
   {
     n: "07",
-    title: "I slutet av månaden – en faktura",
+    title: "I slutet av månaden: en faktura",
     body:
       "Ni får en samlingsfaktura per månad för alla levererade tårtor. Inga abonnemangsavgifter, inget krångel. Bara en rad per födelsedag.",
   },
@@ -62,7 +62,7 @@ const steps = [
 const faqs = [
   {
     q: "Vad händer om födelsedagen är på en helg eller röd dag?",
-    a: "Vi levererar närmaste vardag innan. Du behöver inte tänka på det – vi har koll på alla svenska helgdagar.",
+    a: "Vi levererar närmaste vardag innan. Du behöver inte tänka på det, vi har koll på alla svenska helgdagar.",
   },
   {
     q: "Måste vi logga in någonstans?",
@@ -94,7 +94,7 @@ export default function HurDetFungerarPage() {
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h1 className="font-display text-5xl text-slate-900">
-            Så funkar <BrandName className="text-slate-900" /> – från start till
+            Så funkar <BrandName className="text-slate-900" />, från start till
             tårta
           </h1>
           <p className="mt-6 text-lg text-slate-600">

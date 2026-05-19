@@ -7,9 +7,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
 export const metadata: Metadata = svMarketingPageMeta({
-  title: "Blogg om anställdas välmående – Happysent",
+  title: "Blogg om anställdas välmående | Happysent",
   description:
-    "Tankar om företagskultur, personalförmåner och firande på jobbet – med fokus på Malmö och nordiska kontor.",
+    "Tankar om företagskultur, personalförmåner och firande på jobbet, med fokus på Malmö och nordiska kontor.",
   path: "/blogg",
 });
 
@@ -31,7 +31,7 @@ export default async function BloggPage() {
           Inspiration för HR och chefer som vill lyfta{" "}
           <strong>anställdas välmående</strong>, stärka{" "}
           <strong>företagskultur</strong> och göra{" "}
-          <strong>födelsedag på jobbet</strong> en självklarhet – inte minst i{" "}
+          <strong>födelsedag på jobbet</strong> en självklarhet, inte minst i{" "}
           <strong>Malmö</strong>.
         </p>
         <div className="mt-12 space-y-4">

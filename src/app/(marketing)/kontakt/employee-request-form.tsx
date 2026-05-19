@@ -188,7 +188,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                   required
                 />
                 <p className="mt-1 text-xs text-slate-500">
-                  Ett datum per person — vi behöver inte hela personnumret.
+                  Ett datum per person. Vi behöver inte hela personnumret.
                 </p>
               </div>
             </div>

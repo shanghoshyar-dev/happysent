@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Inlägg" };
 
   const title =
-    post.meta_title?.trim() || `${post.title} – Happysent`;
+    post.meta_title?.trim() || `${post.title} | Happysent`;
   const description =
     post.meta_description?.trim() ||
     post.excerpt?.trim() ||

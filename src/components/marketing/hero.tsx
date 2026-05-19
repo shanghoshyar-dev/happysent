@@ -43,7 +43,7 @@ export function Hero() {
         <p className="hero-text-shadow-soft mt-6 max-w-xl text-base leading-relaxed text-white sm:text-lg">
           <BrandName className="text-white" /> bokar och levererar färska tårtor från
           lokala bagerier till ditt
-          kontor – på rätt dag, varje gång. Lägg till dina anställda, luta dig tillbaka
+          kontor, på rätt dag, varje gång. Lägg till dina anställda, luta dig tillbaka
           och låt oss sköta resten.
         </p>
 

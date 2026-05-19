@@ -3,7 +3,7 @@ const features = [
     icon: "📅",
     title: "Lägg till en gång",
     body:
-      "Registrera dina anställda och deras födelsedagar. Vi tar hand om resten – år efter år.",
+      "Registrera dina anställda och deras födelsedagar. Vi tar hand om resten, år efter år.",
   },
   {
     icon: "🥐",
@@ -15,7 +15,7 @@ const features = [
     icon: "📬",
     title: "Smarta påminnelser",
     body:
-      "Du får mail 14 dagar, 7 dagar och 1 dag innan – så du alltid är förberedd.",
+      "Du får mail 14 dagar, 7 dagar och 1 dag innan, så du alltid är förberedd.",
   },
   {
     icon: "🇸🇪",
