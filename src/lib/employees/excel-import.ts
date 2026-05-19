@@ -10,6 +10,10 @@ import {
   type GiftType,
 } from "@/lib/celebrations";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
+import {
+  errorMentionsColumn,
+  isMissingColumnError,
+} from "@/lib/supabase/db-errors";
 import type { Database } from "@/types/database";
 
 export interface ExcelImportResult {
@@ -239,7 +243,21 @@ export async function insertParsedEmployeeRows(
 ): Promise<ExcelImportResult> {
   let imported = 0;
   if (validRows.length > 0) {
-    const { error } = await supabase.from("employees").insert(validRows);
+    let { error } = await supabase.from("employees").insert(validRows);
+
+    if (
+      error &&
+      isMissingColumnError(error) &&
+      (errorMentionsColumn(error, "celebration_frequency") ||
+        errorMentionsColumn(error, "gift_type"))
+    ) {
+      const legacyRows = validRows.map(
+        ({ celebration_frequency: _cf, gift_type: _gt, ...rest }) => rest,
+      );
+      const retry = await supabase.from("employees").insert(legacyRows);
+      error = retry.error;
+    }
+
     if (error) {
       return {
         ok: false,

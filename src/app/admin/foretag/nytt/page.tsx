@@ -7,7 +7,8 @@ import { getAppSettings } from "@/lib/app-settings";
 import { createClient } from "@/lib/supabase/server";
 
 import { createCompany } from "../actions";
-import { CompanyForm, type CompanyFormProps } from "../company-form";
+import { CreateCompanyForm } from "../create-company-form";
+import type { CompanyFormProps } from "../company-form";
 
 export const dynamic = "force-dynamic";
 
@@ -112,10 +113,10 @@ export default async function NyttForetagPage({
       ) : null}
 
       <Card className="max-w-3xl">
-        <CompanyForm
+        <CreateCompanyForm
           bakeries={bakeries}
           florists={florists}
-          action={createCompany}
+          saveAction={createCompany}
           submitLabel="Spara företag"
           defaultPricePerCake={settings.default_price_per_cake}
           applicationPrefill={applicationPrefill}

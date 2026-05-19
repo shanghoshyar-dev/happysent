@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
+import {
+  errorMentionsColumn,
+  isMissingColumnError,
+} from "@/lib/supabase/db-errors";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { sendCompanyWelcome } from "@/lib/resend/templates";
@@ -77,11 +81,27 @@ export async function createCompany(formData: FormData) {
     price_per_flowers: parsePricePerFlowers(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
-  const { data: created, error } = await supabase
+  let { data: created, error } = await supabase
     .from("companies")
     .insert(payload)
     .select("id")
     .single();
+
+  if (
+    error &&
+    isMissingColumnError(error) &&
+    errorMentionsColumn(error, "price_per_flowers")
+  ) {
+    const { price_per_flowers: _pf, ...legacyPayload } = payload;
+    const retry = await supabase
+      .from("companies")
+      .insert(legacyPayload)
+      .select("id")
+      .single();
+    created = retry.data;
+    error = retry.error;
+  }
+
   if (error) throw new Error(error.message);
 
   const admin = createAdminClient();
