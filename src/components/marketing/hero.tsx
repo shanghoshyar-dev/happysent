@@ -33,7 +33,10 @@ export function Hero() {
         <h1 className="hero-text-shadow mt-8 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
           Glöm aldrig en
           <br />
-          <span className="text-candy-200">födelsedag</span> igen.
+          <span className="font-script text-3xl font-normal text-candy-200 sm:text-4xl md:text-5xl">
+            födelsedag
+          </span>{" "}
+          igen.
         </h1>
 
         <p className="hero-text-shadow-soft mt-6 max-w-xl text-base leading-relaxed text-white sm:text-lg">

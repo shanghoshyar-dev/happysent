@@ -13,7 +13,7 @@ export const metadata: Metadata = svMarketingPageMeta({
 
 export default function IntegritetspolicyPage() {
   return (
-    <article className="mx-auto max-w-3xl px-6 py-20">
+    <article className="font-legal mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-5xl text-slate-900">Privacy Policy</h1>
       <p className="mt-4 text-sm text-slate-500">
         Last updated:{" "}

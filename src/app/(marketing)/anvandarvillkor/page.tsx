@@ -11,7 +11,7 @@ export const metadata: Metadata = svMarketingPageMeta({
 
 export default function AnvandarvillkorPage() {
   return (
-    <article className="mx-auto max-w-3xl px-6 py-20">
+    <article className="font-legal mx-auto max-w-3xl px-6 py-20">
       <h1 className="font-display text-5xl text-slate-900">
         Terms and Conditions – Happysent
       </h1>

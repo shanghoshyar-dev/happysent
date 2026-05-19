@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Kalam } from "next/font/google";
+
+import "@fontsource-variable/host-grotesk/wght.css";
 
 import "./globals.css";
 
@@ -8,6 +10,13 @@ import { getSiteUrl } from "@/lib/site-url";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const kalam = Kalam({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-kalam",
   display: "swap",
 });
 
@@ -43,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="sv" className={inter.variable}>
+    <html lang="sv" className={`${inter.variable} ${kalam.variable}`}>
       <body className="min-h-screen bg-cream font-sans antialiased transition-colors duration-200">
         {children}
       </body>

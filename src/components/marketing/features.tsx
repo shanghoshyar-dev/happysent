@@ -47,8 +47,7 @@ export function Features() {
             <span className="text-candy-500">inget du inte behöver.</span>
           </h2>
           <p className="mt-4 text-lg text-slate-600">
-            Happysent är byggt för HR-team som vill fira sina kollegor utan att
-            lägga timmar på beställningar.
+            Happysent, byggt för företag som bryr sig om sina människor.
           </p>
         </div>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">

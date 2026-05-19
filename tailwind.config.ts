@@ -65,9 +65,23 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        /** Same as sans — headings use Inter with tighter tracking */
-        display: ["var(--font-inter)", "system-ui", "sans-serif"],
+        /** Daymaker: Host Grotesk */
+        sans: [
+          '"Host Grotesk Variable"',
+          '"Host Grotesk"',
+          "system-ui",
+          "sans-serif",
+        ],
+        display: [
+          '"Host Grotesk Variable"',
+          '"Host Grotesk"',
+          "system-ui",
+          "sans-serif",
+        ],
+        /** Daymaker: handskriven accent (t.ex. «oförglömlig») */
+        script: ["var(--font-kalam)", "cursive"],
+        /** Integritetspolicy & användarvillkor */
+        legal: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         soft: "0 10px 30px -12px rgba(232, 96, 60, 0.22)",

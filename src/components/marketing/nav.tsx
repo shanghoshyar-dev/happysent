@@ -69,7 +69,7 @@ export function MarketingNav() {
           >
             🎂
           </motion.span>
-          <span className="truncate font-display text-lg font-semibold text-slate-900 sm:text-xl">
+          <span className="truncate font-script text-xl font-normal text-slate-900 sm:text-2xl">
             Happysent
           </span>
         </Link>

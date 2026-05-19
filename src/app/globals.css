@@ -19,14 +19,14 @@ body {
 
 .prose-happysent h1,
 .prose-happysent h2 {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: "Host Grotesk Variable", "Host Grotesk", system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #2d4a3e;
 }
 
 .prose-happysent h3 {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: "Host Grotesk Variable", "Host Grotesk", system-ui, sans-serif;
   font-weight: 600;
   color: #2d4a3e;
 }
@@ -45,6 +45,14 @@ body {
 
 .prose-happysent a:hover {
   color: #d54e30;
+}
+
+/** Juridiska sidor behåller Inter */
+.font-legal,
+.font-legal .prose-happysent h1,
+.font-legal .prose-happysent h2,
+.font-legal .prose-happysent h3 {
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 /* Marquee: keyframes på rotnivå — i @layer utilities kan vissa PostCSS/Tailwind-byggen äta upp dem */
