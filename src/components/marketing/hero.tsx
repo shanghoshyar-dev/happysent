@@ -25,7 +25,7 @@ export function Hero() {
         <div className="hero-vertical-slats absolute inset-0" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[min(88vh,44rem)] max-w-3xl flex-col items-center justify-center px-6 py-16 text-center sm:min-h-[min(92vh,48rem)] sm:py-20 md:py-24">
+      <div className="relative z-10 mx-auto flex min-h-[min(88vh,44rem)] max-w-3xl flex-col items-center justify-center px-6 pb-16 pt-28 text-center sm:min-h-[min(92vh,48rem)] sm:pb-20 sm:pt-28 md:pb-24 md:pt-24">
         <span className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-black/35 px-4 py-1.5 text-xs font-medium text-white shadow-sm backdrop-blur-md">
           <span aria-hidden>✨</span> Ny i Malmö
         </span>
