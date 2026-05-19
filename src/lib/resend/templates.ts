@@ -100,6 +100,45 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
   });
 }
 
+// 2a-alt) 7 days before — order to florist
+export interface SevenDayFloristArgs {
+  to: string;
+  floristName: string;
+  companyName: string;
+  companyAddress: string;
+  companyCity?: string | null;
+  contactPhone?: string | null;
+  employeeFirstName: string;
+  employeeLastName: string;
+  deliveryDate: string;
+}
+export async function send7DayFlorist(a: SevenDayFloristArgs) {
+  const subject = `Beställning – Blommor till ${a.companyName} den ${formatSwedishDate(a.deliveryDate)}`;
+  const deliveryAddress = a.companyCity
+    ? `${a.companyAddress}, ${a.companyCity}`
+    : a.companyAddress;
+  const contactTel = a.contactPhone?.trim()
+    ? a.contactPhone.trim()
+    : "(saknas i kundregistret — kontakta Happysent vid leveransfrågor)";
+  const text =
+    `Hej ${a.floristName}!\n\n` +
+    `Vi bekräftar följande beställning:\n\n` +
+    `Kund:             ${a.employeeFirstName} ${a.employeeLastName} fyller år den ${formatSwedishDate(a.deliveryDate)}\n` +
+    `Företag:          ${a.companyName}\n` +
+    `Leveransadress:   ${deliveryAddress}\n` +
+    `Kontakt telefon:  ${contactTel}\n` +
+    `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
+    `Skicka faktura till: ${await adminInbox()}\n\n` +
+    `Tack!\nHappysent`;
+
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: a.to,
+    subject,
+    text,
+  });
+}
+
 // 2b) 7 days before — confirmation to company
 export interface SevenDayCompanyArgs extends BaseArgs {
   to: string;

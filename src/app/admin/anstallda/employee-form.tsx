@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { Tables } from "@/types/database";
 
 interface EmployeeFormProps {
@@ -76,6 +77,39 @@ export function EmployeeForm({
           required
           defaultValue={employee?.number_of_people ?? 1}
         />
+      </div>
+      <div>
+        <Label htmlFor="celebration_frequency">Firande</Label>
+        <Select
+          id="celebration_frequency"
+          name="celebration_frequency"
+          defaultValue={
+            (employee?.celebration_frequency as CelebrationFrequency | undefined) ??
+            "every_year"
+          }
+        >
+          <option value="every_year">Varje år</option>
+          <option value="twice_yearly">
+            Två gånger per år (födelsedag + halvår)
+          </option>
+          <option value="decade">Jämna år (20, 30, 40 …)</option>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="gift_type">Gåva</Label>
+        <Select
+          id="gift_type"
+          name="gift_type"
+          defaultValue={
+            (employee?.gift_type as GiftType | undefined) ?? "cake"
+          }
+        >
+          <option value="cake">Tårta</option>
+          <option value="flowers">Blommor</option>
+        </Select>
+        <p className="mt-1 text-xs text-slate-500">
+          Blommor kräver att företaget har blomsterpartner aktiverad.
+        </p>
       </div>
       <div className="flex items-center gap-2 md:col-span-2">
         <input

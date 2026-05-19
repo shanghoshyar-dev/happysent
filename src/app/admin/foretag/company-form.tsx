@@ -163,6 +163,21 @@ export function CompanyForm({
         />
       </div>
       <div>
+        <Label htmlFor="price_per_flowers">Pris per blombukett (SEK)</Label>
+        <Input
+          id="price_per_flowers"
+          name="price_per_flowers"
+          type="number"
+          min={0}
+          placeholder="Samma som tårta om tomt"
+          defaultValue={company?.price_per_flowers ?? ""}
+        />
+        <p className="mt-1 text-xs text-slate-500">
+          Används när en anställd har gåva &quot;Blommor&quot;. Lämna tomt för att
+          använda tårtpriset.
+        </p>
+      </div>
+      <div>
         <Label htmlFor="status">Status</Label>
         <Select id="status" name="status" defaultValue={company?.status ?? "active"}>
           <option value="active">Aktivt</option>

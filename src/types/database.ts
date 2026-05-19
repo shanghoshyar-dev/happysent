@@ -35,9 +35,13 @@ export type InvoiceStatus = "unpaid" | "paid";
 export type ReminderType =
   | "14_days"
   | "7_days_bakery"
+  | "7_days_florist"
   | "7_days_company"
   | "1_day"
   | "day_of";
+
+export type CelebrationFrequency = "every_year" | "twice_yearly" | "decade";
+export type GiftType = "cake" | "flowers";
 
 export type Database = {
   public: {
@@ -162,6 +166,7 @@ export type Database = {
           offers_flowers: boolean;
           florist_id: string | null;
           price_per_cake: number;
+          price_per_flowers: number | null;
           status: CompanyStatus;
           created_at: string;
         };
@@ -177,6 +182,7 @@ export type Database = {
           offers_flowers?: boolean;
           florist_id?: string | null;
           price_per_cake: number;
+          price_per_flowers?: number | null;
           status?: CompanyStatus;
           created_at?: string;
         };
@@ -192,6 +198,7 @@ export type Database = {
           offers_flowers?: boolean;
           florist_id?: string | null;
           price_per_cake?: number;
+          price_per_flowers?: number | null;
           status?: CompanyStatus;
           created_at?: string;
         };
@@ -276,6 +283,8 @@ export type Database = {
           last_name: string;
           birthday: string;
           number_of_people: number;
+          celebration_frequency: CelebrationFrequency;
+          gift_type: GiftType;
           is_active: boolean;
           created_at: string;
         };
@@ -286,6 +295,8 @@ export type Database = {
           last_name: string;
           birthday: string;
           number_of_people?: number;
+          celebration_frequency?: CelebrationFrequency;
+          gift_type?: GiftType;
           is_active?: boolean;
           created_at?: string;
         };
@@ -296,6 +307,8 @@ export type Database = {
           last_name?: string;
           birthday?: string;
           number_of_people?: number;
+          celebration_frequency?: CelebrationFrequency;
+          gift_type?: GiftType;
           is_active?: boolean;
           created_at?: string;
         };
@@ -317,6 +330,7 @@ export type Database = {
           delivery_date: string;
           status: OrderStatus;
           price: number;
+          gift_type: GiftType;
           created_at: string;
         };
         Insert: {
@@ -326,6 +340,7 @@ export type Database = {
           delivery_date: string;
           status?: OrderStatus;
           price: number;
+          gift_type?: GiftType;
           created_at?: string;
         };
         Update: {
@@ -335,6 +350,7 @@ export type Database = {
           delivery_date?: string;
           status?: OrderStatus;
           price?: number;
+          gift_type?: GiftType;
           created_at?: string;
         };
         Relationships: [

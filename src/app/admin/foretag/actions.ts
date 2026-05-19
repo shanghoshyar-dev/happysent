@@ -14,6 +14,16 @@ function parseContactPhone(formData: FormData): string | null {
   return t ? t : null;
 }
 
+function parsePricePerFlowers(formData: FormData): number | null {
+  const raw = String(formData.get("price_per_flowers") ?? "").trim();
+  if (!raw) return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) {
+    throw new Error("Pris per blombukett måste vara ett giltigt tal (0 eller högre).");
+  }
+  return n;
+}
+
 function parseFlowerPartnerFields(formData: FormData): {
   offers_flowers: boolean;
   florist_id: string | null;
@@ -64,6 +74,7 @@ export async function createCompany(formData: FormData) {
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
+    price_per_flowers: parsePricePerFlowers(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
   const { data: created, error } = await supabase
@@ -162,6 +173,7 @@ export async function updateCompany(id: string, formData: FormData) {
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
+    price_per_flowers: parsePricePerFlowers(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
   const { error } = await supabase.from("companies").update(payload).eq("id", id);

@@ -40,8 +40,12 @@ export function ExcelImportForm({ companies, defaultCompanyId }: Props) {
           Ladda upp en{" "}
           <code className="rounded bg-slate-100 px-1.5 py-0.5">.xlsx</code>-fil
           med kolumnerna{" "}
-          <strong>Förnamn, Efternamn, Födelsedag, Antal personer</strong>.
-          Födelsedag i formatet <code>YYYY-MM-DD</code>.
+          <strong>
+            Förnamn, Efternamn, Födelsedag, Antal personer
+          </strong>{" "}
+          (valfritt: <strong>Firande</strong>, <strong>Gåva</strong>). Firande:
+          varje år, halvår eller 10-år. Gåva: tårta eller blommor. Födelsedag i
+          formatet <code>YYYY-MM-DD</code>.
         </p>
       </div>
 

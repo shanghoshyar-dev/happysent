@@ -3,6 +3,12 @@ import "server-only";
 import ExcelJS from "exceljs";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import {
+  parseCelebrationFrequency,
+  parseGiftType,
+  type CelebrationFrequency,
+  type GiftType,
+} from "@/lib/celebrations";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import type { Database } from "@/types/database";
 
@@ -14,10 +20,15 @@ export interface ExcelImportResult {
   globalError?: string;
 }
 
-const HEADER_MAP: Record<
-  string,
-  "first_name" | "last_name" | "birthday" | "number_of_people"
-> = {
+type EmployeeImportField =
+  | "first_name"
+  | "last_name"
+  | "birthday"
+  | "number_of_people"
+  | "celebration_frequency"
+  | "gift_type";
+
+const HEADER_MAP: Record<string, EmployeeImportField> = {
   förnamn: "first_name",
   fornamn: "first_name",
   efternamn: "last_name",
@@ -25,6 +36,10 @@ const HEADER_MAP: Record<
   fodelsedag: "birthday",
   "antal personer": "number_of_people",
   antal: "number_of_people",
+  firande: "celebration_frequency",
+  frekvens: "celebration_frequency",
+  gåva: "gift_type",
+  gava: "gift_type",
 };
 
 function normaliseHeader(h: unknown): string {
@@ -56,8 +71,28 @@ export type ParsedEmployeeImportRow = EmployeeInsert & {
   last_name: string;
   birthday: string;
   number_of_people: number;
+  celebration_frequency: CelebrationFrequency;
+  gift_type: GiftType;
   is_active: true;
 };
+
+function findHeaderRow(sheet: ExcelJS.Worksheet): {
+  headerRowIndex: number;
+  colByField: Partial<Record<EmployeeImportField, number>>;
+} | null {
+  for (let r = 1; r <= 5; r++) {
+    const row = sheet.getRow(r);
+    const colByField: Partial<Record<EmployeeImportField, number>> = {};
+    row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+      const key = HEADER_MAP[normaliseHeader(cell.value)];
+      if (key) colByField[key] = colNumber;
+    });
+    if (colByField.first_name) {
+      return { headerRowIndex: r, colByField };
+    }
+  }
+  return null;
+}
 
 /**
  * Läser workbook från buffert och bygger rader för insert (samma mall som admin-import).
@@ -90,14 +125,14 @@ export async function parseEmployeesExcelBuffer(
     return { globalError: "Arbetsboken är tom." };
   }
 
-  const headerRow = sheet.getRow(1);
-  const colByField: Partial<
-    Record<"first_name" | "last_name" | "birthday" | "number_of_people", number>
-  > = {};
-  headerRow.eachCell({ includeEmpty: false }, (cell, colNumber) => {
-    const key = HEADER_MAP[normaliseHeader(cell.value)];
-    if (key) colByField[key] = colNumber;
-  });
+  const header = findHeaderRow(sheet);
+  if (!header) {
+    return {
+      globalError:
+        "Kunde inte hitta kolumnrubriker (förväntar rad med ”Förnamn”).",
+    };
+  }
+  const { headerRowIndex, colByField } = header;
 
   const missing: string[] = [];
   if (!colByField.first_name) missing.push("Förnamn");
@@ -114,7 +149,8 @@ export async function parseEmployeesExcelBuffer(
   const errors: ExcelImportResult["errors"] = [];
 
   const rowCount = sheet.rowCount;
-  for (let r = 2; r <= rowCount; r++) {
+  const dataStartRow = headerRowIndex + 1;
+  for (let r = dataStartRow; r <= rowCount; r++) {
     const row = sheet.getRow(r);
     if (row.cellCount === 0) continue;
 
@@ -145,12 +181,49 @@ export async function parseEmployeesExcelBuffer(
       continue;
     }
 
+    let celebrationFrequency: CelebrationFrequency = "every_year";
+    if (colByField.celebration_frequency) {
+      const raw = String(
+        row.getCell(colByField.celebration_frequency).value ?? "",
+      ).trim();
+      if (raw) {
+        const parsed = parseCelebrationFrequency(raw);
+        if (!parsed) {
+          errors.push({
+            row: r,
+            reason:
+              'Ogiltigt firande (t.ex. "varje år", "halvår", "10-år")',
+          });
+          continue;
+        }
+        celebrationFrequency = parsed;
+      }
+    }
+
+    let giftType: GiftType = "cake";
+    if (colByField.gift_type) {
+      const raw = String(row.getCell(colByField.gift_type).value ?? "").trim();
+      if (raw) {
+        const parsed = parseGiftType(raw);
+        if (!parsed) {
+          errors.push({
+            row: r,
+            reason: 'Ogiltig gåva (t.ex. "tårta" eller "blommor")',
+          });
+          continue;
+        }
+        giftType = parsed;
+      }
+    }
+
     validRows.push({
       company_id: companyId,
       first_name: firstName,
       last_name: lastName,
       birthday,
       number_of_people: numberOfPeople,
+      celebration_frequency: celebrationFrequency,
+      gift_type: giftType,
       is_active: true,
     });
   }

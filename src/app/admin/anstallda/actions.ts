@@ -2,10 +2,35 @@
 
 import { revalidatePath } from "next/cache";
 
+import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import { createClient } from "@/lib/supabase/server";
+
+const CELEBRATION_FREQUENCIES = [
+  "every_year",
+  "twice_yearly",
+  "decade",
+] as const satisfies readonly CelebrationFrequency[];
+
+const GIFT_TYPES = ["cake", "flowers"] as const satisfies readonly GiftType[];
+
+function parseCelebrationFrequencyField(formData: FormData): CelebrationFrequency {
+  const raw = String(formData.get("celebration_frequency") ?? "every_year");
+  if (CELEBRATION_FREQUENCIES.includes(raw as CelebrationFrequency)) {
+    return raw as CelebrationFrequency;
+  }
+  return "every_year";
+}
+
+function parseGiftTypeField(formData: FormData): GiftType {
+  const raw = String(formData.get("gift_type") ?? "cake");
+  if (GIFT_TYPES.includes(raw as GiftType)) {
+    return raw as GiftType;
+  }
+  return "cake";
+}
 
 export async function createEmployee(formData: FormData) {
   const supabase = createClient();
@@ -15,6 +40,8 @@ export async function createEmployee(formData: FormData) {
     last_name: String(formData.get("last_name") ?? "").trim(),
     birthday: String(formData.get("birthday") ?? ""),
     number_of_people: Number(formData.get("number_of_people") ?? 1),
+    celebration_frequency: parseCelebrationFrequencyField(formData),
+    gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
   };
   const { error } = await supabase.from("employees").insert(payload);
@@ -39,6 +66,8 @@ export async function updateEmployee(id: string, formData: FormData) {
     last_name: String(formData.get("last_name") ?? "").trim(),
     birthday: String(formData.get("birthday") ?? ""),
     number_of_people: Number(formData.get("number_of_people") ?? 1),
+    celebration_frequency: parseCelebrationFrequencyField(formData),
+    gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
   };
   const { error } = await supabase

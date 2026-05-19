@@ -53,6 +53,9 @@ export function ManualCronButton() {
           <p className="font-medium">Klar.</p>
           <ul className="mt-2 space-y-1">
             <li>Anställda kontrollerade: {result.daily.scannedEmployees}</li>
+            <li>
+              Leveranstillfällen i år: {result.daily.deliverySlotsChecked}
+            </li>
             <li>Nya ordrar: {result.daily.ordersUpserted}</li>
             <li>Skickade påminnelser: {result.daily.remindersSent}</li>
             <li>Hoppade över (redan skickade): {result.daily.remindersSkipped}</li>

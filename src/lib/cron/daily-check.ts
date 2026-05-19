@@ -1,20 +1,21 @@
 import "server-only";
 
-import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  adjustDeliveryDate,
-  birthdayThisYear,
-  diffInDays,
-  toDateString,
-} from "@/lib/holidays/swedish";
+  deliveryOccasionsInYear,
+  shouldProcessDelivery,
+  type GiftType,
+} from "@/lib/celebrations";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { diffInDays } from "@/lib/holidays/swedish";
 import {
   send14DayCompany,
   send1DayCompany,
   send7DayBakery,
   send7DayCompany,
+  send7DayFlorist,
   sendDayOfCompany,
 } from "@/lib/resend/templates";
-import type { ReminderType } from "@/types/database";
+import type { CelebrationFrequency, ReminderType } from "@/types/database";
 
 interface ReminderAction {
   type: ReminderType;
@@ -23,6 +24,7 @@ interface ReminderAction {
 
 export interface DailyCheckResult {
   scannedEmployees: number;
+  deliverySlotsChecked: number;
   ordersUpserted: number;
   remindersSent: number;
   remindersSkipped: number;
@@ -35,9 +37,11 @@ export interface DailyCheckResult {
  */
 export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
   const supabase = createAdminClient();
+  const year = today.getUTCFullYear();
 
   const result: DailyCheckResult = {
     scannedEmployees: 0,
+    deliverySlotsChecked: 0,
     ordersUpserted: 0,
     remindersSent: 0,
     remindersSkipped: 0,
@@ -49,9 +53,12 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
     .select(
       `
       id, first_name, last_name, birthday, number_of_people, is_active, company_id,
+      celebration_frequency, gift_type,
       companies:company_id (
-        id, name, address, city, contact_email, contact_phone, billing_email, price_per_cake, status,
-        bakeries:bakery_id ( id, name, email )
+        id, name, address, city, contact_email, contact_phone, billing_email,
+        price_per_cake, price_per_flowers, status, offers_flowers, florist_id,
+        bakeries:bakery_id ( id, name, email ),
+        florists:florist_id ( id, name, email )
       )
     `,
     )
@@ -67,72 +74,97 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
   for (const emp of employees) {
     result.scannedEmployees++;
     try {
-      // Supabase typed-relations come through as `unknown` in the placeholder
-      // type, so we narrow with a small runtime guard.
       const company = (emp as unknown as { companies: CompanyJoin | null })
         .companies;
       if (!company || company.status !== "active") continue;
-      const bakery = company.bakeries;
-      if (!bakery) continue;
 
-      const birthday = birthdayThisYear(emp.birthday, today);
-      const deliveryDate = adjustDeliveryDate(birthday);
-      const deliveryIso = toDateString(deliveryDate);
-      const daysAway = diffInDays(deliveryDate, today);
+      const rule = {
+        birthday: emp.birthday,
+        celebration_frequency:
+          (emp.celebration_frequency as CelebrationFrequency) ?? "every_year",
+      };
+      const giftType = (emp.gift_type as GiftType) ?? "cake";
 
-      // We only act on milestones; otherwise skip to save DB writes.
-      if (![14, 7, 1, 0].includes(daysAway)) continue;
+      const deliveries = deliveryOccasionsInYear(rule, year);
 
-      // Idempotently ensure an order row exists for this employee/year.
-      const order = await ensureOrder({
-        supabase,
-        employeeId: emp.id,
-        companyId: company.id,
-        deliveryIso,
-        price: company.price_per_cake,
-      });
-      if (order.created) result.ordersUpserted++;
+      for (const delivery of deliveries) {
+        if (!shouldProcessDelivery(rule, delivery)) continue;
 
-      const actions: ReminderAction[] = buildActions({
-        daysAway,
-        order,
-        company,
-        bakery,
-        emp,
-        deliveryIso,
-      });
+        result.deliverySlotsChecked++;
+        const deliveryIso = delivery.deliveryIso;
+        const daysAway = diffInDays(delivery.deliveryDate, today);
 
-      for (const action of actions) {
-        const alreadySent = await reminderAlreadySent(
-          supabase,
-          order.id,
-          action.type,
-        );
-        if (alreadySent) {
-          result.remindersSkipped++;
-          continue;
+        if (![14, 7, 1, 0].includes(daysAway)) continue;
+
+        if (giftType === "cake") {
+          if (!company.bakeries) {
+            throw new Error("Aktivt företag saknar bageri");
+          }
+        } else {
+          if (!company.offers_flowers || !company.florists) {
+            throw new Error(
+              "Anställd har blommor men företaget saknar blomsterleverans eller florist",
+            );
+          }
         }
 
-        await action.send();
-        await supabase.from("reminder_log").insert({
-          employee_id: emp.id,
-          order_id: order.id,
-          type: action.type,
-        });
-        result.remindersSent++;
-      }
+        const price =
+          giftType === "flowers"
+            ? (company.price_per_flowers ?? company.price_per_cake)
+            : company.price_per_cake;
 
-      if (daysAway === 0) {
-        await supabase
-          .from("orders")
-          .update({ status: "delivered" })
-          .eq("id", order.id);
-      } else if (daysAway === 7) {
-        await supabase
-          .from("orders")
-          .update({ status: "sent_to_bakery" })
-          .eq("id", order.id)
-          .eq("status", "scheduled");
+        const order = await ensureOrder({
+          supabase,
+          employeeId: emp.id,
+          companyId: company.id,
+          deliveryIso,
+          price,
+          giftType,
+        });
+        if (order.created) result.ordersUpserted++;
+
+        const actions: ReminderAction[] = buildActions({
+          daysAway,
+          company,
+          bakery: company.bakeries,
+          florist: company.florists,
+          giftType,
+          emp,
+          deliveryIso,
+        });
+
+        for (const action of actions) {
+          const alreadySent = await reminderAlreadySent(
+            supabase,
+            order.id,
+            action.type,
+          );
+          if (alreadySent) {
+            result.remindersSkipped++;
+            continue;
+          }
+
+          await action.send();
+          await supabase.from("reminder_log").insert({
+            employee_id: emp.id,
+            order_id: order.id,
+            type: action.type,
+          });
+          result.remindersSent++;
+        }
+
+        if (daysAway === 0) {
+          await supabase
+            .from("orders")
+            .update({ status: "delivered" })
+            .eq("id", order.id);
+        } else if (daysAway === 7) {
+          await supabase
+            .from("orders")
+            .update({ status: "sent_to_bakery" })
+            .eq("id", order.id)
+            .eq("status", "scheduled");
+        }
       }
     } catch (err) {
       result.errors.push({
@@ -147,6 +179,12 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
 
 // ---- helpers ---------------------------------------------------------------
 
+interface Partner {
+  id: string;
+  name: string;
+  email: string;
+}
+
 interface CompanyJoin {
   id: string;
   name: string;
@@ -156,8 +194,12 @@ interface CompanyJoin {
   contact_phone: string | null;
   billing_email: string;
   price_per_cake: number;
+  price_per_flowers: number | null;
   status: "active" | "paused";
-  bakeries: { id: string; name: string; email: string } | null;
+  offers_flowers: boolean;
+  florist_id: string | null;
+  bakeries: Partner | null;
+  florists: Partner | null;
 }
 
 interface OrderRow {
@@ -171,17 +213,15 @@ async function ensureOrder(args: {
   companyId: string;
   deliveryIso: string;
   price: number;
+  giftType: GiftType;
 }): Promise<OrderRow> {
-  const { supabase, employeeId, companyId, deliveryIso, price } = args;
-  const year = Number(deliveryIso.slice(0, 4));
+  const { supabase, employeeId, companyId, deliveryIso, price, giftType } = args;
 
-  // Look for an existing order in this delivery year for this employee.
   const { data: existing, error: selErr } = await supabase
     .from("orders")
     .select("id")
     .eq("employee_id", employeeId)
-    .gte("delivery_date", `${year}-01-01`)
-    .lte("delivery_date", `${year}-12-31`)
+    .eq("delivery_date", deliveryIso)
     .maybeSingle();
 
   if (selErr) throw new Error(`Lookup order failed: ${selErr.message}`);
@@ -194,6 +234,7 @@ async function ensureOrder(args: {
       company_id: companyId,
       delivery_date: deliveryIso,
       price,
+      gift_type: giftType,
       status: "scheduled",
     })
     .select("id")
@@ -222,9 +263,10 @@ async function reminderAlreadySent(
 
 function buildActions(args: {
   daysAway: number;
-  order: OrderRow;
   company: CompanyJoin;
-  bakery: NonNullable<CompanyJoin["bakeries"]>;
+  bakery: Partner | null;
+  florist: Partner | null;
+  giftType: GiftType;
   emp: {
     id: string;
     first_name: string;
@@ -233,7 +275,7 @@ function buildActions(args: {
   };
   deliveryIso: string;
 }): ReminderAction[] {
-  const { daysAway, company, bakery, emp, deliveryIso } = args;
+  const { daysAway, company, bakery, florist, giftType, emp, deliveryIso } = args;
   const baseCompany = {
     to: company.contact_email,
     companyName: company.name,
@@ -241,6 +283,42 @@ function buildActions(args: {
     employeeLastName: emp.last_name,
     deliveryDate: deliveryIso,
   };
+
+  const partnerOrder =
+    giftType === "flowers" && florist
+      ? {
+          type: "7_days_florist" as const,
+          send: () =>
+            send7DayFlorist({
+              to: florist.email,
+              floristName: florist.name,
+              companyName: company.name,
+              companyAddress: company.address,
+              companyCity: company.city,
+              contactPhone: company.contact_phone,
+              employeeFirstName: emp.first_name,
+              employeeLastName: emp.last_name,
+              deliveryDate: deliveryIso,
+            }),
+        }
+      : bakery
+        ? {
+            type: "7_days_bakery" as const,
+            send: () =>
+              send7DayBakery({
+                to: bakery.email,
+                bakeryName: bakery.name,
+                companyName: company.name,
+                companyAddress: company.address,
+                companyCity: company.city,
+                contactPhone: company.contact_phone,
+                employeeFirstName: emp.first_name,
+                employeeLastName: emp.last_name,
+                deliveryDate: deliveryIso,
+                numberOfPeople: emp.number_of_people,
+              }),
+          }
+        : null;
 
   switch (daysAway) {
     case 14:
@@ -250,29 +328,16 @@ function buildActions(args: {
           send: () => send14DayCompany(baseCompany),
         },
       ];
-    case 7:
-      return [
-        {
-          type: "7_days_bakery",
-          send: () =>
-            send7DayBakery({
-              to: bakery.email,
-              bakeryName: bakery.name,
-              companyName: company.name,
-              companyAddress: company.address,
-              companyCity: company.city,
-              contactPhone: company.contact_phone,
-              employeeFirstName: emp.first_name,
-              employeeLastName: emp.last_name,
-              deliveryDate: deliveryIso,
-              numberOfPeople: emp.number_of_people,
-            }),
-        },
+    case 7: {
+      const actions: ReminderAction[] = [
         {
           type: "7_days_company",
           send: () => send7DayCompany(baseCompany),
         },
       ];
+      if (partnerOrder) actions.unshift(partnerOrder);
+      return actions;
+    }
     case 1:
       return [{ type: "1_day", send: () => send1DayCompany(baseCompany) }];
     case 0:
