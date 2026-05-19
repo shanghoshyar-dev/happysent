@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
+import { formatOrganizationNumber } from "@/lib/organization-number";
 import { formatDate } from "@/lib/utils";
 
 import type { PendingApplicationQueueRow } from "@/lib/admin/pending-company-applications";
@@ -40,6 +41,7 @@ export function CompanyApplicationQueue({ rows }: Props) {
               <TH>Inkommen</TH>
               <TH>Kontakt</TH>
               <TH>Företag</TH>
+              <TH>Org.nr</TH>
               <TH>Mejl</TH>
               <TH>Telefon</TH>
               <TH>Meddelande</TH>
@@ -56,6 +58,13 @@ export function CompanyApplicationQueue({ rows }: Props) {
                 </TD>
                 <TD className="font-medium text-slate-900">{r.contact_name}</TD>
                 <TD>{r.company_name}</TD>
+                <TD className="whitespace-nowrap text-sm text-slate-700">
+                  {r.organization_number?.trim() ? (
+                    formatOrganizationNumber(r.organization_number)
+                  ) : (
+                    <span className="text-slate-400">—</span>
+                  )}
+                </TD>
                 <TD>
                   <a
                     href={`mailto:${r.contact_email}`}

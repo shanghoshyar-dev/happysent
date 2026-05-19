@@ -16,6 +16,10 @@ import {
   type DigestChangeEntry,
 } from "@/lib/cron/employee-add-digest";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
+import {
+  formatOrganizationNumber,
+  normalizeOrganizationNumber,
+} from "@/lib/organization-number";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ContactState =
@@ -134,6 +138,11 @@ function errorMentionsContactPhone(error: { message?: string }): boolean {
   return m.includes("contact_phone");
 }
 
+function errorMentionsOrganizationNumber(error: { message?: string }): boolean {
+  const m = (error.message ?? "").toLowerCase();
+  return m.includes("organization_number");
+}
+
 /**
  * Telefon ska alltid ligga i kolumnen contact_phone — aldrig gömd i message.
  * Om villkorskolumner saknas i DB kan vi spara utan dem (migration pending).
@@ -143,6 +152,7 @@ async function insertCompanyApplicationRow(
   row: {
     name: string;
     company: string;
+    organizationNumber: string;
     email: string;
     phone: string;
     message: string;
@@ -156,6 +166,7 @@ async function insertCompanyApplicationRow(
   const fullPayload = {
     contact_name: row.name,
     company_name: row.company,
+    organization_number: row.organizationNumber,
     contact_email: row.email,
     contact_phone: row.phone,
     message: baseMessage,
@@ -173,6 +184,38 @@ async function insertCompanyApplicationRow(
     return { ok: true, applicationId: createdFull.id };
   }
 
+  const retryWithoutOrgNumber =
+    fullErr &&
+    isLikelyMissingColumnError(fullErr) &&
+    errorMentionsOrganizationNumber(fullErr);
+
+  if (retryWithoutOrgNumber) {
+    console.warn(
+      "[submitContactForm] organization_number saknas i DB — sparar org.nr i meddelandefältet. Kör migration company_applications_organization_number.",
+    );
+    const orgPrefix = `Organisationsnummer: ${formatOrganizationNumber(row.organizationNumber)}`;
+    const messageWithOrg = baseMessage
+      ? `${orgPrefix}\n\n${baseMessage}`
+      : orgPrefix;
+    const withoutOrgPayload = {
+      contact_name: row.name,
+      company_name: row.company,
+      contact_email: row.email,
+      contact_phone: row.phone,
+      message: messageWithOrg,
+      terms_accepted_at: new Date().toISOString(),
+      terms_document_version: TERMS_DOCUMENT_VERSION,
+    };
+    const { data: createdOrgFallback, error: orgFallbackErr } = await admin
+      .from("company_applications")
+      .insert(withoutOrgPayload as never)
+      .select("id")
+      .single();
+    if (!orgFallbackErr && createdOrgFallback?.id) {
+      return { ok: true, applicationId: createdOrgFallback.id };
+    }
+  }
+
   const retryWithoutTerms =
     fullErr &&
     isLikelyMissingColumnError(fullErr) &&
@@ -186,6 +229,7 @@ async function insertCompanyApplicationRow(
     const slimPayload = {
       contact_name: row.name,
       company_name: row.company,
+      organization_number: row.organizationNumber,
       contact_email: row.email,
       contact_phone: row.phone,
       message: baseMessage,
@@ -210,16 +254,26 @@ export async function submitContactForm(
 ): Promise<ContactState> {
   const name = getStr(formData, "name");
   const company = getStr(formData, "company");
+  const organizationNumberRaw = getStr(formData, "organization_number");
+  const organizationNumber = normalizeOrganizationNumber(organizationNumberRaw);
   const email = getStr(formData, "email");
   const phone = getStr(formData, "phone");
   const message = getStr(formData, "message");
   const consent = formData.get("consent") === "on";
   const termsAccept = formData.get("terms_accept") === "on";
 
-  if (!name || !company || !email || !phone) {
+  if (!name || !company || !organizationNumberRaw || !email || !phone) {
     return {
       status: "error",
-      message: "Fyll i namn, företag, mejl och telefon.",
+      message:
+        "Fyll i namn, företag, organisationsnummer, mejl och telefon.",
+    };
+  }
+  if (!organizationNumber) {
+    return {
+      status: "error",
+      message:
+        "Organisationsnumret ser inte giltigt ut. Ange 10 siffror (t.ex. 556123-4567).",
     };
   }
   if (!isValidEmail(email)) {
@@ -261,6 +315,7 @@ export async function submitContactForm(
     const inserted = await insertCompanyApplicationRow(admin, {
       name,
       company,
+      organizationNumber,
       email,
       phone,
       message,
@@ -273,6 +328,7 @@ export async function submitContactForm(
         await sendContactAdminNotification({
           name,
           company,
+          organizationNumber,
           email,
           phone,
           message:
@@ -364,6 +420,7 @@ export async function submitContactForm(
     await sendContactAdminNotification({
       name,
       company,
+      organizationNumber,
       email,
       phone,
       message: adminMessage || "(inget meddelande)",

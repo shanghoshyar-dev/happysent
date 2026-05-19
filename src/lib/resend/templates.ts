@@ -1,5 +1,6 @@
 import "server-only";
 
+import { formatOrganizationNumber } from "@/lib/organization-number";
 import { getResend } from "@/lib/resend/client";
 import {
   getAppSettings,
@@ -207,6 +208,7 @@ export async function sendDayOfCompany(a: DayOfCompanyArgs) {
 export interface ContactAdminArgs {
   name: string;
   company: string;
+  organizationNumber?: string;
   email: string;
   phone: string;
   message: string;
@@ -220,6 +222,9 @@ export async function sendContactAdminNotification(a: ContactAdminArgs) {
     `Ny förfrågan via happysent.com/kontakt:\n\n` +
     `Namn:     ${a.name}\n` +
     `Företag:  ${a.company}\n` +
+    (a.organizationNumber
+      ? `Org.nr:   ${formatOrganizationNumber(a.organizationNumber)}\n`
+      : "") +
     `Mejl:     ${a.email}\n` +
     `Telefon:  ${a.phone}\n\n` +
     `Meddelande:\n${a.message || "(inget meddelande)"}\n`;

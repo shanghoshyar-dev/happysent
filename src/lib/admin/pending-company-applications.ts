@@ -7,6 +7,7 @@ export type PendingApplicationQueueRow = {
   id: string;
   contact_name: string;
   company_name: string;
+  organization_number: string | null;
   contact_email: string;
   contact_phone: string | null;
   message: string | null;
@@ -17,17 +18,21 @@ export type PendingApplicationQueueRow = {
 };
 
 const SELECT_WITH_EXCEL =
-  "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version, employees_import_storage_path";
+  "id, contact_name, company_name, organization_number, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version, employees_import_storage_path";
 
 const SELECT_WITHOUT_EXCEL =
-  "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version";
+  "id, contact_name, company_name, organization_number, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version";
+
+const SELECT_LEGACY_NO_ORG_WITH_EXCEL =
+  "id, contact_name, company_name, contact_email, contact_phone, message, created_at, terms_accepted_at, terms_document_version, employees_import_storage_path";
 
 function mentionsMissingExcelColumn(msg: string): boolean {
   const m = msg.toLowerCase();
-  return (
-    m.includes("employees_import_storage_path") ||
-    (m.includes("column") && m.includes("company_applications"))
-  );
+  return m.includes("employees_import_storage_path");
+}
+
+function mentionsMissingOrganizationNumberColumn(msg: string): boolean {
+  return (msg ?? "").toLowerCase().includes("organization_number");
 }
 
 function rowFromDb(
@@ -35,6 +40,7 @@ function rowFromDb(
     id: string;
     contact_name: string;
     company_name: string;
+    organization_number?: string | null;
     contact_email: string;
     contact_phone: string | null;
     message: string | null;
@@ -49,6 +55,7 @@ function rowFromDb(
     id: r.id,
     contact_name: r.contact_name,
     company_name: r.company_name,
+    organization_number: r.organization_number ?? null,
     contact_email: r.contact_email,
     contact_phone: r.contact_phone,
     message: r.message,
@@ -83,6 +90,26 @@ export async function fetchPendingCompanyApplications(
     return {
       rows: first.data.map((r) => rowFromDb(r, undefined)),
     };
+  }
+
+  if (
+    first.error &&
+    mentionsMissingOrganizationNumberColumn(first.error.message ?? "")
+  ) {
+    const legacy = await supabase
+      .from("company_applications")
+      .select(SELECT_LEGACY_NO_ORG_WITH_EXCEL)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+    if (!legacy.error && legacy.data) {
+      return {
+        rows: legacy.data.map((r) =>
+          rowFromDb({ ...r, organization_number: null }, undefined),
+        ),
+        warning:
+          "Organisationsnummer saknas i databasen — kör migration company_applications_organization_number.",
+      };
+    }
   }
 
   if (first.error && mentionsMissingExcelColumn(first.error.message ?? "")) {
@@ -137,6 +164,21 @@ export async function fetchPendingApplicationById(
 
   if (!first.error && first.data) {
     return rowFromDb(first.data, undefined);
+  }
+
+  if (
+    first.error &&
+    mentionsMissingOrganizationNumberColumn(first.error.message ?? "")
+  ) {
+    const legacy = await supabase
+      .from("company_applications")
+      .select(SELECT_LEGACY_NO_ORG_WITH_EXCEL)
+      .eq("id", id)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (!legacy.error && legacy.data) {
+      return rowFromDb({ ...legacy.data, organization_number: null }, undefined);
+    }
   }
 
   if (first.error && mentionsMissingExcelColumn(first.error.message ?? "")) {

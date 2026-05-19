@@ -72,6 +72,18 @@ export function ContactForm({ className }: { className?: string }) {
           <Input id="company" name="company" required />
         </div>
         <div>
+          <Label htmlFor="organization_number">{f.organizationNumber}</Label>
+          <Input
+            id="organization_number"
+            name="organization_number"
+            required
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder={f.organizationNumberPlaceholder}
+          />
+          <p className="mt-1 text-xs text-slate-500">{f.organizationNumberHint}</p>
+        </div>
+        <div>
           <Label htmlFor="email">{f.email}</Label>
           <Input
             id="email"

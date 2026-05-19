@@ -224,6 +224,7 @@ export type Database = {
           id: string;
           contact_name: string;
           company_name: string;
+          organization_number: string | null;
           contact_email: string;
           contact_phone: string | null;
           employees_import_storage_path: string | null;
@@ -239,6 +240,7 @@ export type Database = {
           id?: string;
           contact_name: string;
           company_name: string;
+          organization_number?: string | null;
           contact_email: string;
           contact_phone?: string | null;
           employees_import_storage_path?: string | null;
@@ -254,6 +256,7 @@ export type Database = {
           id?: string;
           contact_name?: string;
           company_name?: string;
+          organization_number?: string | null;
           contact_email?: string;
           contact_phone?: string | null;
           employees_import_storage_path?: string | null;
