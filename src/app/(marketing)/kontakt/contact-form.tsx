@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 
+import { BrandName } from "@/components/brand-name";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -122,7 +123,7 @@ export function ContactForm({ className }: { className?: string }) {
               href="/happysent-mall.xlsx"
               className="font-medium text-candy-600 hover:underline"
             >
-              Happysent-mallen
+              <BrandName />-mallen
             </Link>
             , fyll i och bifoga här. Vid godkänd ansökan importeras raderna till
             ert företag automatiskt.
@@ -136,7 +137,7 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            Jag godkänner Happysents{" "}
+            Jag godkänner <BrandName>Happysents</BrandName>{" "}
             <Link
               href="/integritetspolicy"
               className="font-medium text-candy-600 hover:underline"
@@ -154,7 +155,7 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            Jag har läst och godkänner Happysents{" "}
+            Jag har läst och godkänner <BrandName>Happysents</BrandName>{" "}
             <Link
               href="/anvandarvillkor"
               className="font-medium text-candy-600 hover:underline"

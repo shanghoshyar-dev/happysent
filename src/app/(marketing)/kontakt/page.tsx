@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
+import { BrandName } from "@/components/brand-name";
+
 import { ContactForm } from "./contact-form";
 import { EmployeeRequestForm } from "./employee-request-form";
 
@@ -18,7 +20,7 @@ export default function KontaktPage() {
       <div className="mx-auto w-full max-w-6xl space-y-14 px-6">
         <div className="max-w-3xl">
           <h1 className="font-display text-5xl text-slate-900">
-            Säg hej till Happysent.
+            Säg hej till <BrandName className="text-slate-900" />.
           </h1>
           <p className="mt-4 text-lg text-slate-600">
             Skriv några rader om ert företag så hör vi av oss inom en

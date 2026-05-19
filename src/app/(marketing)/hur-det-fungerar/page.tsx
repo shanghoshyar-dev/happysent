@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
+import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 
 export const metadata: Metadata = svMarketingPageMeta({
@@ -93,7 +94,8 @@ export default function HurDetFungerarPage() {
       <section className="py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h1 className="font-display text-5xl text-slate-900">
-            Så funkar Happysent – från start till tårta
+            Så funkar <BrandName className="text-slate-900" /> – från start till
+            tårta
           </h1>
           <p className="mt-6 text-lg text-slate-600">
             Vi tar bort hela det administrativa kring födelsedagar. Här är hela

@@ -46,7 +46,7 @@ export function Features() {
             Allt du behöver,{" "}
             <span className="text-candy-500">inget du inte behöver.</span>
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg font-script font-normal text-slate-600">
             Happysent, byggt för företag som bryr sig om sina människor.
           </p>
         </div>

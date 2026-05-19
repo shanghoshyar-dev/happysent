@@ -52,7 +52,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="sv" className={`${inter.variable} ${kalam.variable}`}>
+    <html
+      lang="sv"
+      className={`${inter.variable} ${kalam.variable}`}
+    >
       <body className="min-h-screen bg-cream font-sans antialiased transition-colors duration-200">
         {children}
       </body>

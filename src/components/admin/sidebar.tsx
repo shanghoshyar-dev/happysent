@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { BrandName } from "@/components/brand-name";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -29,9 +30,7 @@ export function AdminSidebar() {
     <aside className="hidden w-60 shrink-0 border-r border-candy-100 bg-white md:block">
       <div className="flex h-16 items-center gap-2 border-b border-candy-100 px-6">
         <span aria-hidden className="text-2xl">🎂</span>
-        <span className="font-display text-lg font-semibold text-slate-900">
-          Happysent
-        </span>
+        <BrandName size="logo" className="text-slate-900" />
       </div>
       <nav className="space-y-1 p-4">
         {items.map((item) => {

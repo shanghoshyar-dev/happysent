@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { brandify } from "@/lib/brandify";
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
 export const metadata: Metadata = svMarketingPageMeta({
@@ -30,10 +31,9 @@ export default function IntegritetspolicyPage() {
             Summary
           </h2>
           <p className="mt-3">
-            Happysent (“we”, “us”) is the controller for the personal data
-            submitted by our customer companies. We comply with the GDPR and
-            only collect what we need to deliver a cake to the right person, on
-            the right day, at the right address.
+            {brandify(
+              'Happysent ("we", "us") is the controller for the personal data submitted by our customer companies. We comply with the GDPR and only collect what we need to deliver a cake to the right person, on the right day, at the right address.',
+            )}
           </p>
         </section>
 
@@ -163,9 +163,9 @@ export default function IntegritetspolicyPage() {
         <section>
           <h2 className="font-display text-2xl text-slate-900">Security</h2>
           <p className="mt-3">
-            Data is stored in encrypted databases in the EU. Only authorised
-            Happysent staff can access it, and access is protected with
-            multi-factor authentication.
+            {brandify(
+              "Data is stored in encrypted databases in the EU. Only authorised Happysent staff can access it, and access is protected with multi-factor authentication.",
+            )}
           </p>
         </section>
 

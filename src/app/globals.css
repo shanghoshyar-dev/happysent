@@ -47,12 +47,16 @@ body {
   color: #d54e30;
 }
 
-/** Juridiska sidor behåller Inter */
+/** Juridiska sidor: brödtext i Inter, varumärket behåller Kalam */
 .font-legal,
 .font-legal .prose-happysent h1,
 .font-legal .prose-happysent h2,
 .font-legal .prose-happysent h3 {
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.font-legal .font-script {
+  font-family: var(--font-kalam), cursive;
 }
 
 /* Marquee: keyframes på rotnivå — i @layer utilities kan vissa PostCSS/Tailwind-byggen äta upp dem */

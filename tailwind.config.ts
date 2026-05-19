@@ -78,7 +78,7 @@ const config: Config = {
           "system-ui",
           "sans-serif",
         ],
-        /** Daymaker: handskriven accent (t.ex. «oförglömlig») */
+        /** Logotyp & accenter (Kalam) */
         script: ["var(--font-kalam)", "cursive"],
         /** Integritetspolicy & användarvillkor */
         legal: ["var(--font-inter)", "system-ui", "sans-serif"],

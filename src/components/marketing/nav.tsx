@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 
+import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 
 const links = [
@@ -69,9 +70,7 @@ export function MarketingNav() {
           >
             🎂
           </motion.span>
-          <span className="truncate font-script text-xl font-normal text-slate-900 sm:text-2xl">
-            Happysent
-          </span>
+          <BrandName size="logo" className="truncate text-slate-900" />
         </Link>
 
         <nav

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
+import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +23,7 @@ export default function OmOssPage() {
 
       <div className="prose-happysent mt-8 space-y-6 text-lg text-slate-600">
         <p>
-          Vi är Shang och Danny, två bröder som grundade Happysent. Shang är 28
+          Vi är Shang och Danny, två bröder som grundade <BrandName />. Shang är 28
           och Danny är 22, och tillsammans har vi byggt något vi önskar hade
           funnits på varje arbetsplats vi någonsin besökt.
         </p>
@@ -53,7 +54,7 @@ export default function OmOssPage() {
         <h2 className="font-display text-3xl text-slate-900">Vår vision</h2>
         <p>
           Att inga anställda ska känna sig glömda på sin födelsedag, och att
-          inga HR-team ska behöva komma ihåg dem. Det räcker att Happysent gör
+          inga HR-team ska behöva komma ihåg dem. Det räcker att <BrandName /> gör
           det.
         </p>
 

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BrandName } from "@/components/brand-name";
+
 import { LoginForm } from "./login-form";
 
 export const metadata = {
@@ -12,9 +14,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-3xl border border-candy-100 bg-white p-10 shadow-soft">
         <Link href="/" className="flex items-center gap-2">
           <span aria-hidden className="text-2xl">🎂</span>
-          <span className="font-display text-xl font-semibold text-slate-900">
-            Happysent
-          </span>
+          <BrandName size="logo" className="text-slate-900" />
         </Link>
         <h1 className="mt-8 font-display text-3xl text-slate-900">
           Logga in på admin

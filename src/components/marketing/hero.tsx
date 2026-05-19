@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
@@ -33,14 +34,15 @@ export function Hero() {
         <h1 className="hero-text-shadow mt-8 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl">
           Glöm aldrig en
           <br />
-          <span className="font-script text-3xl font-normal text-candy-200 sm:text-4xl md:text-5xl">
+          <span className="font-script text-4xl font-normal text-candy-200 sm:text-5xl md:text-6xl">
             födelsedag
           </span>{" "}
           igen.
         </h1>
 
         <p className="hero-text-shadow-soft mt-6 max-w-xl text-base leading-relaxed text-white sm:text-lg">
-          Happysent bokar och levererar färska tårtor från lokala bagerier till ditt
+          <BrandName className="text-white" /> bokar och levererar färska tårtor från
+          lokala bagerier till ditt
           kontor – på rätt dag, varje gång. Lägg till dina anställda, luta dig tillbaka
           och låt oss sköta resten.
         </p>

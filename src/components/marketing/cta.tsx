@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BrandName } from "@/components/brand-name";
 import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +13,8 @@ export function CtaBlock() {
             Redo att fira riktigt?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-candy-50/90">
-            Boka en kort demo så visar vi hur Happysent passar er och vilka
+            Boka en kort demo så visar vi hur <BrandName className="text-white" />{" "}
+            passar er och vilka
             bagerier som levererar i er stad.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
