@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
-import { Button } from "@/components/ui/button";
+import { CtaButton } from "@/components/marketing/cta-button";
 
 export const metadata: Metadata = svMarketingPageMeta({
   title: "Hur Happysent fungerar – Enkel automatisk tårtaleverans",
@@ -307,7 +307,7 @@ export default function HurDetFungerarPage() {
           </dl>
           <div className="mt-12 text-center">
             <Link href="/kontakt">
-              <Button size="lg">Hör av dig så ses vi</Button>
+              <CtaButton size="lg">Hör av dig så ses vi</CtaButton>
             </Link>
           </div>
         </div>

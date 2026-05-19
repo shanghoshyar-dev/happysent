@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
-import { Button } from "@/components/ui/button";
+import { CtaButton } from "@/components/marketing/cta-button";
 
 export const metadata: Metadata = svMarketingPageMeta({
   title: "Priser – Happysent",
@@ -94,13 +94,14 @@ export default function PriserPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/kontakt" className="mt-8">
-                <Button
+              <Link href="/kontakt" className="mt-8 block">
+                <CtaButton
                   variant={tier.highlighted ? "primary" : "secondary"}
                   className="w-full"
+                  fullWidth
                 >
                   {tier.cta}
-                </Button>
+                </CtaButton>
               </Link>
             </div>
           ))}

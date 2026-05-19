@@ -113,3 +113,43 @@ body {
     }
   }
 }
+
+/* CTA-dekoration: lätt wiggle på tårta/blomma, inte på knappen */
+@keyframes cta-decor-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+  50% {
+    transform: rotate(4deg) translateY(1px);
+  }
+  75% {
+    transform: rotate(-3deg) translateY(0);
+  }
+}
+
+.cta-decor {
+  display: inline-block;
+  line-height: 1;
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+.cta-decor--cake {
+  animation: cta-decor-wiggle 2.6s ease-in-out infinite;
+}
+
+.cta-decor--flower {
+  animation: cta-decor-wiggle 2.6s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-decor--cake,
+  .cta-decor--flower {
+    animation: none;
+  }
+}

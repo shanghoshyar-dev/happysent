@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
 export function CtaBlock() {
@@ -16,9 +17,9 @@ export function CtaBlock() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/kontakt">
-              <Button variant="secondary" size="lg">
+              <CtaButton variant="secondary" size="lg">
                 Kom igång
-              </Button>
+              </CtaButton>
             </Link>
             <Link href="/priser">
               <Button

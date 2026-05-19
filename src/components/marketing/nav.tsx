@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { CtaButton } from "@/components/marketing/cta-button";
 
 const links = [
   { href: "/om-oss", label: "Om oss" },
@@ -44,7 +44,7 @@ export function MarketingNav() {
             Logga in
           </Link>
           <Link href="/kontakt">
-            <Button size="sm">Kom igång</Button>
+            <CtaButton size="sm">Kom igång</CtaButton>
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
@@ -22,7 +23,7 @@ export function Hero() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link href="/kontakt">
-              <Button size="lg">Kom igång</Button>
+              <CtaButton size="lg">Kom igång</CtaButton>
             </Link>
             <Link href="/priser">
               <Button size="lg" variant="secondary">

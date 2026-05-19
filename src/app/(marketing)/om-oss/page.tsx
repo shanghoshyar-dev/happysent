@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { svMarketingPageMeta } from "@/lib/marketing-metadata";
 
+import { CtaButton } from "@/components/marketing/cta-button";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = svMarketingPageMeta({
@@ -76,7 +77,9 @@ export default function OmOssPage() {
 
       <div className="mt-14 flex flex-col gap-4 sm:flex-row">
         <Link href="/kontakt" className="sm:flex-1">
-          <Button className="w-full">Säg hej</Button>
+          <CtaButton className="w-full" fullWidth>
+            Säg hej
+          </CtaButton>
         </Link>
         <Link href="/hur-det-fungerar" className="sm:flex-1">
           <Button variant="ghost" className="w-full">
