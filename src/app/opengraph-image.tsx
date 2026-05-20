@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Happysent, automatiska födelsedagstårtor";
+export const alt = "HappySent, automatiska födelsedagstårtor";
 
 export const size = { width: 1200, height: 630 };
 
@@ -35,7 +35,7 @@ export default function OpenGraphImage() {
             lineHeight: 1.1,
           }}
         >
-          Happysent
+          HappySent
         </div>
         <div
           style={{

@@ -25,22 +25,22 @@ const site = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(site),
-  title: "Happysent | Automatiska födelsedagstårtor till företag i Malmö",
+  title: "HappySent | Automatiska födelsedagstårtor till företag i Malmö",
   description:
-    "Glöm aldrig en kollegas födelsedag igen. Happysent bokar och levererar tårtor från lokala bagerier till ert kontor i Malmö, automatiskt.",
+    "Glöm aldrig en kollegas födelsedag igen. HappySent bokar och levererar tårtor från lokala bagerier till ert kontor i Malmö, automatiskt.",
   openGraph: {
     type: "website",
     locale: "sv_SE",
     url: site,
-    siteName: "Happysent",
+    siteName: "HappySent",
     title:
-      "Happysent | Automatiska födelsedagstårtor till företag i Malmö",
+      "HappySent | Automatiska födelsedagstårtor till företag i Malmö",
     description:
       "Automatiska födelsedagstårtor för företag. Lokala bagerier, leverans på jobbet, en faktura i månaden.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Happysent | Födelsedagstårtor till företag",
+    title: "HappySent | Födelsedagstårtor till företag",
     description:
       "Automatiska födelsedagstårtor för företag i Malmö. Vi sköter påminnelser och leveranser.",
   },

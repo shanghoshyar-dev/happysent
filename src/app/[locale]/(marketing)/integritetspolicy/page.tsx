@@ -10,9 +10,9 @@ type Props = { params: { locale: string } };
 export function generateMetadata({ params }: Props): Metadata {
   const locale = parseLocaleParam(params.locale);
   return marketingPageMeta({
-    title: "Privacy Policy | Happysent",
+    title: "Privacy Policy | HappySent",
     description:
-      "How Happysent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
+      "How HappySent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
     path: "/integritetspolicy",
     locale,
     ogLocale: "en_US",
@@ -39,7 +39,7 @@ export default function IntegritetspolicyPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              'Happysent ("we", "us") is the controller for the personal data submitted by our customer companies. We comply with the GDPR and only collect what we need to deliver a cake to the right person, on the right day, at the right address.',
+              'HappySent ("we", "us") is the controller for the personal data submitted by our customer companies. We comply with the GDPR and only collect what we need to deliver a cake to the right person, on the right day, at the right address.',
             )}
           </p>
         </section>
@@ -171,7 +171,7 @@ export default function IntegritetspolicyPage(_props: Props) {
           <h2 className="font-display text-2xl text-slate-900">Security</h2>
           <p className="mt-3">
             {brandify(
-              "Data is stored in encrypted databases in the EU. Only authorised Happysent staff can access it, and access is protected with multi-factor authentication.",
+              "Data is stored in encrypted databases in the EU. Only authorised HappySent staff can access it, and access is protected with multi-factor authentication.",
             )}
           </p>
         </section>

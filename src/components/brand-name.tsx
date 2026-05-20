@@ -7,10 +7,10 @@ type BrandNameProps = {
   size?: "logo" | "inline";
 };
 
-/** Varumärket «Happysent» – Kalam (Daymaker-lik «unforgettable»-stil). */
+/** Varumärket «HappySent» – Kalam (Daymaker-lik «unforgettable»-stil). */
 export function BrandName({
   className,
-  children = "Happysent",
+  children = "HappySent",
   size = "inline",
 }: BrandNameProps) {
   return (

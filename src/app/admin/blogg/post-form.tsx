@@ -91,7 +91,7 @@ export function BlogPostForm({ post, submitLabel }: PostFormProps) {
         <Input
           id="author"
           name="author"
-          defaultValue={post?.author ?? "Happysent"}
+          defaultValue={post?.author ?? "HappySent"}
         />
       </div>
 

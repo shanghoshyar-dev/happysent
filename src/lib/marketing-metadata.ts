@@ -38,7 +38,7 @@ export function marketingPageMeta(opts: {
       description: opts.description,
       url,
       locale: ogLocale,
-      siteName: "Happysent",
+      siteName: "HappySent",
       type: "website",
       images: [{ url: `${base}/opengraph-image`, width: 1200, height: 630 }],
     },

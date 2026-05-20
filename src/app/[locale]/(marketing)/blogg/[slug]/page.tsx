@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Inlägg" };
 
   const title =
-    post.meta_title?.trim() || `${post.title} | Happysent`;
+    post.meta_title?.trim() || `${post.title} | HappySent`;
   const description =
     post.meta_description?.trim() ||
     post.excerpt?.trim() ||
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.published_at ?? undefined,
       images: ogImages,
       locale: "sv_SE",
-      siteName: "Happysent",
+      siteName: "HappySent",
     },
     twitter: {
       card: "summary_large_image",
@@ -127,7 +127,7 @@ export default async function BloggPostPage({ params }: Props) {
     },
     publisher: {
       "@type": "Organization",
-      name: "Happysent",
+      name: "HappySent",
       url: site,
     },
     mainEntityOfPage: {

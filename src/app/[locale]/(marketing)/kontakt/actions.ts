@@ -408,7 +408,7 @@ export async function submitContactForm(
     if (excelUploadedPath) {
       adminMessage =
         (adminMessage ? `${adminMessage}\n\n` : "") +
-        "[Excel enligt Happysent-mall bifogad — personal importeras automatiskt när ansökan godkänns i admin.]";
+        "[Excel enligt HappySent-mall bifogad — personal importeras automatiskt när ansökan godkänns i admin.]";
     }
 
     await sendContactAdminNotification({

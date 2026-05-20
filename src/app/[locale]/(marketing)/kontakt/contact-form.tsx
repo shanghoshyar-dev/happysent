@@ -147,7 +147,7 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            {f.consentBefore} <BrandName>Happysents</BrandName>{" "}
+            {f.consentBefore} <BrandName>HappySents</BrandName>{" "}
             <LocalizedLink
               href="/integritetspolicy"
               className="font-medium text-candy-600 hover:underline"
@@ -165,7 +165,7 @@ export function ContactForm({ className }: { className?: string }) {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-candy-600 focus:ring-candy-500"
           />
           <span>
-            {f.termsBefore} <BrandName>Happysents</BrandName>{" "}
+            {f.termsBefore} <BrandName>HappySents</BrandName>{" "}
             <LocalizedLink
               href="/anvandarvillkor"
               className="font-medium text-candy-600 hover:underline"

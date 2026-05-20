@@ -2,12 +2,12 @@ import type { Messages } from "@/i18n/messages/sv";
 
 export const en: Messages = {
   meta: {
-    homeTitle: "Happysent | Automatic birthday cakes for companies in Malmö",
+    homeTitle: "HappySent | Automatic birthday cakes for companies in Malmö",
     homeDescription:
-      "Never forget a colleague's birthday again. Happysent books and delivers cakes from local bakeries to your office in Malmö, automatically.",
+      "Never forget a colleague's birthday again. HappySent books and delivers cakes from local bakeries to your office in Malmö, automatically.",
   },
   nav: {
-    homeAria: "Happysent home",
+    homeAria: "HappySent home",
     mainAria: "Main navigation",
     mobileAria: "Mobile navigation",
     about: "About us",
@@ -40,7 +40,7 @@ export const en: Messages = {
   features: {
     heading: "Everything you need,",
     headingAccent: "nothing you don't.",
-    tagline: "Happysent, built for companies that care about their people.",
+    tagline: "HappySent, built for companies that care about their people.",
     items: [
       {
         title: "Add once",
@@ -99,19 +99,19 @@ export const en: Messages = {
   },
   pages: {
     about: {
-      metaTitle: "About us | Happysent",
+      metaTitle: "About us | HappySent",
       metaDescription:
-        "Shang and Danny founded Happysent in Malmö. Read how the idea started and why we want every employee to feel seen at work.",
+        "Shang and Danny founded HappySent in Malmö. Read how the idea started and why we want every employee to feel seen at work.",
       h1: "We're Shang and Danny",
       paragraphs: [
-        "We're Shang and Danny, two brothers who founded Happysent. Shang is 28 and Danny is 22, and together we've built something we wish had existed at every workplace we've ever been part of.",
+        "We're Shang and Danny, two brothers who founded HappySent. Shang is 28 and Danny is 22, and together we've built something we wish had existed at every workplace we've ever been part of.",
         "It started with a podcast. One evening we listened to an episode about unique business ideas and heard about a similar concept abroad. We looked at each other and asked the same question at once: why doesn't this exist in Sweden?",
         "Neither of us had worked in HR or held a fancy office job. But we both knew what it feels like to show up day after day and never quite feel seen. To perform, contribute, and engage, yet feel easily replaceable. That feeling slows people down from the inside, and we wanted to do something about it.",
         "Shang builds and runs the system and makes sure every delivery happens on the right day to the right place. Danny stays close to customers and makes sure every company feels looked after. Together we cover the whole chain from tech to cake.",
       ],
       visionTitle: "Our vision",
       vision:
-        "That no employee should feel forgotten on their birthday, and no HR team should have to remember them. Happysent can do that.",
+        "That no employee should feel forgotten on their birthday, and no HR team should have to remember them. HappySent can do that.",
       promiseTitle: "What we promise",
       promises: [
         "A fresh cake on the birthday or your money back.",
@@ -125,9 +125,9 @@ export const en: Messages = {
       ctaHow: "How it works",
     },
     howItWorks: {
-      metaTitle: "How Happysent works | Simple automatic cake delivery",
+      metaTitle: "How HappySent works | Simple automatic cake delivery",
       metaDescription:
-        "From first signup to fresh cake at the office. Here's how Happysent works, step by step.",
+        "From first signup to fresh cake at the office. Here's how HappySent works, step by step.",
       h1Before: "How",
       h1After: " works, from start to cake",
       intro:
@@ -137,7 +137,7 @@ export const en: Messages = {
           title: "We receive your list",
           body: "Email us names, birthdays, and team sizes for everyone you want to celebrate. One email or a simple Excel file is enough. We handle the rest of the admin.",
           imageAlt:
-            "Office admin sending an employee list to Happysent",
+            "Office admin sending an employee list to HappySent",
         },
         {
           title: "We choose a local bakery",
@@ -154,7 +154,7 @@ export const en: Messages = {
           title: "One week before: the bakery gets the order",
           body: "Seven days ahead we send the bakery address, name, date, and headcount. You also get a reminder: \"One week left. The cake is ordered.\"",
           imageAlt:
-            "Baker at a bakery receiving and reading a Happysent order on a tablet",
+            "Baker at a bakery receiving and reading a HappySent order on a tablet",
         },
         {
           title: "The day before: final reminder",
@@ -171,7 +171,7 @@ export const en: Messages = {
           title: "At month end: one invoice",
           body: "You get one monthly invoice for all delivered cakes. No subscription fees, no hassle. Just one line per birthday.",
           imageAlt:
-            "Finance lead reviewing the monthly Happysent invoice on a laptop at the office",
+            "Finance lead reviewing the monthly HappySent invoice on a laptop at the office",
         },
       ],
       faqTitle: "Common questions",
@@ -196,7 +196,7 @@ export const en: Messages = {
       cta: "Get in touch",
     },
     pricing: {
-      metaTitle: "Pricing | Happysent",
+      metaTitle: "Pricing | HappySent",
       metaDescription:
         "Transparent pricing per delivered cake. No setup fees, no lock-in.",
       h1: "Clear pricing, zero admin",
@@ -243,9 +243,9 @@ export const en: Messages = {
       ],
     },
     contact: {
-      metaTitle: "Contact Happysent | Become a customer today",
+      metaTitle: "Contact HappySent | Become a customer today",
       metaDescription:
-        "Get in touch and we'll book a short demo to see if Happysent fits your team.",
+        "Get in touch and we'll book a short demo to see if HappySent fits your team.",
       h1Before: "Say hello to",
       h1After: ".",
       intro:
@@ -263,7 +263,7 @@ export const en: Messages = {
         "Let us know when someone joins or leaves and we'll update your list. No login required.",
     },
     blog: {
-      metaTitle: "Blog on employee wellbeing | Happysent",
+      metaTitle: "Blog on employee wellbeing | HappySent",
       metaDescription:
         "Thoughts on company culture, benefits, and celebrating at work, with a focus on Malmö and Nordic offices.",
       h1: "The blog",

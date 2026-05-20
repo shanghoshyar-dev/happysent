@@ -23,7 +23,7 @@ async function mailFrom(): Promise<string> {
   const settings = await getAppSettings();
   const email = resolveAdminEmail(settings);
   if (!email) throw new Error("ADMIN_EMAIL saknas i miljö eller inställningar.");
-  return `Happysent <${email}>`;
+  return `HappySent <${email}>`;
 }
 
 async function adminInbox(): Promise<string> {
@@ -50,7 +50,7 @@ export async function send14DayCompany(a: FourteenDayCompanyArgs) {
     `Vi vill påminna om att ${a.employeeFirstName} ${a.employeeLastName} fyller år om 14 dagar, den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
     `En tårta är bokad och levereras automatiskt den dagen.\n` +
     `Ni behöver inte göra någonting!\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -80,7 +80,7 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
     : a.companyAddress;
   const contactTel = a.contactPhone?.trim()
     ? a.contactPhone.trim()
-    : "(saknas i kundregistret — kontakta Happysent vid leveransfrågor)";
+    : "(saknas i kundregistret — kontakta HappySent vid leveransfrågor)";
   const text =
     `Hej ${a.bakeryName}!\n\n` +
     `Vi bekräftar följande beställning:\n\n` +
@@ -91,7 +91,7 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
     `Antal personer:   ${a.numberOfPeople}\n` +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
     `Skicka faktura till: ${await adminInbox()}\n\n` +
-    `Tack!\nHappysent`;
+    `Tack!\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -120,7 +120,7 @@ export async function send7DayFlorist(a: SevenDayFloristArgs) {
     : a.companyAddress;
   const contactTel = a.contactPhone?.trim()
     ? a.contactPhone.trim()
-    : "(saknas i kundregistret — kontakta Happysent vid leveransfrågor)";
+    : "(saknas i kundregistret — kontakta HappySent vid leveransfrågor)";
   const text =
     `Hej ${a.floristName}!\n\n` +
     `Vi bekräftar följande beställning:\n\n` +
@@ -130,7 +130,7 @@ export async function send7DayFlorist(a: SevenDayFloristArgs) {
     `Kontakt telefon:  ${contactTel}\n` +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
     `Skicka faktura till: ${await adminInbox()}\n\n` +
-    `Tack!\nHappysent`;
+    `Tack!\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -150,7 +150,7 @@ export async function send7DayCompany(a: SevenDayCompanyArgs) {
     `Hej ${a.companyName}!\n\n` +
     `En påminnelse om att ${a.employeeFirstName} fyller år om 7 dagar.\n` +
     `Tårtan är beställd och levereras den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -170,7 +170,7 @@ export async function send1DayCompany(a: OneDayCompanyArgs) {
     `Hej ${a.companyName}!\n\n` +
     `Imorgon fyller ${a.employeeFirstName} ${a.employeeLastName} år!\n` +
     `Tårtan levereras imorgon den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -193,7 +193,7 @@ export async function sendDayOfCompany(a: DayOfCompanyArgs) {
     `Idag fyller ${a.employeeFirstName} år!\n` +
     `Tårtan levereras idag ${slot}.\n\n` +
     `Vi hoppas ${a.employeeFirstName} får en fantastisk dag!\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -303,11 +303,11 @@ export interface ContactConfirmationArgs {
   name: string;
 }
 export async function sendContactConfirmation(a: ContactConfirmationArgs) {
-  const subject = `Tack för ditt meddelande – Happysent`;
+  const subject = `Tack för ditt meddelande – HappySent`;
   const text =
     `Hej ${a.name}!\n\n` +
     `Vi har tagit emot ditt meddelande och återkommer inom en arbetsdag.\n\n` +
-    `Hälsningar,\nHappysent-teamet`;
+    `Hälsningar,\nHappySent-teamet`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -324,15 +324,15 @@ export interface WelcomeCompanyArgs {
   companyName: string;
 }
 export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
-  const subject = `Välkommen till Happysent! 🎂`;
+  const subject = `Välkommen till HappySent! 🎂`;
   const text =
     `Hej ${a.companyName}!\n\n` +
-    `Välkommen till Happysent!\n\n` +
+    `Välkommen till HappySent!\n\n` +
     `Era anställda är nu registrerade i vårt system.\n` +
     `Ni behöver inte göra någonting – vi sköter allt.\n` +
     `Tårtan levereras automatiskt på rätt dag.\n\n` +
     `Hör av er om ni har frågor på ${await adminInbox()}\n\n` +
-    `Hälsningar,\nHappysent-teamet`;
+    `Hälsningar,\nHappySent-teamet`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -385,18 +385,18 @@ export async function sendEmployeeChangesDigest(a: EmployeeChangesDigestArgs) {
 
   let subject: string;
   if (adds.length > 0 && removes.length > 0) {
-    subject = `Personaländringar registrerade – Happysent`;
+    subject = `Personaländringar registrerade – HappySent`;
   } else if (removes.length > 0) {
     subject =
       removes.length === 1
-        ? `Anställd borttagen – Happysent`
-        : `${removes.length} anställda borttagna – Happysent`;
+        ? `Anställd borttagen – HappySent`
+        : `${removes.length} anställda borttagna – HappySent`;
   } else {
     const count = adds.length;
     subject =
       count === 1
-        ? `Ny anställd registrerad – Happysent`
-        : `${count} nya anställda registrerade – Happysent`;
+        ? `Ny anställd registrerad – HappySent`
+        : `${count} nya anställda registrerade – HappySent`;
   }
 
   const text =
@@ -404,7 +404,7 @@ export async function sendEmployeeChangesDigest(a: EmployeeChangesDigestArgs) {
     `Vi har registrerat följande ändring(ar) för er (${formatSwedishDate(a.digestDateIso)}):\n\n` +
     `${lines}\n\n` +
     `Detta är en automatisk bekräftelse. Vid felaktig uppgift, kontakta oss på info@happysent.com.\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -447,7 +447,7 @@ export interface MonthlyInvoiceSummaryArgs {
 export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
   const sek = (n: number) =>
     new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
-  const subject = `Happysent – Dags att fakturera ${a.monthLabel}`;
+  const subject = `HappySent – Dags att fakturera ${a.monthLabel}`;
   const lines = a.rows.length
     ? a.rows
         .map(
@@ -463,7 +463,7 @@ export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
     `${lines}\n\n` +
     `Total: ${sek(a.total)}\n\n` +
     `Logga in på admin-panelen för att markera fakturorna som skickade.\n\n` +
-    `Hälsningar,\nHappysent`;
+    `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
     from: await mailFrom(),
@@ -479,7 +479,7 @@ export interface SystemErrorArgs {
   timestamp: string; // ISO string
 }
 export async function sendSystemErrorEmail(a: SystemErrorArgs) {
-  const subject = `⚠️ Happysent – Systemfel`;
+  const subject = `⚠️ HappySent – Systemfel`;
   const text =
     `Ett fel uppstod i systemet:\n\n` +
     `${a.errorMessage}\n\n` +

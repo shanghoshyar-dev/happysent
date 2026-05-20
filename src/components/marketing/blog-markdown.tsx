@@ -8,7 +8,7 @@ interface Props {
 
 export function BlogMarkdown({ content }: Props) {
   return (
-    <div className="prose-happysent prose-blog max-w-none">
+    <div className="prose-HappySent prose-blog max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
         h2: ({ children }) => (
           <h2 className="mt-10 scroll-mt-24 text-2xl font-bold tracking-tight text-forest-700 first:mt-0">
@@ -67,7 +67,7 @@ export function BlogMarkdown({ content }: Props) {
               src={typeof src === "string" ? src : ""}
               alt={
                 alt?.trim() ||
-                "Illustration till blogginlägg om anställdas välmående och företagskultur från Happysent"
+                "Illustration till blogginlägg om anställdas välmående och företagskultur från HappySent"
               }
               className="h-auto w-full object-cover"
               loading="lazy"

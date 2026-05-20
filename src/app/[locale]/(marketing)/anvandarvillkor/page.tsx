@@ -10,9 +10,9 @@ type Props = { params: { locale: string } };
 export function generateMetadata({ params }: Props): Metadata {
   const locale = parseLocaleParam(params.locale);
   return marketingPageMeta({
-    title: "Terms and Conditions | Happysent",
+    title: "Terms and Conditions | HappySent",
     description:
-      "Terms for Happysent's service for business customers: deliveries, cancellation, pricing, and liability.",
+      "Terms for HappySent's service for business customers: deliveries, cancellation, pricing, and liability.",
     path: "/anvandarvillkor",
     locale,
     ogLocale: "en_US",
@@ -30,7 +30,7 @@ export default function AnvandarvillkorPage(_props: Props) {
       <div className="prose-happysent mt-10 space-y-10 text-base leading-relaxed text-slate-700">
         <p>
           {brandify(
-            "These Terms and Conditions govern the use of services provided by Happysent. By becoming a customer of Happysent, you agree to these terms in full.",
+            "These Terms and Conditions govern the use of services provided by HappySent. By becoming a customer of HappySent, you agree to these terms in full.",
           )}
         </p>
 
@@ -40,7 +40,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "Happysent is a birthday cake delivery service that automates the process of celebrating employees on their birthdays. Happysent coordinates cake orders with local partner bakeries and manages all communication and logistics on behalf of the customer.",
+              "HappySent is a birthday cake delivery service that automates the process of celebrating employees on their birthdays. HappySent coordinates cake orders with local partner bakeries and manages all communication and logistics on behalf of the customer.",
             )}
           </p>
         </section>
@@ -51,7 +51,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "To use Happysent, the customer provides a list of employees including their names, birthdays and number of people in their department. Happysent registers this information and manages all future deliveries automatically. The customer is responsible for ensuring that they have the necessary consent from their employees to share personal data with Happysent.",
+              "To use HappySent, the customer provides a list of employees including their names, birthdays and number of people in their department. HappySent registers this information and manages all future deliveries automatically. The customer is responsible for ensuring that they have the necessary consent from their employees to share personal data with HappySent.",
             )}
           </p>
         </section>
@@ -62,7 +62,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "Happysent will send an automatic cake order to the partner bakery seven days before each employee's birthday. The cake will be delivered to the registered company address between 08:00 and 11:00 on the birthday. If the birthday falls on a weekend or Swedish public holiday, the delivery will be moved to the nearest weekday before.",
+              "HappySent will send an automatic cake order to the partner bakery seven days before each employee's birthday. The cake will be delivered to the registered company address between 08:00 and 11:00 on the birthday. If the birthday falls on a weekend or Swedish public holiday, the delivery will be moved to the nearest weekday before.",
             )}
           </p>
         </section>
@@ -73,7 +73,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "Cancellations must be made at least 10 days before the scheduled delivery date. Cancellations received less than 10 days before the delivery date will be charged the full price. To cancel a delivery, the customer must contact Happysent in writing via ",
+              "Cancellations must be made at least 10 days before the scheduled delivery date. Cancellations received less than 10 days before the delivery date will be charged the full price. To cancel a delivery, the customer must contact HappySent in writing via ",
             )}
             <a href="mailto:info@happysent.com">info@happysent.com</a>.
           </p>
@@ -90,7 +90,7 @@ export default function AnvandarvillkorPage(_props: Props) {
             <a href="mailto:info@happysent.com">info@happysent.com</a>. Changes
             will be processed within two business days.{" "}
             {brandify(
-              "Happysent is not responsible for missed deliveries caused by failure to notify us of changes in a timely manner.",
+              "HappySent is not responsible for missed deliveries caused by failure to notify us of changes in a timely manner.",
             )}
           </p>
         </section>
@@ -99,7 +99,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           <h2 className="font-display text-2xl text-slate-900">6. Pricing</h2>
           <p className="mt-3">
             {brandify(
-              "Pricing is agreed upon individually with each customer and confirmed in writing before the service begins. Prices may be adjusted by Happysent with a minimum of 30 days written notice to the customer.",
+              "Pricing is agreed upon individually with each customer and confirmed in writing before the service begins. Prices may be adjusted by HappySent with a minimum of 30 days written notice to the customer.",
             )}
           </p>
         </section>
@@ -110,7 +110,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "Happysent invoices customers monthly for all deliveries made during that month. Payment is due within 30 days of the invoice date. Late payments are subject to a reminder fee of 60 SEK and interest at a rate of 8% per annum in accordance with Swedish law.",
+              "HappySent invoices customers monthly for all deliveries made during that month. Payment is due within 30 days of the invoice date. Late payments are subject to a reminder fee of 60 SEK and interest at a rate of 8% per annum in accordance with Swedish law.",
             )}
           </p>
         </section>
@@ -119,7 +119,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           <h2 className="font-display text-2xl text-slate-900">8. Liability</h2>
           <p className="mt-3">
             {brandify(
-              "Happysent works with carefully selected partner bakeries but cannot be held responsible for delays or quality issues caused by the bakery. In the event of a failed delivery, Happysent will offer a credit on the customer's next invoice. Happysent is not liable for indirect losses or damages resulting from a missed or delayed delivery.",
+              "HappySent works with carefully selected partner bakeries but cannot be held responsible for delays or quality issues caused by the bakery. In the event of a failed delivery, HappySent will offer a credit on the customer's next invoice. HappySent is not liable for indirect losses or damages resulting from a missed or delayed delivery.",
             )}
           </p>
         </section>
@@ -130,7 +130,7 @@ export default function AnvandarvillkorPage(_props: Props) {
           </h2>
           <p className="mt-3">
             {brandify(
-              "Happysent collects and stores employee names, birthdays and company address for the sole purpose of managing deliveries. This data is shared only with the partner bakery responsible for the customer's deliveries. Happysent does not store personal identity numbers, salaries or any other sensitive personal data. Customers may request deletion of their data at any time by contacting ",
+              "HappySent collects and stores employee names, birthdays and company address for the sole purpose of managing deliveries. This data is shared only with the partner bakery responsible for the customer's deliveries. HappySent does not store personal identity numbers, salaries or any other sensitive personal data. Customers may request deletion of their data at any time by contacting ",
             )}
             <a href="mailto:info@happysent.com">info@happysent.com</a>. For full
             details, please refer to our Privacy Policy at{" "}

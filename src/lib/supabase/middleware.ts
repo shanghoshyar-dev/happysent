@@ -10,7 +10,7 @@ export async function updateSession(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     if (process.env.NODE_ENV === "development") {
       console.warn(
-        "[happysent] Supabase env saknas — hoppar över session i middleware (fyll NEXT_PUBLIC_SUPABASE_URL och NEXT_PUBLIC_SUPABASE_ANON_KEY i .env.local).",
+        "[HappySent] Supabase env saknas — hoppar över session i middleware (fyll NEXT_PUBLIC_SUPABASE_URL och NEXT_PUBLIC_SUPABASE_ANON_KEY i .env.local).",
       );
     }
     return NextResponse.next({ request });
@@ -71,7 +71,7 @@ export async function updateSession(request: NextRequest) {
 
     return supabaseResponse;
   } catch (err) {
-    console.error("[happysent] Middleware Supabase-fel:", err);
+    console.error("[HappySent] Middleware Supabase-fel:", err);
     return NextResponse.next({ request });
   }
 }

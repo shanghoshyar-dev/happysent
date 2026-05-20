@@ -1,11 +1,11 @@
 export const sv = {
   meta: {
-    homeTitle: "Happysent | Automatiska födelsedagstårtor till företag i Malmö",
+    homeTitle: "HappySent | Automatiska födelsedagstårtor till företag i Malmö",
     homeDescription:
-      "Glöm aldrig en kollegas födelsedag igen. Happysent bokar och levererar tårtor från lokala bagerier till ert kontor i Malmö, automatiskt.",
+      "Glöm aldrig en kollegas födelsedag igen. HappySent bokar och levererar tårtor från lokala bagerier till ert kontor i Malmö, automatiskt.",
   },
   nav: {
-    homeAria: "Happysent startsida",
+    homeAria: "HappySent startsida",
     mainAria: "Huvudnavigation",
     mobileAria: "Mobilnavigation",
     about: "Om oss",
@@ -38,7 +38,7 @@ export const sv = {
   features: {
     heading: "Allt du behöver,",
     headingAccent: "inget du inte behöver.",
-    tagline: "Happysent, byggt för företag som bryr sig om sina människor.",
+    tagline: "HappySent, byggt för företag som bryr sig om sina människor.",
     items: [
       {
         title: "Lägg till en gång",
@@ -97,19 +97,19 @@ export const sv = {
   },
   pages: {
     about: {
-      metaTitle: "Om oss | Happysent",
+      metaTitle: "Om oss | HappySent",
       metaDescription:
-        "Shang och Danny grundade Happysent i Malmö. Läs hur idén föddes och varför vi vill att alla anställda ska kännas sedda på jobbet.",
+        "Shang och Danny grundade HappySent i Malmö. Läs hur idén föddes och varför vi vill att alla anställda ska kännas sedda på jobbet.",
       h1: "Vi är Shang och Danny",
       paragraphs: [
-        "Vi är Shang och Danny, två bröder som grundade Happysent. Shang är 28 och Danny är 22, och tillsammans har vi byggt något vi önskar hade funnits på varje arbetsplats vi någonsin besökt.",
+        "Vi är Shang och Danny, två bröder som grundade HappySent. Shang är 28 och Danny är 22, och tillsammans har vi byggt något vi önskar hade funnits på varje arbetsplats vi någonsin besökt.",
         "Det hela började med en podcast. En kväll satt vi och lyssnade på ett avsnitt om unika affärsidéer när vi hörde om ett liknande koncept utomlands. Vi tittade på varandra och ställde samma fråga samtidigt. Varför finns inte det här i Sverige?",
         "Ingen av oss hade arbetat inom HR eller haft ett fancy kontorsjobb. Men vi visste båda hur det känns att gå till jobbet dag efter dag och aldrig riktigt känna sig sedd. Att prestera, bidra och engagera sig, men ändå känna att man enkelt kunde bytas ut mot vem som helst. Det är en känsla som saktar ner en människa inifrån, och vi ville göra något åt det.",
         "Shang bygger och driver systemet och ser till att varje leverans sker på rätt dag till rätt plats. Danny håller kontakten med kunderna och ser till att varje företag känner sig omhändertaget. Tillsammans täcker vi hela kedjan från teknik till tårta.",
       ],
       visionTitle: "Vår vision",
       vision:
-        "Att inga anställda ska känna sig glömda på sin födelsedag, och att inga HR-team ska behöva komma ihåg dem. Det räcker att Happysent gör det.",
+        "Att inga anställda ska känna sig glömda på sin födelsedag, och att inga HR-team ska behöva komma ihåg dem. Det räcker att HappySent gör det.",
       promiseTitle: "Det vi lovar",
       promises: [
         "En färsk tårta på födelsedagen eller pengarna tillbaka.",
@@ -123,9 +123,9 @@ export const sv = {
       ctaHow: "Så funkar det",
     },
     howItWorks: {
-      metaTitle: "Hur Happysent fungerar | Enkel automatisk tårtaleverans",
+      metaTitle: "Hur HappySent fungerar | Enkel automatisk tårtaleverans",
       metaDescription:
-        "Från första registrering till färsk tårta på kontoret. Så jobbar Happysent steg för steg.",
+        "Från första registrering till färsk tårta på kontoret. Så jobbar HappySent steg för steg.",
       h1Before: "Så funkar",
       h1After: ", från start till tårta",
       intro:
@@ -135,7 +135,7 @@ export const sv = {
           title: "Vi tar emot din lista",
           body: "Du mejlar oss namn, födelsedag och avdelningens storlek på alla anställda du vill fira. Det räcker med ett mejl eller en enkel Excel-fil. Vi sköter resten av administrationen.",
           imageAlt:
-            "Kontaktadministratör som skickar in medarbetarlista till Happysent på kontoret",
+            "Kontaktadministratör som skickar in medarbetarlista till HappySent på kontoret",
         },
         {
           title: "Vi väljer ett lokalt bageri",
@@ -153,7 +153,7 @@ export const sv = {
           title: "En vecka innan: bageriet får beställningen",
           body: "Sju dagar innan skickar vi en beställning till bageriet med adress, namn, datum och antal personer. Samtidigt får ni en påminnelse: ”En vecka kvar. Tårtan är beställd.”",
           imageAlt:
-            "Bagare i bageri som tar emot och läser en Happysent-beställning på surfplatta",
+            "Bagare i bageri som tar emot och läser en HappySent-beställning på surfplatta",
         },
         {
           title: "Dagen innan: sista påminnelsen",
@@ -170,7 +170,7 @@ export const sv = {
           title: "I slutet av månaden: en faktura",
           body: "Ni får en samlingsfaktura per månad för alla levererade tårtor. Inga abonnemangsavgifter, inget krångel. Bara en rad per födelsedag.",
           imageAlt:
-            "Ekonomiansvarig som granskar månadens Happysent-faktura på laptop på kontoret",
+            "Ekonomiansvarig som granskar månadens HappySent-faktura på laptop på kontoret",
         },
       ],
       faqTitle: "Vanliga frågor",
@@ -195,7 +195,7 @@ export const sv = {
       cta: "Hör av dig så ses vi",
     },
     pricing: {
-      metaTitle: "Priser | Happysent",
+      metaTitle: "Priser | HappySent",
       metaDescription:
         "Transparenta priser per levererad tårta. Inga uppstartsavgifter, ingen bindningstid.",
       h1: "Tydliga priser, ingen administration",
@@ -242,9 +242,9 @@ export const sv = {
       ],
     },
     contact: {
-      metaTitle: "Kontakta Happysent | Bli kund idag",
+      metaTitle: "Kontakta HappySent | Bli kund idag",
       metaDescription:
-        "Hör av dig så bokar vi en kort demo och ser om Happysent passar er.",
+        "Hör av dig så bokar vi en kort demo och ser om HappySent passar er.",
       h1Before: "Säg hej till",
       h1After: ".",
       intro:
@@ -262,7 +262,7 @@ export const sv = {
         "Skicka in när någon börjar eller slutar så uppdaterar vi personallistan åt er. Du behöver inte logga in någonstans.",
     },
     blog: {
-      metaTitle: "Blogg om anställdas välmående | Happysent",
+      metaTitle: "Blogg om anställdas välmående | HappySent",
       metaDescription:
         "Tankar om företagskultur, personalförmåner och firande på jobbet, med fokus på Malmö och nordiska kontor.",
       h1: "Bloggen",

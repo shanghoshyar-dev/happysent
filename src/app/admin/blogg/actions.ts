@@ -76,7 +76,7 @@ async function buildPayload(
     : null;
 
   const author =
-    String(formData.get("author") ?? "").trim() || "Happysent";
+    String(formData.get("author") ?? "").trim() || "HappySent";
 
   return {
     title,
