@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandName } from "@/components/brand-name";
+import { BrandCakeIcon } from "@/components/marketing/brand-cake-icon";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { useLocale } from "@/i18n/locale-provider";
 
@@ -11,9 +12,7 @@ export function MarketingFooter() {
     <footer className="border-t border-candy-100 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
-          <span aria-hidden className="text-xl">
-            🎂
-          </span>
+          <BrandCakeIcon size={24} className="h-6 w-6" />
           <BrandName size="logo" className="text-slate-900" />
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">

@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 
 import { BrandName } from "@/components/brand-name";
+import { BrandCakeIcon } from "@/components/marketing/brand-cake-icon";
 import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { CtaButton } from "@/components/marketing/cta-button";
@@ -55,21 +56,20 @@ export function MarketingNav() {
         : "text-slate-700 hover:text-candy-600",
     ].join(" ");
 
-  const motionProps = reduceMotion
+  /** Avoid opacity:0 on mount — can stick invisible (clickable) on locale change / hidden lg: children. */
+  const linkMotionProps = reduceMotion
     ? {}
     : {
-        initial: { opacity: 0, y: -8 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.25 },
+        initial: { y: -4 },
+        animate: { y: 0 },
+        transition: { duration: 0.2 },
       };
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 py-4 md:py-6">
       <motion.div
-        className="pointer-events-auto relative flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-candy-100/80 bg-white/95 px-3 py-2.5 shadow-soft backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:gap-3 sm:px-5 sm:py-3 lg:px-6"
-        initial={reduceMotion ? false : { opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="pointer-events-auto relative flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-candy-100/80 bg-white/95 px-3 py-2.5 opacity-100 shadow-soft backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:gap-3 sm:px-5 sm:py-3 lg:px-6"
+        initial={false}
       >
         <LocalizedLink
           href="/"
@@ -78,11 +78,11 @@ export function MarketingNav() {
         >
           <motion.span
             aria-hidden
-            className="text-2xl leading-none"
+            className="flex shrink-0 leading-none"
             whileHover={reduceMotion ? undefined : { rotate: 10, scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
-            🎂
+            <BrandCakeIcon size={28} className="h-7 w-7" />
           </motion.span>
           <BrandName size="logo" className="truncate text-slate-900" />
         </LocalizedLink>
@@ -92,7 +92,7 @@ export function MarketingNav() {
           aria-label={messages.nav.mainAria}
         >
           {linkHrefs.map((href, i) => (
-            <motion.div key={href} {...motionProps}>
+            <motion.div key={href} {...linkMotionProps}>
               <LocalizedLink href={href} className={linkClass(href)}>
                 {navLabels[i]}
               </LocalizedLink>
@@ -101,8 +101,8 @@ export function MarketingNav() {
         </nav>
 
         <motion.div
-          className="hidden shrink-0 items-center gap-2 lg:flex xl:gap-3"
-          {...motionProps}
+          className="hidden shrink-0 items-center gap-2 opacity-100 lg:flex xl:gap-3"
+          {...linkMotionProps}
         >
           <LanguageSwitcher />
           <Link href="/login" className={linkClass("/login")}>
@@ -134,9 +134,9 @@ export function MarketingNav() {
           <motion.div
             id="marketing-mobile-menu"
             className="pointer-events-auto fixed inset-0 z-40 bg-cream-50 px-6 pt-28 md:hidden"
-            initial={reduceMotion ? false : { opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, x: "100%" }}
+            initial={reduceMotion ? false : { x: "100%" }}
+            animate={{ x: 0 }}
+            exit={reduceMotion ? undefined : { x: "100%" }}
             transition={
               reduceMotion
                 ? { duration: 0 }
@@ -150,9 +150,9 @@ export function MarketingNav() {
               {linkHrefs.map((href, i) => (
                 <motion.div
                   key={href}
-                  initial={reduceMotion ? false : { opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={reduceMotion ? undefined : { opacity: 0, x: 16 }}
+                  initial={reduceMotion ? false : { x: 16 }}
+                  animate={{ x: 0 }}
+                  exit={reduceMotion ? undefined : { x: 16 }}
                   transition={
                     reduceMotion ? { duration: 0 } : { delay: i * 0.05 + 0.08 }
                   }
@@ -169,8 +169,8 @@ export function MarketingNav() {
 
               <motion.div
                 className="mt-4 space-y-3 border-t border-candy-100 pt-6"
-                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={reduceMotion ? false : { y: 8 }}
+                animate={{ y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: 0.35 }}
               >
                 <Link

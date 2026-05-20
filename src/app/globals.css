@@ -198,3 +198,58 @@ body {
     animation: none;
   }
 }
+
+/* «Så funkar det»-kort: tårt-maskotter */
+@keyframes step-mascot-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(2deg);
+  }
+}
+
+@keyframes step-mascot-wiggle {
+  0%,
+  100% {
+    transform: translateY(-2px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-2deg);
+  }
+}
+
+.step-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: step-mascot-float 3.2s ease-in-out infinite;
+}
+
+.step-mascot--delay-1 {
+  animation-delay: 0.4s;
+}
+
+.step-mascot--delay-2 {
+  animation-delay: 0.8s;
+}
+
+.group:hover .step-mascot {
+  animation: step-mascot-wiggle 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-mascot,
+  .group:hover .step-mascot {
+    animation: none;
+  }
+}
