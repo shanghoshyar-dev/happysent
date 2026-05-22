@@ -298,6 +298,35 @@ export async function sendEmployeeRequestAdminNotification(
   });
 }
 
+export interface GeneralQuestionAdminArgs {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+export async function sendGeneralQuestionAdminNotification(
+  a: GeneralQuestionAdminArgs,
+) {
+  const name = `${a.firstName} ${a.lastName}`.trim();
+  const subject = `Fråga via integritetspolicyn – ${name}`;
+  const text =
+    `Ny kontaktförfrågan via happysent.com/kontakt/fraga (länk från integritetspolicyn):\n\n` +
+    `Förnamn:   ${a.firstName}\n` +
+    `Efternamn: ${a.lastName}\n` +
+    `Mejl:      ${a.email}\n` +
+    `Telefon:   ${a.phone}\n\n` +
+    `Meddelande:\n${a.message}\n`;
+
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: await adminInbox(),
+    replyTo: a.email,
+    subject,
+    text,
+  });
+}
+
 export interface ContactConfirmationArgs {
   to: string;
   name: string;

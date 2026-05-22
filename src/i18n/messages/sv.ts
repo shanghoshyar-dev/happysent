@@ -92,7 +92,7 @@ export const sv = {
     secondary: "Se priser",
   },
   footer: {
-    privacy: "Privacy policy",
+    privacy: "Integritetspolicy",
     terms: "Användarvillkor",
   },
   pages: {
@@ -272,8 +272,111 @@ export const sv = {
       emptyDescription:
         "Vi publicerar snart texter om motivation och firande på jobbet.",
     },
+    privacy: {
+      metaTitle: "Integritetspolicy | HappySent",
+      metaDescription:
+        "Så behandlar HappySent personuppgifter enligt GDPR: vad vi samlar in, varför, vem vi delar med och dina rättigheter.",
+      h1: "Integritetspolicy",
+      updatedLabel: "Senast uppdaterad:",
+      summary: {
+        title: "Sammanfattning",
+        body: 'HappySent ("vi", "oss") är personuppgiftsansvarig för de uppgifter som våra kundföretag lämnar till oss. Vi följer GDPR och samlar bara in det vi behöver för att leverera en tårta till rätt person, på rätt dag, till rätt adress.',
+      },
+      collect: {
+        title: "Vad vi samlar in",
+        items: [
+          {
+            strong: "Anställds för- och efternamn",
+            text: "så bageriet kan baka och leverera till rätt person.",
+          },
+          {
+            strong: "Födelsedatum",
+            text: "så vi vet när tårtan ska levereras. När någon skickar in lägg till/ta bort via webbplatsen samlar vi in fullständigt kalenderdatum så vi kan skilja anställda åt i bekräftelser; ni behöver inte ange fullständigt personnummer.",
+          },
+          {
+            strong: "Leveransadress",
+            text: "ert besöksadress på arbetsplatsen.",
+          },
+          {
+            strong: "Avdelningens storlek",
+            text: "så vi vet vilken tårtstorlek som ska beställas.",
+          },
+          {
+            strong: "Kontaktpersons mejl",
+            text: "på kundföretaget, för bekräftelser och fakturor.",
+          },
+          {
+            strong: "Telefonnummer",
+            text: "när ni kontaktar oss som potentiell ny kund via kontaktformuläret, så vi kan ringa eller mejla om er förfrågan.",
+          },
+        ],
+      },
+      notCollect: {
+        title: "Vad vi inte lagrar",
+        items: [
+          "Långsiktig lagring av personnummer som allmän HR-/löneinformation (vi för inte personalfiler utöver det som behövs för leveranser)",
+          "Löne- eller HR-register",
+          "Hälsouppgifter eller andra särskilda kategorier av personuppgifter",
+          "Bank- eller kortuppgifter (fakturor skickas som PDF till er fakturamejl)",
+        ],
+      },
+      legalBasis: {
+        title: "Rättslig grund",
+        body: "Vi förlitar oss på berättigat intresse (artikel 6.1 f GDPR): arbetsgivaren vill att vi firar anställda, och vi kan inte tillhandahålla tjänsten utan namn, födelsedatum och adress. Vi har vägt det intresset mot de anställdas integritet; behandlingen är minimal och i linje med vad anställda rimligen kan förvänta sig på en arbetsplats.",
+      },
+      share: {
+        title: "Vem vi delar med",
+        body: "Vi delar uppgifter endast med det lokala bageri som är kopplat till ert leveransområde, och bara det som behövs för leveransen (namn, adress, datum, antal personer). Vi säljer aldrig data, använder den inte för marknadsföring och överför den inte utanför EU/EES för behandling.",
+      },
+      retention: {
+        title: "Lagringstid",
+        body: "Vi sparar personuppgifter så länge ni är kund. När en anställd tas bort raderas personuppgifterna inom 30 dagar. Bokföringsunderlag (fakturor) sparas i 7 år enligt svensk bokföringslag.",
+      },
+      rights: {
+        title: "Dina rättigheter",
+        body: "Du har rätt att begära registerutdrag, rättelse, radering, begränsning eller dataportabilitet, samt att invända mot vår behandling. Kontakta oss på",
+        complaintBefore: "Om du är missnöjd med hur vi hanterar dina uppgifter kan du lämna klagomål till",
+        complaintLink: "Integritetsskyddsmyndigheten (IMY)",
+      },
+      security: {
+        title: "Säkerhet",
+        body: "Uppgifter lagras i krypterade databaser inom EU. Endast behörig HappySent-personal har åtkomst, och åtkomsten skyddas med flerfaktorsautentisering.",
+      },
+      contact: {
+        title: "Kontakt",
+        beforeEmail: "Frågor? Mejla",
+        afterEmail: "eller använd vårt",
+        contactForm: "kontaktformulär",
+      },
+    },
+    generalQuestion: {
+      metaTitle: "Kontakt | HappySent",
+      metaDescription:
+        "Ställ en fråga till HappySent. Lämna dina kontaktuppgifter så återkommer vi inom en arbetsdag.",
+      h1: "Ställ en fråga",
+      intro:
+        "Lämna dina uppgifter så hör vi av oss inom en arbetsdag. Du behöver inte fylla i företags- eller organisationsuppgifter.",
+    },
   },
   forms: {
+    generalQuestion: {
+      sending: "Skickar…",
+      submit: "Skicka",
+      successTitle: "Tack!",
+      successBody:
+        "Vi har tagit emot dina uppgifter och återkommer inom en arbetsdag.",
+      firstName: "Förnamn",
+      lastName: "Efternamn",
+      email: "Mejl",
+      phone: "Telefon",
+      message: "Meddelande",
+      messagePlaceholder: "Skriv din fråga här…",
+      fillRequired: "Fyll i förnamn, efternamn, mejl, telefon och meddelande.",
+      invalidEmail: "Mejladressen ser inte giltig ut.",
+      invalidPhone:
+        "Telefonnumret ser inte giltigt ut. Ange minst 8 siffror (t.ex. 070-123 45 67 eller +46 …).",
+      sendFailed: "Något gick fel. Försök igen eller mejla info@happysent.com.",
+    },
     contact: {
       sending: "Skickar…",
       submit: "Skicka",
@@ -296,7 +399,7 @@ export const sv = {
         ", fyll i och bifoga här. Vid godkänd ansökan importeras raderna till ert företag automatiskt.",
       templateSuffix: "-mallen",
       consentBefore: "Jag godkänner",
-      consentPrivacy: "privacy policy",
+      consentPrivacy: "integritetspolicyn",
       consentAfter: "och databehandlingsavtal.",
       termsBefore: "Jag har läst och godkänner",
       termsLink: "användarvillkor (Terms and Conditions)",

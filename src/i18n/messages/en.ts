@@ -273,8 +273,112 @@ export const en: Messages = {
       emptyDescription:
         "We'll soon publish posts on motivation and celebrating at work.",
     },
+    privacy: {
+      metaTitle: "Privacy Policy | HappySent",
+      metaDescription:
+        "How HappySent handles personal data under GDPR: what we collect, why, who we share with, retention, and your rights.",
+      h1: "Privacy Policy",
+      updatedLabel: "Last updated:",
+      summary: {
+        title: "Summary",
+        body: 'HappySent ("we", "us") is the controller for the personal data submitted by our customer companies. We comply with the GDPR and only collect what we need to deliver a cake to the right person, on the right day, at the right address.',
+      },
+      collect: {
+        title: "What we collect",
+        items: [
+          {
+            strong: "The employee's first and last name",
+            text: "so the bakery can bake and deliver to the correct person.",
+          },
+          {
+            strong: "Date of birth",
+            text: "so we know when to deliver the cake. When someone submits add/remove requests via our website, we collect the full calendar date so we can tell employees apart in confirmations; you do not need to enter a complete national ID number.",
+          },
+          {
+            strong: "Delivery address",
+            text: "your workplace visit address.",
+          },
+          {
+            strong: "Department size",
+            text: "so we know what size of cake to order.",
+          },
+          {
+            strong: "Contact person's email",
+            text: "at the customer company, for confirmations and invoices.",
+          },
+          {
+            strong: "Phone number",
+            text: "when you reach out as a potential new customer via our contact form, so we can call or message you about your enquiry.",
+          },
+        ],
+      },
+      notCollect: {
+        title: "What we do not store",
+        items: [
+          "Long-term storage of national identity numbers as general HR payroll records (we do not maintain personnel files beyond what is needed for deliveries)",
+          "Salary or HR records",
+          "Health data or other special categories of personal data",
+          "Bank or card details (invoices are sent as PDF to your billing email)",
+        ],
+      },
+      legalBasis: {
+        title: "Legal basis",
+        body: "We rely on legitimate interests (Article 6(1)(f) GDPR): your employer wants us to celebrate employees, and we cannot provide the service without name, birth date, and address. We have balanced those interests against employee privacy; processing is minimal and in line with what employees can reasonably expect in a workplace context.",
+      },
+      share: {
+        title: "Who we share with",
+        body: "We only share data with the local bakery assigned to your company's delivery area, and only what is needed to fulfil delivery (name, address, date, party size). We never sell data, we do not use it for marketing, and we do not transfer it outside the EU/EEA for processing.",
+      },
+      retention: {
+        title: "Retention",
+        body: "We keep personal data for as long as you remain a customer. When an employee is removed, their personal data is deleted within 30 days. Accounting records (invoices) are retained for 7 years as required by Swedish bookkeeping law.",
+      },
+      rights: {
+        title: "Your rights",
+        body: "You have the right to request access, rectification, erasure, restriction, or data portability, and to object to our processing. Contact us at",
+        complaintBefore: "If you are unhappy with how we handle your data, you may lodge a complaint with the",
+        complaintLink: "Swedish Authority for Privacy Protection (IMY)",
+      },
+      security: {
+        title: "Security",
+        body: "Data is stored in encrypted databases in the EU. Only authorised HappySent staff can access it, and access is protected with multi-factor authentication.",
+      },
+      contact: {
+        title: "Contact",
+        beforeEmail: "Questions? Email",
+        afterEmail: "or use our",
+        contactForm: "contact form",
+      },
+    },
+    generalQuestion: {
+      metaTitle: "Contact | HappySent",
+      metaDescription:
+        "Ask HappySent a question. Leave your contact details and we will get back to you within one business day.",
+      h1: "Ask a question",
+      intro:
+        "Leave your details and we will get back to you within one business day. You do not need to provide company or organisation details.",
+    },
   },
   forms: {
+    generalQuestion: {
+      sending: "Sending…",
+      submit: "Send",
+      successTitle: "Thank you!",
+      successBody:
+        "We have received your details and will get back to you within one business day.",
+      firstName: "First name",
+      lastName: "Last name",
+      email: "Email",
+      phone: "Phone",
+      message: "Message",
+      messagePlaceholder: "Write your question here…",
+      fillRequired:
+        "Please enter your first name, last name, email, phone number, and message.",
+      invalidEmail: "That email address does not look valid.",
+      invalidPhone:
+        "That phone number does not look valid. Enter at least 8 digits (e.g. 070-123 45 67 or +46 …).",
+      sendFailed: "Something went wrong. Please try again or email info@happysent.com.",
+    },
     contact: {
       sending: "Sending…",
       submit: "Send",
