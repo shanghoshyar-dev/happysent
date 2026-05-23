@@ -480,6 +480,8 @@ export type Database = {
           status: InvoiceStatus;
           orders: Json;
           created_at: string;
+          sent_at: string | null;
+          pdf_downloaded_at: string | null;
         };
         Insert: {
           id?: string;
@@ -489,6 +491,8 @@ export type Database = {
           status?: InvoiceStatus;
           orders?: Json;
           created_at?: string;
+          sent_at?: string | null;
+          pdf_downloaded_at?: string | null;
         };
         Update: {
           id?: string;
@@ -498,6 +502,8 @@ export type Database = {
           status?: InvoiceStatus;
           orders?: Json;
           created_at?: string;
+          sent_at?: string | null;
+          pdf_downloaded_at?: string | null;
         };
         Relationships: [
           {

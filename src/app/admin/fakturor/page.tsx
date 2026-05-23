@@ -17,7 +17,7 @@ export default async function FakturorPage() {
   const { data: invoices } = await supabase
     .from("invoices")
     .select(
-      "id, month, total_amount, status, companies:company_id ( name )",
+      "id, month, total_amount, status, sent_at, companies:company_id ( name )",
     )
     .order("month", { ascending: false });
 
@@ -57,6 +57,7 @@ export default async function FakturorPage() {
               <TH>Företag</TH>
               <TH>Belopp</TH>
               <TH>Status</TH>
+              <TH className="text-right">PDF</TH>
             </TR>
           </THead>
           <TBody>
@@ -80,6 +81,19 @@ export default async function FakturorPage() {
                     >
                       {inv.status === "paid" ? "Betald" : "Obetald"}
                     </Badge>
+                    {(inv.sent_at as string | null) ? (
+                      <span className="ml-2 text-xs text-slate-500">
+                        Skickad
+                      </span>
+                    ) : null}
+                  </TD>
+                  <TD className="text-right">
+                    <a
+                      href={`/api/invoices/${inv.id}/pdf`}
+                      className="text-sm font-medium text-coral-600 hover:underline"
+                    >
+                      Ladda ner
+                    </a>
                   </TD>
                 </TR>
               );

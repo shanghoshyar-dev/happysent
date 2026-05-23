@@ -491,7 +491,7 @@ export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
     `Här är månadens sammanställning för ${a.monthLabel}:\n\n` +
     `${lines}\n\n` +
     `Total: ${sek(a.total)}\n\n` +
-    `Logga in på admin-panelen för att markera fakturorna som skickade.\n\n` +
+    `Logga in på admin-panelen under Fakturor för att ladda ner PDF eller skicka till kund.\n\n` +
     `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({
@@ -499,6 +499,40 @@ export async function sendMonthlyInvoiceSummary(a: MonthlyInvoiceSummaryArgs) {
     to: await adminInbox(),
     subject,
     text,
+  });
+}
+
+export interface CustomerInvoiceArgs {
+  to: string;
+  companyName: string;
+  monthLabel: string;
+  invoiceNumber: string;
+  totalInclVat: string;
+  pdfFilename: string;
+  pdfBase64: string;
+}
+export async function sendCustomerInvoiceEmail(a: CustomerInvoiceArgs) {
+  const subject = `Faktura ${a.monthLabel} – HappySent`;
+  const text =
+    `Hej!\n\n` +
+    `Bifogat finner ni faktura ${a.invoiceNumber} för ${a.companyName} ` +
+    `(period ${a.monthLabel}).\n\n` +
+    `Att betala: ${a.totalInclVat}\n` +
+    `Betalningsvillkor: 30 dagar.\n\n` +
+    `Vid frågor, svara på detta mejl.\n\n` +
+    `Hälsningar,\nHappySent`;
+
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: a.to,
+    subject,
+    text,
+    attachments: [
+      {
+        filename: a.pdfFilename,
+        content: a.pdfBase64,
+      },
+    ],
   });
 }
 

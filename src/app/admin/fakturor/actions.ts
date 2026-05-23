@@ -2,6 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  formatMonthLabel,
+  invoiceNumber,
+  vatFromSubtotal,
+} from "@/lib/invoices/format";
+import { generateInvoicePdf } from "@/lib/invoices/generate-invoice-pdf";
+import { loadInvoicePdfData } from "@/lib/invoices/load-invoice-data";
+import { sendCustomerInvoiceEmail } from "@/lib/resend/templates";
+import { formatSek } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -76,4 +85,61 @@ export async function markInvoicePaid(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/fakturor");
   revalidatePath(`/admin/fakturor/${id}`);
+}
+
+export interface SendInvoiceResult {
+  ok: boolean;
+  error?: string;
+}
+
+export async function sendInvoiceToCustomer(
+  id: string,
+): Promise<SendInvoiceResult> {
+  const invoice = await loadInvoicePdfData(id);
+  if (!invoice) {
+    return { ok: false, error: "Faktura hittades inte." };
+  }
+  if (!invoice.company.billingEmail) {
+    return { ok: false, error: "Företaget saknar fakturamejl." };
+  }
+
+  const pdf = await generateInvoicePdf(id);
+  if (!pdf) {
+    return { ok: false, error: "Kunde inte skapa PDF." };
+  }
+
+  const subtotal = invoice.lineItems.reduce((sum, row) => sum + row.amount, 0);
+  const totalInclVat = subtotal + vatFromSubtotal(subtotal);
+  const number = invoiceNumber(invoice.id, invoice.month);
+
+  try {
+    await sendCustomerInvoiceEmail({
+      to: invoice.company.billingEmail,
+      companyName: invoice.company.name,
+      monthLabel: formatMonthLabel(invoice.month),
+      invoiceNumber: number,
+      totalInclVat: formatSek(totalInclVat),
+      pdfFilename: pdf.filename,
+      pdfBase64: pdf.buffer.toString("base64"),
+    });
+  } catch (e) {
+    console.error("[sendInvoiceToCustomer]", e);
+    return {
+      ok: false,
+      error: "Mejlet kunde inte skickas. Kontrollera Resend-konfigurationen.",
+    };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("invoices")
+    .update({ sent_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  revalidatePath("/admin/fakturor");
+  revalidatePath(`/admin/fakturor/${id}`);
+  return { ok: true };
 }

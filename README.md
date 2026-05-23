@@ -115,6 +115,6 @@ npm run db:reset     # Återställ lokal DB + kör seed
 
 ## Att göra (utanför detta första scope)
 
-- Stripe-integration för fakturering (tabellen `invoices` finns; PDF-generering är en stubb).
+- Stripe-integration för automatisk betalningsmatchning (PDF-faktura + nedladdning/mejl finns i admin → Fakturor).
 - Företagsinloggning (just nu bara admin).
 - Tester.

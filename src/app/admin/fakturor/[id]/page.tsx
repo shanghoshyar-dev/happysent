@@ -9,7 +9,9 @@ import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatSek } from "@/lib/utils";
 
+import { DownloadInvoiceButton } from "./download-invoice-button";
 import { MarkPaidButton } from "./mark-paid-button";
+import { SendInvoiceButton } from "./send-invoice-button";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
   const { data: invoice } = await supabase
     .from("invoices")
     .select(
-      "id, month, total_amount, status, orders, created_at, companies:company_id ( name, billing_email )",
+      "id, month, total_amount, status, orders, created_at, sent_at, pdf_downloaded_at, companies:company_id ( name, address, city, billing_email )",
     )
     .eq("id", params.id)
     .maybeSingle();
@@ -30,8 +32,10 @@ export default async function InvoiceDetailPage({ params }: Props) {
   if (!invoice) notFound();
 
   const company = invoice.companies as
-    | { name: string; billing_email: string }
+    | { name: string; address: string; city: string; billing_email: string }
     | null;
+  const sentAt = invoice.sent_at ?? null;
+  const pdfDownloadedAt = invoice.pdf_downloaded_at ?? null;
   const orderIds = Array.isArray(invoice.orders)
     ? (invoice.orders as string[])
     : [];
@@ -56,7 +60,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
         }
       />
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <p className="text-sm text-slate-500">Belopp</p>
           <p className="mt-1 font-display text-2xl text-slate-900">
@@ -77,6 +81,33 @@ export default async function InvoiceDetailPage({ params }: Props) {
             {company?.billing_email ?? "—"}
           </p>
         </Card>
+        <Card>
+          <p className="text-sm text-slate-500">Skickad till kund</p>
+          <p className="mt-1 text-sm text-slate-900">
+            {sentAt
+              ? new Date(sentAt).toLocaleString("sv-SE", {
+                  timeZone: "Europe/Stockholm",
+                })
+              : "Ej skickad"}
+          </p>
+          {pdfDownloadedAt ? (
+            <p className="mt-1 text-xs text-slate-500">
+              PDF nedladdad:{" "}
+              {new Date(pdfDownloadedAt).toLocaleString("sv-SE", {
+                timeZone: "Europe/Stockholm",
+              })}
+            </p>
+          ) : null}
+        </Card>
+      </div>
+
+      <div className="mb-8 flex flex-wrap gap-3">
+        <DownloadInvoiceButton invoiceId={invoice.id} />
+        <SendInvoiceButton
+          id={invoice.id}
+          billingEmail={company?.billing_email ?? null}
+          sentAt={sentAt}
+        />
       </div>
 
       <h2 className="mb-3 font-display text-xl text-slate-900">Rader</h2>

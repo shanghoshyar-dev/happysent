@@ -83,6 +83,11 @@ export function ManualCronButton() {
                 )}
               </li>
             )}
+            {result.employeeDigest?.errors.map((err) => (
+              <li key={err} className="text-amber-800">
+                Personal-digest: {err}
+              </li>
+            ))}
           </ul>
         </div>
       )}
