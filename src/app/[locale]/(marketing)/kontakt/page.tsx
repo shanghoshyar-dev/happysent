@@ -30,31 +30,34 @@ export default function KontaktPage({ params }: Props) {
     <section className="pb-20">
       <div className="mx-auto w-full max-w-6xl space-y-14 px-6">
         <div className="max-w-3xl">
-          <h1 className="font-display text-5xl text-slate-900">
-            {p.h1Before} <BrandName className="text-slate-900" />
+          <h1 className="font-display text-5xl text-black">
+            {p.h1Before} <BrandName className="text-black" />
             {p.h1After}
           </h1>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-black">
             {p.intro}{" "}
             <a
               href="mailto:info@happysent.com"
-              className="font-medium text-forest-700 underline-offset-4 transition-colors hover:text-forest-800 hover:underline"
+              className="font-medium text-black underline-offset-4 transition-colors hover:underline"
             >
               info@happysent.com
             </a>
             .
           </p>
           <div className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <ExcelTemplateDownload label={p.excelLink} />
-            <p className="text-sm text-slate-600">{p.excelAfter}</p>
+            <ExcelTemplateDownload
+              label={p.excelLink}
+              className="border-slate-300 text-black hover:border-slate-400 hover:bg-white"
+            />
+            <p className="text-sm text-black">{p.excelAfter}</p>
           </div>
-          <dl className="mt-10 space-y-4 text-sm text-slate-600">
+          <dl className="mt-10 space-y-4 text-sm text-black">
             <div>
-              <dt className="font-semibold text-slate-900">{p.emailLabel}</dt>
+              <dt className="font-semibold text-black">{p.emailLabel}</dt>
               <dd>info@happysent.com</dd>
             </div>
             <div>
-              <dt className="font-semibold text-slate-900">{p.locationLabel}</dt>
+              <dt className="font-semibold text-black">{p.locationLabel}</dt>
               <dd>{p.locationValue}</dd>
             </div>
           </dl>
