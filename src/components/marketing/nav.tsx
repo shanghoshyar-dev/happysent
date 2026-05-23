@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 
-import { BrandName } from "@/components/brand-name";
-import { BrandCakeIcon } from "@/components/marketing/brand-cake-icon";
+import { BrandLogo } from "@/components/marketing/brand-logo";
 import { LanguageSwitcher } from "@/components/marketing/language-switcher";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { CtaButton } from "@/components/marketing/cta-button";
@@ -77,14 +76,12 @@ export function MarketingNav() {
           aria-label={messages.nav.homeAria}
         >
           <motion.span
-            aria-hidden
-            className="flex shrink-0 leading-none"
-            whileHover={reduceMotion ? undefined : { rotate: 10, scale: 1.05 }}
+            className="flex min-w-0 items-center"
+            whileHover={reduceMotion ? undefined : { scale: 1.03 }}
             transition={{ duration: 0.2 }}
           >
-            <BrandCakeIcon size={28} className="h-7 w-7" />
+            <BrandLogo markSize={28} className="min-w-0" />
           </motion.span>
-          <BrandName size="logo" className="truncate text-slate-900" />
         </LocalizedLink>
 
         <nav

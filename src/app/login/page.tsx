@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { BrandName } from "@/components/brand-name";
-import { BrandCakeIcon } from "@/components/marketing/brand-cake-icon";
+import { BrandLogo } from "@/components/marketing/brand-logo";
 
 import { LoginForm } from "./login-form";
 
@@ -13,9 +12,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-candy-gradient px-6 py-12">
       <div className="w-full max-w-md rounded-3xl border border-candy-100 bg-white p-10 shadow-soft">
-        <Link href="/" className="flex items-center gap-2">
-          <BrandCakeIcon size={28} className="h-7 w-7" />
-          <BrandName size="logo" className="text-slate-900" />
+        <Link href="/" className="inline-flex">
+          <BrandLogo markSize={28} />
         </Link>
         <h1 className="mt-8 font-display text-3xl text-slate-900">
           Logga in på admin

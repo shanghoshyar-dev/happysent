@@ -1,25 +1,11 @@
-import Image from "next/image";
-
-import { cn } from "@/lib/utils";
+import { BrandLogoMark } from "@/components/marketing/brand-logo-mark";
 
 type BrandCakeIconProps = {
   className?: string;
   size?: number;
 };
 
-/** Tårt-ikon från logotypen (samma som i nav). */
-export function BrandCakeIcon({
-  className,
-  size = 32,
-}: BrandCakeIconProps) {
-  return (
-    <Image
-      src="/marketing/brand-cake.png"
-      alt=""
-      width={size}
-      height={size}
-      className={cn("object-contain", className)}
-      aria-hidden
-    />
-  );
+/** @deprecated Använd BrandLogoMark — behålls för bakåtkompatibilitet. */
+export function BrandCakeIcon({ className, size = 32 }: BrandCakeIconProps) {
+  return <BrandLogoMark className={className} size={size} />;
 }
