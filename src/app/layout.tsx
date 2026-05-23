@@ -6,6 +6,7 @@ import "@fontsource-variable/host-grotesk/wght.css";
 
 import "./globals.css";
 
+import { AdminLoginShortcut } from "@/components/admin-login-shortcut";
 import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
@@ -61,6 +62,7 @@ export default function RootLayout({
       className={`${inter.variable} ${kalam.variable}`}
     >
       <body className="min-h-screen bg-cream font-sans antialiased transition-colors duration-200">
+        <AdminLoginShortcut />
         {children}
       </body>
     </html>

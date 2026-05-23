@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
@@ -102,9 +101,6 @@ export function MarketingNav() {
           {...linkMotionProps}
         >
           <LanguageSwitcher />
-          <Link href="/login" className={linkClass("/login")}>
-            {messages.nav.login}
-          </Link>
           <LocalizedLink href="/kontakt">
             <CtaButton size="sm">{messages.nav.getStarted}</CtaButton>
           </LocalizedLink>
@@ -165,18 +161,11 @@ export function MarketingNav() {
               ))}
 
               <motion.div
-                className="mt-4 space-y-3 border-t border-candy-100 pt-6"
+                className="mt-4 border-t border-candy-100 pt-6"
                 initial={reduceMotion ? false : { y: 8 }}
                 animate={{ y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: 0.35 }}
               >
-                <Link
-                  href="/login"
-                  className="block rounded-2xl px-4 py-3 text-lg font-medium text-slate-700 hover:bg-white"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {messages.nav.login}
-                </Link>
                 <LocalizedLink href="/kontakt" onClick={() => setIsOpen(false)}>
                   <CtaButton size="md" fullWidth>
                     {messages.nav.getStarted}

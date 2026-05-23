@@ -40,9 +40,6 @@ export function MarketingFooter() {
           <LocalizedLink href="/anvandarvillkor" className="hover:text-candy-600">
             {messages.footer.terms}
           </LocalizedLink>
-          <LocalizedLink href="/login" className="hover:text-candy-600">
-            {messages.nav.login}
-          </LocalizedLink>
         </nav>
         <div className="flex flex-col gap-1 text-right md:text-left">
           <a

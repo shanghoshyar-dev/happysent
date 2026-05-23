@@ -1,6 +1,7 @@
 import "server-only";
 
 import { formatOrganizationNumber } from "@/lib/organization-number";
+import { formatSek } from "@/lib/utils";
 import { getResend } from "@/lib/resend/client";
 import {
   getAppSettings,
@@ -533,6 +534,28 @@ export async function sendCustomerInvoiceEmail(a: CustomerInvoiceArgs) {
         content: a.pdfBase64,
       },
     ],
+  });
+}
+
+export interface DonationYearSummaryArgs {
+  year: number;
+  totalKr: number;
+}
+export async function sendDonationYearSummary(a: DonationYearSummaryArgs) {
+  const formatted = formatSek(a.totalKr);
+  const subject = `HappySent donationskassa ${a.year} – ${formatted} insamlade`;
+  const text =
+    `Hej!\n\n` +
+    `Insamlingsperioden för donationskassan ${a.year} är avslutad.\n\n` +
+    `Totalt insamlat: ${formatted}\n\n` +
+    `Kassan är nollställd inför nästa år. Utlottningen sker enligt plan live på TikTok.\n\n` +
+    `Hälsningar,\nHappySent`;
+
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: await adminInbox(),
+    subject,
+    text,
   });
 }
 

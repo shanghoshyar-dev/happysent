@@ -1,6 +1,7 @@
 "use server";
 
 import { runDailyCheck } from "@/lib/cron/daily-check";
+import { runDonationCampaignClose } from "@/lib/cron/donation-campaign-close";
 import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
 import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
 import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
@@ -13,6 +14,7 @@ export interface ManualCheckResult {
   daily?: Awaited<ReturnType<typeof runDailyCheck>>;
   employeeDigest?: Awaited<ReturnType<typeof flushPendingEmployeeAddDigests>>;
   monthly?: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null;
+  donationClose?: Awaited<ReturnType<typeof runDonationCampaignClose>> | null;
   error?: string;
 }
 
@@ -54,7 +56,15 @@ export async function triggerDailyCheckManually(): Promise<ManualCheckResult> {
       }
     }
 
-    return { ok: true, daily, employeeDigest, monthly };
+    let donationClose: Awaited<ReturnType<typeof runDonationCampaignClose>> | null =
+      null;
+    try {
+      donationClose = await runDonationCampaignClose(new Date());
+    } catch (err) {
+      console.error("[manual] donation campaign close failed:", err);
+    }
+
+    return { ok: true, daily, employeeDigest, monthly, donationClose };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await recordLog("error", "manual-trigger", message);

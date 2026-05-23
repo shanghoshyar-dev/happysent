@@ -97,6 +97,7 @@ export const sv = {
     hours: "Timmar",
     minutes: "Min",
     seconds: "Sek",
+    previousYearLabel: "Insamlat {year}:",
     lottery:
       "Den hjälporganisation som vinner får hela beloppet. Utlottningen sänds live på TikTok i början av nästa år.",
     participantsTitle: "Deltagande organisationer",

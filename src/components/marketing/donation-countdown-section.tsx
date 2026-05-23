@@ -1,7 +1,22 @@
 import { DonationCountdown } from "@/components/marketing/donation-countdown";
-import { getDonationFundTotalKr } from "@/lib/donation-fund";
+import {
+  closeDonationCampaignIfDue,
+  getDonationFundTotalKr,
+  getPreviousYearDonationSnapshot,
+} from "@/lib/donation-fund";
 
 export async function DonationCountdownSection() {
-  const totalKr = await getDonationFundTotalKr();
-  return <DonationCountdown initialTotalKr={totalKr} />;
+  await closeDonationCampaignIfDue();
+
+  const [totalKr, previousYear] = await Promise.all([
+    getDonationFundTotalKr(),
+    getPreviousYearDonationSnapshot(),
+  ]);
+
+  return (
+    <DonationCountdown
+      initialTotalKr={totalKr}
+      previousYear={previousYear}
+    />
+  );
 }

@@ -8,6 +8,7 @@ import { formatSek } from "@/lib/utils";
 
 interface Props {
   initialTotalKr: number;
+  previousYear: { year: number; totalKr: number } | null;
 }
 
 type CountdownParts = {
@@ -31,7 +32,7 @@ function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-export function DonationCountdown({ initialTotalKr }: Props) {
+export function DonationCountdown({ initialTotalKr, previousYear }: Props) {
   const { messages } = useLocale();
   const d = messages.donationCountdown;
   const endMs = useMemo(() => donationCampaignEndMs(), []);
@@ -110,6 +111,17 @@ export function DonationCountdown({ initialTotalKr }: Props) {
                   </div>
                 ))}
               </div>
+            )}
+            {previousYear && previousYear.totalKr > 0 && (
+              <p className="mt-4 text-center text-sm text-slate-600">
+                {d.previousYearLabel.replace(
+                  "{year}",
+                  String(previousYear.year),
+                )}{" "}
+                <span className="font-semibold text-slate-800">
+                  {formatSek(previousYear.totalKr)}
+                </span>
+              </p>
             )}
           </div>
 

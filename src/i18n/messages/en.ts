@@ -100,6 +100,7 @@ export const en: Messages = {
     hours: "Hours",
     minutes: "Min",
     seconds: "Sec",
+    previousYearLabel: "Raised in {year}:",
     lottery:
       "The winning charity receives the full amount. The draw is streamed live on TikTok early next year.",
     participantsTitle: "Participating organisations",

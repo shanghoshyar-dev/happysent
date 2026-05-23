@@ -88,6 +88,13 @@ export function ManualCronButton() {
                 Personal-digest: {err}
               </li>
             ))}
+            {result.donationClose?.closed && (
+              <li>
+                Donationskassa {result.donationClose.year} avslutad:{" "}
+                {result.donationClose.totalKr} kr
+                {result.donationClose.emailSent ? " (mejl skickat)" : ""}
+              </li>
+            )}
           </ul>
         </div>
       )}

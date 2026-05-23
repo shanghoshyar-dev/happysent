@@ -661,6 +661,27 @@ export type Database = {
           },
         ];
       };
+      donation_campaign_snapshots: {
+        Row: {
+          year: number;
+          total_kr: number;
+          closed_at: string;
+          email_sent_at: string | null;
+        };
+        Insert: {
+          year: number;
+          total_kr: number;
+          closed_at?: string;
+          email_sent_at?: string | null;
+        };
+        Update: {
+          year?: number;
+          total_kr?: number;
+          closed_at?: string;
+          email_sent_at?: string | null;
+        };
+        Relationships: [];
+      };
       contact_rate_limits: {
         Row: {
           bucket_key: string;
