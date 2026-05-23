@@ -27,7 +27,9 @@ export default function OmOssPage({ params }: Props) {
 
   return (
     <article className="mx-auto max-w-3xl px-6 pb-20">
-      <h1 className="font-display text-5xl text-slate-900">{p.h1}</h1>
+      <div className="inline-block rounded-3xl border border-candy-200 bg-white px-8 py-6 shadow-sm ring-1 ring-candy-100/60">
+        <h1 className="font-display text-5xl text-slate-900">{p.h1}</h1>
+      </div>
 
       <div className="prose-happysent mt-8 space-y-6 text-lg text-slate-600">
         {p.paragraphs.map((paragraph) => (

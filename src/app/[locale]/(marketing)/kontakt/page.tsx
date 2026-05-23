@@ -7,6 +7,7 @@ import { marketingPageMeta } from "@/lib/marketing-metadata";
 
 import { ContactForm } from "./contact-form";
 import { EmployeeRequestForm } from "./employee-request-form";
+import { ExcelTemplateDownload } from "./excel-template-download";
 
 type Props = { params: { locale: string } };
 
@@ -37,22 +38,16 @@ export default function KontaktPage({ params }: Props) {
             {p.intro}{" "}
             <a
               href="mailto:info@happysent.com"
-              className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
+              className="font-medium text-forest-700 underline-offset-4 transition-colors hover:text-forest-800 hover:underline"
             >
               info@happysent.com
             </a>
             .
           </p>
-          <p className="mt-4 text-sm text-slate-600">
-            <a
-              href="/happysent-mall.xlsx"
-              download
-              className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
-            >
-              {p.excelLink}
-            </a>{" "}
-            {p.excelAfter}
-          </p>
+          <div className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <ExcelTemplateDownload label={p.excelLink} />
+            <p className="text-sm text-slate-600">{p.excelAfter}</p>
+          </div>
           <dl className="mt-10 space-y-4 text-sm text-slate-600">
             <div>
               <dt className="font-semibold text-slate-900">{p.emailLabel}</dt>
@@ -79,15 +74,9 @@ export default function KontaktPage({ params }: Props) {
                 {p.existingTitle}
               </h2>
               <p className="mt-4 text-lg text-slate-600">{p.existingBody}</p>
-              <p className="mt-4 text-sm text-slate-600">
-                <a
-                  href="/happysent-mall.xlsx"
-                  download
-                  className="font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
-                >
-                  {p.excelLink}
-                </a>
-              </p>
+              <div className="mt-4">
+                <ExcelTemplateDownload label={p.excelLink} />
+              </div>
             </div>
             <EmployeeRequestForm className="min-h-0 flex-1" />
           </div>

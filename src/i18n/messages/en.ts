@@ -175,7 +175,7 @@ export const en: Messages = {
         },
         {
           title: "Two weeks before: you get a confirmation",
-          body: "Exactly 14 days before the birthday, your contact gets an email: \"Kalle turns [age] in two weeks, the cake is booked.\" Then you know it's happening.",
+          body: "Exactly 14 days before the birthday, your contact gets an email: \"Kalle's birthday is in two weeks, the cake is booked.\" Then you know it's happening.",
           imageAlt:
             "Phone on a desk showing an email confirming a birthday cake is booked two weeks ahead",
         },
