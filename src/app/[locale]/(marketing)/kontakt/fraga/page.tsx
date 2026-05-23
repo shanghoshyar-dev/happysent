@@ -29,11 +29,13 @@ export default function GeneralQuestionPage({ params }: Props) {
   return (
     <section className="pb-20">
       <div className="mx-auto w-full max-w-lg px-6">
-        <h1 className="font-display text-4xl text-slate-900 sm:text-5xl">
-          {p.h1}
-        </h1>
-        <p className="mt-4 text-lg text-slate-600">{p.intro}</p>
-        <GeneralQuestionForm className="mt-10" />
+        <div className="rounded-3xl bg-white/95 p-8 shadow-sm ring-1 ring-candy-100/60 backdrop-blur-sm sm:p-10">
+          <h1 className="font-display text-4xl text-slate-900 sm:text-5xl">
+            {p.h1}
+          </h1>
+          <p className="mt-4 text-lg text-slate-600">{p.intro}</p>
+          <GeneralQuestionForm className="mt-10" />
+        </div>
       </div>
     </section>
   );

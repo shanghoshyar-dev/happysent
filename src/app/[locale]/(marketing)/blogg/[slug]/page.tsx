@@ -154,6 +154,7 @@ export default async function BloggPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article className="mx-auto max-w-3xl px-6 pb-16 sm:pb-20">
+        <div className="rounded-3xl bg-white/95 p-8 shadow-sm ring-1 ring-candy-100/60 backdrop-blur-sm sm:p-10">
         <LocalizedLink
           href="/blogg"
           className="text-sm font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"
@@ -247,6 +248,7 @@ export default async function BloggPostPage({ params }: Props) {
             </div>
           </div>
         </footer>
+        </div>
       </article>
     </>
   );

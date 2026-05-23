@@ -33,9 +33,13 @@ export default async function BloggPage({ params }: Props) {
     .eq("is_published", true)
     .order("published_at", { ascending: false });
 
+  const contentPanel =
+    "rounded-3xl bg-white/95 p-8 shadow-sm ring-1 ring-candy-100/60 backdrop-blur-sm sm:p-10";
+
   return (
     <section className="pb-20">
       <div className="mx-auto max-w-4xl px-6">
+        <div className={contentPanel}>
         <h1 className="font-display text-5xl text-forest-800">{p.h1}</h1>
         <p className="mt-4 max-w-xl text-lg text-slate-600">{p.intro}</p>
         <div className="mt-12 space-y-4">
@@ -67,6 +71,7 @@ export default async function BloggPage({ params }: Props) {
               description={p.emptyDescription}
             />
           )}
+        </div>
         </div>
       </div>
     </section>

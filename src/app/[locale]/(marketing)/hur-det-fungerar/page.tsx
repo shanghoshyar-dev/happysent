@@ -42,12 +42,14 @@ export default function HurDetFungerarPage({ params }: Props) {
   return (
     <>
       <section className="pb-20">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <h1 className="font-display text-5xl text-slate-900">
-            {page.h1Before} <BrandName className="text-slate-900" />
-            {page.h1After}
-          </h1>
-          <p className="mt-6 text-lg text-slate-600">{page.intro}</p>
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="rounded-3xl bg-white/95 p-8 text-center shadow-sm ring-1 ring-candy-100/60 backdrop-blur-sm sm:p-10">
+            <h1 className="font-display text-5xl text-slate-900">
+              {page.h1Before} <BrandName className="text-slate-900" />
+              {page.h1After}
+            </h1>
+            <p className="mt-6 text-lg text-slate-600">{page.intro}</p>
+          </div>
         </div>
       </section>
 

@@ -143,7 +143,8 @@ body {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   }
 
-  /** Hero: vertikala slats (tunna linjer + lätt kolumnvariation). */
+  /** Marketing photo: vertikala slats (tunna linjer + lätt kolumnvariation). */
+  .marketing-photo-slats,
   .hero-vertical-slats {
     background-image:
       repeating-linear-gradient(
