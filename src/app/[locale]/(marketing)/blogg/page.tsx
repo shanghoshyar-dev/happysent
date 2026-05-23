@@ -34,7 +34,7 @@ export default async function BloggPage({ params }: Props) {
     .order("published_at", { ascending: false });
 
   return (
-    <section className="py-20">
+    <section className="pb-20">
       <div className="mx-auto max-w-4xl px-6">
         <h1 className="font-display text-5xl text-forest-800">{p.h1}</h1>
         <p className="mt-4 max-w-xl text-lg text-slate-600">{p.intro}</p>

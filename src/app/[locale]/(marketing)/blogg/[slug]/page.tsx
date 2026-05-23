@@ -153,7 +153,7 @@ export default async function BloggPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <article className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+      <article className="mx-auto max-w-3xl px-6 pb-16 sm:pb-20">
         <LocalizedLink
           href="/blogg"
           className="text-sm font-medium text-coral-600 underline-offset-4 transition-colors hover:text-coral-700 hover:underline"

@@ -27,7 +27,7 @@ export default function GeneralQuestionPage({ params }: Props) {
   const p = getMessages(locale).pages.generalQuestion;
 
   return (
-    <section className="py-20">
+    <section className="pb-20">
       <div className="mx-auto w-full max-w-lg px-6">
         <h1 className="font-display text-4xl text-slate-900 sm:text-5xl">
           {p.h1}

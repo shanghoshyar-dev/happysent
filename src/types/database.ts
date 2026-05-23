@@ -632,6 +632,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      donation_contributions: {
+        Row: {
+          invoice_id: string;
+          order_count: number;
+          amount_kr: number;
+          created_at: string;
+        };
+        Insert: {
+          invoice_id: string;
+          order_count: number;
+          amount_kr: number;
+          created_at?: string;
+        };
+        Update: {
+          invoice_id?: string;
+          order_count?: number;
+          amount_kr?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "donation_contributions_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: true;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       contact_rate_limits: {
         Row: {
           bucket_key: string;

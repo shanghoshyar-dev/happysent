@@ -10,6 +10,7 @@ import {
 import { generateInvoicePdf } from "@/lib/invoices/generate-invoice-pdf";
 import { loadInvoicePdfData } from "@/lib/invoices/load-invoice-data";
 import { sendCustomerInvoiceEmail } from "@/lib/resend/templates";
+import { creditDonationForPaidInvoice } from "@/lib/donation-fund";
 import { formatSek } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -83,8 +84,12 @@ export async function markInvoicePaid(id: string) {
     .update({ status: "paid" })
     .eq("id", id);
   if (error) throw new Error(error.message);
+
+  await creditDonationForPaidInvoice(id);
+
   revalidatePath("/admin/fakturor");
   revalidatePath(`/admin/fakturor/${id}`);
+  revalidatePath("/", "layout");
 }
 
 export interface SendInvoiceResult {

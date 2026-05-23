@@ -21,7 +21,7 @@ export function generateMetadata({ params }: Props): Metadata {
 
 export default function AnvandarvillkorPage(_props: Props) {
   return (
-    <article className="font-legal mx-auto max-w-3xl px-6 py-20">
+    <article className="font-legal mx-auto max-w-3xl px-6 pb-20">
       <h1 className="font-display text-5xl text-slate-900">
         Terms and Conditions: <BrandName className="text-slate-900" />
       </h1>

@@ -26,7 +26,7 @@ export default function OmOssPage({ params }: Props) {
   const p = getMessages(locale).pages.about;
 
   return (
-    <article className="mx-auto max-w-3xl px-6 py-20">
+    <article className="mx-auto max-w-3xl px-6 pb-20">
       <h1 className="font-display text-5xl text-slate-900">{p.h1}</h1>
 
       <div className="prose-happysent mt-8 space-y-6 text-lg text-slate-600">
@@ -54,7 +54,7 @@ export default function OmOssPage({ params }: Props) {
           </CtaButton>
         </LocalizedLink>
         <LocalizedLink href="/hur-det-fungerar" className="sm:flex-1">
-          <Button variant="ghost" className="w-full">
+          <Button variant="secondary" className="w-full">
             {p.ctaHow}
           </Button>
         </LocalizedLink>

@@ -4,6 +4,13 @@
 
 :root {
   color-scheme: light;
+  --marketing-nav-offset: 5.5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --marketing-nav-offset: 6.5rem;
+  }
 }
 
 html,

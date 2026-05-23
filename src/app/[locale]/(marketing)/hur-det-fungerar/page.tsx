@@ -41,7 +41,7 @@ export default function HurDetFungerarPage({ params }: Props) {
 
   return (
     <>
-      <section className="py-20">
+      <section className="pb-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h1 className="font-display text-5xl text-slate-900">
             {page.h1Before} <BrandName className="text-slate-900" />

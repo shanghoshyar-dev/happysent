@@ -86,6 +86,35 @@ export const en: Messages = {
       },
     ],
   },
+  donationCountdown: {
+    eyebrow: "Donation fund",
+    heading: "Making a difference together",
+    intro:
+      "Every cake and flower sold adds to our donation fund. Early next year we draw which charity receives the full amount — live on TikTok.",
+    fundLabel: "Raised so far",
+    perDelivery:
+      "10 SEK per delivered cake or flower is added when the invoice is marked paid.",
+    countdownLabel: "Countdown to the draw on 31 December",
+    countdownEnded: "The draw is coming soon — follow us on TikTok!",
+    days: "Days",
+    hours: "Hours",
+    minutes: "Min",
+    seconds: "Sec",
+    lottery:
+      "The winning charity receives the full amount. The draw is streamed live on TikTok early next year.",
+    participantsTitle: "Participating organisations",
+    participants: [
+      "Médecins Sans Frontières Sweden",
+      "UNICEF Sweden",
+      "Sweden for UNHCR",
+      "Save the Children Sweden",
+      "Swedish Red Cross",
+    ],
+    joinBefore:
+      "Want your organisation to join the draw? Email us at",
+    joinAfter:
+      "and tell us who you are and what the funds should support.",
+  },
   cta: {
     heading: "Ready to celebrate properly?",
     body: "Book a short demo and we'll show how",

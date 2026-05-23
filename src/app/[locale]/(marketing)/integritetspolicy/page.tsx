@@ -34,7 +34,7 @@ export default function IntegritetspolicyPage({ params }: Props) {
   const p = getMessages(locale).pages.privacy;
 
   return (
-    <article className="font-legal mx-auto max-w-3xl px-6 py-20">
+    <article className="font-legal mx-auto max-w-3xl px-6 pb-20">
       <h1 className="font-display text-5xl text-slate-900">{p.h1}</h1>
       <p className="mt-4 text-sm text-slate-500">
         {p.updatedLabel} {formatUpdatedDate(locale)}

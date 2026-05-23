@@ -28,7 +28,7 @@ export default function PriserPage({ params }: Props) {
   }));
 
   return (
-    <section className="bg-cream-50 py-20">
+    <section className="bg-cream-50 pb-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="font-display text-5xl text-slate-900">{p.h1}</h1>

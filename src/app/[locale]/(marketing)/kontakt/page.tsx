@@ -26,7 +26,7 @@ export default function KontaktPage({ params }: Props) {
   const p = getMessages(locale).pages.contact;
 
   return (
-    <section className="py-20">
+    <section className="pb-20">
       <div className="mx-auto w-full max-w-6xl space-y-14 px-6">
         <div className="max-w-3xl">
           <h1 className="font-display text-5xl text-slate-900">

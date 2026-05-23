@@ -84,6 +84,34 @@ export const sv = {
       },
     ],
   },
+  donationCountdown: {
+    eyebrow: "Donationskassa",
+    heading: "Tillsammans gör vi skillnad",
+    intro:
+      "Varje såld tårta och blomma bidrar till vår donationskassa. I början av nästa år lottar vi ut hela summan till en hjälporganisation – live på TikTok.",
+    fundLabel: "Insamlat hittills",
+    perDelivery: "10 kr per levererad tårta eller blomma läggs till när fakturan betalas.",
+    countdownLabel: "Countdown till utlottningen 31 december",
+    countdownEnded: "Utlottningen sker snart – följ oss på TikTok!",
+    days: "Dagar",
+    hours: "Timmar",
+    minutes: "Min",
+    seconds: "Sek",
+    lottery:
+      "Den hjälporganisation som vinner får hela beloppet. Utlottningen sänds live på TikTok i början av nästa år.",
+    participantsTitle: "Deltagande organisationer",
+    participants: [
+      "Läkare Utan Gränser",
+      "UNICEF Sverige",
+      "Sverige för UNHCR",
+      "Rädda Barnen",
+      "Svenska Röda Korset",
+    ],
+    joinBefore:
+      "Vill er organisation vara med i utlottningen? Mejla oss på",
+    joinAfter:
+      "och berätta vilka ni är och vad pengarna ska gå till.",
+  },
   cta: {
     heading: "Redo att fira riktigt?",
     body: "Boka en kort demo så visar vi hur",

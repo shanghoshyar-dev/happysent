@@ -22,9 +22,9 @@ export default function MarketingLayout({
 
   return (
     <LocaleProvider locale={locale} messages={messages}>
-      <div className="flex min-h-screen min-w-0 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-col pt-[var(--marketing-nav-offset)]">
         <MarketingNav />
-        <main className="min-w-0 flex-1 overflow-x-clip scroll-pt-28">
+        <main className="min-w-0 flex-1 overflow-x-clip scroll-pt-[var(--marketing-nav-offset)]">
           {children}
         </main>
         <MarketingFooter />

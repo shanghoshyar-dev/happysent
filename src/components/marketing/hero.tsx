@@ -13,7 +13,7 @@ export function Hero() {
   const h = messages.hero;
 
   return (
-    <section className="relative min-h-[min(88vh,44rem)] overflow-hidden sm:min-h-[min(92vh,48rem)]">
+    <section className="relative -mt-[var(--marketing-nav-offset)] min-h-[min(88vh,44rem)] overflow-hidden sm:min-h-[min(92vh,48rem)]">
       <div className="absolute inset-0" aria-hidden>
         <Image
           src="/marketing/hero-cakes-flowers.avif"
