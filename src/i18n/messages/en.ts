@@ -126,6 +126,16 @@ export const en: Messages = {
   footer: {
     privacy: "Privacy policy",
     terms: "Terms and conditions",
+    cookieSettings: "Cookie settings",
+  },
+  cookieBanner: {
+    title: "We use cookies",
+    bodyBefore:
+      "Necessary cookies power language choice and sign-in. With your consent we use Google Analytics to understand how the site is used. Read more in our",
+    privacyLink: "privacy policy",
+    bodyAfter: ".",
+    acceptAll: "Accept all",
+    necessaryOnly: "Necessary only",
   },
   pages: {
     about: {
@@ -357,7 +367,41 @@ export const en: Messages = {
       },
       share: {
         title: "Who we share with",
-        body: "We only share data with the local bakery assigned to your company's delivery area, and only what is needed to fulfil delivery (name, address, date, party size). We never sell data, we do not use it for marketing, and we do not transfer it outside the EU/EEA for processing.",
+        body: "We only share data with the local bakery assigned to your company's delivery area, and only what is needed to fulfil delivery (name, address, date, party size). We never sell customer data or use it for marketing. If you accept analytics cookies, Google Analytics (Google) may receive anonymised visit statistics; Google may process data outside the EU/EEA under its terms and standard contractual clauses.",
+      },
+      cookies: {
+        title: "Cookies",
+        intro:
+          "Cookies are small text files stored by your browser. Some are necessary for the site to work; others require your consent.",
+        tableHeaders: {
+          name: "Cookie / service",
+          purpose: "Purpose",
+          consent: "Requires consent",
+        },
+        items: [
+          {
+            name: "happysent_locale",
+            purpose: "Remembers your language choice (Swedish or English).",
+            consent: "No (necessary)",
+          },
+          {
+            name: "Supabase-auth",
+            purpose: "Keeps you signed in to admin when you use login.",
+            consent: "No (necessary)",
+          },
+          {
+            name: "happysent_cookie_consent",
+            purpose: "Stores your choice in the cookie banner.",
+            consent: "No (necessary)",
+          },
+          {
+            name: "Google Analytics (_ga, _ga_*)",
+            purpose: "Visit statistics when you accept analytics cookies.",
+            consent: "Yes",
+          },
+        ],
+        manage:
+          "You can change your choice at any time via Cookie settings in the footer.",
       },
       retention: {
         title: "Retention",

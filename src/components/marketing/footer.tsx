@@ -1,12 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { BrandLogo } from "@/components/marketing/brand-logo";
 import { BrandName } from "@/components/brand-name";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { useLocale } from "@/i18n/locale-provider";
+import { getGaMeasurementId, openCookieSettings } from "@/lib/cookie-consent";
 
 export function MarketingFooter() {
   const { messages } = useLocale();
+  const [showCookieSettings, setShowCookieSettings] = useState(false);
+
+  useEffect(() => {
+    setShowCookieSettings(Boolean(getGaMeasurementId()));
+  }, []);
 
   return (
     <footer className="relative z-20 shrink-0 border-t border-candy-100 bg-white">
@@ -40,6 +48,15 @@ export function MarketingFooter() {
           <LocalizedLink href="/anvandarvillkor" className="hover:text-candy-600">
             {messages.footer.terms}
           </LocalizedLink>
+          {showCookieSettings ? (
+            <button
+              type="button"
+              className="hover:text-candy-600"
+              onClick={() => openCookieSettings()}
+            >
+              {messages.footer.cookieSettings}
+            </button>
+          ) : null}
         </nav>
         <div className="flex flex-col gap-1 text-right md:text-left">
           <a

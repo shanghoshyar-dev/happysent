@@ -1,6 +1,8 @@
 import { MarketingFooter } from "@/components/marketing/footer";
 import { MarketingNav } from "@/components/marketing/nav";
 import { MarketingPhotoBackground } from "@/components/marketing/marketing-photo-background";
+import { CookieBanner } from "@/components/cookie-banner";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import type { Locale } from "@/i18n/config";
 import { isLocale } from "@/i18n/config";
 import { getMessages } from "@/i18n/get-messages";
@@ -30,6 +32,8 @@ export default function MarketingLayout({
           <div className="relative z-10">{children}</div>
         </main>
         <MarketingFooter />
+        <CookieBanner />
+        <GoogleAnalytics />
       </div>
     </LocaleProvider>
   );

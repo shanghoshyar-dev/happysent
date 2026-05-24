@@ -123,6 +123,15 @@ export const sv = {
   footer: {
     privacy: "Integritetspolicy",
     terms: "Användarvillkor",
+    cookieSettings: "Cookie-inställningar",
+  },
+  cookieBanner: {
+    title: "Vi använder cookies",
+    bodyBefore: "Nödvändiga cookies driver språkval och inloggning. Med ditt samtycke använder vi Google Analytics för att förstå hur sidan används. Läs mer i vår",
+    privacyLink: "integritetspolicy",
+    bodyAfter: ".",
+    acceptAll: "Acceptera alla",
+    necessaryOnly: "Endast nödvändiga",
   },
   pages: {
     about: {
@@ -355,7 +364,41 @@ export const sv = {
       },
       share: {
         title: "Vem vi delar med",
-        body: "Vi delar uppgifter endast med det lokala bageri som är kopplat till ert leveransområde, och bara det som behövs för leveransen (namn, adress, datum, antal personer). Vi säljer aldrig data, använder den inte för marknadsföring och överför den inte utanför EU/EES för behandling.",
+        body: "Vi delar uppgifter endast med det lokala bageri som är kopplat till ert leveransområde, och bara det som behövs för leveransen (namn, adress, datum, antal personer). Vi säljer aldrig kunddata och använder den inte för marknadsföring. Om du godkänner analys-cookies kan Google Analytics (Google) ta emot anonymiserad besöksstatistik; Google kan behandla data utanför EU/EES enligt sina villkor och standardavtal.",
+      },
+      cookies: {
+        title: "Cookies",
+        intro:
+          "Cookies är små textfiler som webbläsaren sparar. Vissa är nödvändiga för att sidan ska fungera; andra kräver ditt samtycke.",
+        tableHeaders: {
+          name: "Cookie / tjänst",
+          purpose: "Syfte",
+          consent: "Kräver samtycke",
+        },
+        items: [
+          {
+            name: "happysent_locale",
+            purpose: "Kommer ihåg ditt språkval (svenska eller engelska).",
+            consent: "Nej (nödvändig)",
+          },
+          {
+            name: "Supabase-auth",
+            purpose: "Håller dig inloggad i admin när du använder inloggning.",
+            consent: "Nej (nödvändig)",
+          },
+          {
+            name: "happysent_cookie_consent",
+            purpose: "Sparar ditt val i cookie-bannern.",
+            consent: "Nej (nödvändig)",
+          },
+          {
+            name: "Google Analytics (_ga, _ga_*)",
+            purpose: "Besöksstatistik när du godkänner analys-cookies.",
+            consent: "Ja",
+          },
+        ],
+        manage:
+          "Du kan när som helst ändra ditt val via länken Cookie-inställningar i sidfoten.",
       },
       retention: {
         title: "Lagringstid",

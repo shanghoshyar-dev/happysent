@@ -88,6 +88,42 @@ export default function IntegritetspolicyPage({ params }: Props) {
 
         <section>
           <h2 className="font-display text-2xl text-slate-900">
+            {p.cookies.title}
+          </h2>
+          <p className="mt-3">{p.cookies.intro}</p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[32rem] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-cream-200 text-left">
+                  <th className="py-2 pr-4 font-semibold text-slate-900">
+                    {p.cookies.tableHeaders.name}
+                  </th>
+                  <th className="py-2 pr-4 font-semibold text-slate-900">
+                    {p.cookies.tableHeaders.purpose}
+                  </th>
+                  <th className="py-2 font-semibold text-slate-900">
+                    {p.cookies.tableHeaders.consent}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {p.cookies.items.map((item) => (
+                  <tr key={item.name} className="border-b border-cream-100">
+                    <td className="py-3 pr-4 align-top font-medium text-slate-800">
+                      {item.name}
+                    </td>
+                    <td className="py-3 pr-4 align-top">{item.purpose}</td>
+                    <td className="py-3 align-top">{item.consent}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3">{p.cookies.manage}</p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl text-slate-900">
             {p.retention.title}
           </h2>
           <p className="mt-3">{p.retention.body}</p>
