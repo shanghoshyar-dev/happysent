@@ -25,15 +25,17 @@ function SubmitButton({
   rowCount: number;
 }) {
   const { pending } = useFormStatus();
-  const base = action === "add" ? "Skicka tillägg" : "Skicka borttagning";
+  const { messages } = useLocale();
+  const f = messages.forms.employee;
+  const base = action === "add" ? f.submitAdd : f.submitRemove;
   const label =
-    rowCount > 1 ? `${base} (${rowCount} personer)` : base;
+    rowCount > 1 ? `${base}${f.submitCountSuffix.replace("{count}", String(rowCount))}` : base;
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? (
         <span className="inline-flex items-center justify-center gap-2">
           <Spinner />
-          Skickar…
+          {f.sending}
         </span>
       ) : (
         label
@@ -44,6 +46,7 @@ function SubmitButton({
 
 export function EmployeeRequestForm({ className }: { className?: string }) {
   const { messages } = useLocale();
+  const f = messages.forms.employee;
   const [state, formAction] = useFormState(submitEmployeeRequest, initialState);
   const [action, setAction] = useState<"add" | "remove">("add");
   const [rowKeys, setRowKeys] = useState<string[]>(() => ["0"]);
@@ -56,12 +59,8 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
           className,
         )}
       >
-        <h2 className="font-display text-2xl text-slate-900">Tack!</h2>
-        <p className="text-slate-600">
-          Vi har tagit emot din förfrågan och skickat en bekräftelse till din
-          mejl. Ändringen granskas i vår kölista och görs i systemet när den är
-          godkänd, vanligtvis inom en arbetsdag.
-        </p>
+        <h2 className="font-display text-2xl text-slate-900">{f.successTitle}</h2>
+        <p className="text-slate-600">{f.successBody}</p>
       </div>
     );
   }
@@ -76,18 +75,17 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
     >
       <HoneypotField />
       <div className="shrink-0">
-        <h2 className="font-display text-2xl text-slate-900">
-          Lägg till eller ta bort anställd
-        </h2>
+        <h2 className="font-display text-2xl text-slate-900">{f.title}</h2>
         <p className="mt-2 text-sm text-slate-600">
-          Är ni redan kund? Skicka in ändringar i personalen här så uppdaterar
-          vi listan åt er. Ni kan ange <strong>flera personer i samma formulär</strong>.
+          {f.introBefore}
+          <strong>{f.introBold}</strong>
+          {f.introAfter}
         </p>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div>
-          <Label htmlFor="action_type">Åtgärd</Label>
+          <Label htmlFor="action_type">{f.actionLabel}</Label>
           <Select
             id="action_type"
             name="action_type"
@@ -95,22 +93,22 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
             onChange={(e) => setAction(e.target.value as "add" | "remove")}
             required
           >
-            <option value="add">Lägg till</option>
-            <option value="remove">Ta bort</option>
+            <option value="add">{f.actionAdd}</option>
+            <option value="remove">{f.actionRemove}</option>
           </Select>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Label htmlFor="company_name">Företagsnamn</Label>
+            <Label htmlFor="company_name">{f.companyName}</Label>
             <Input id="company_name" name="company_name" required />
           </div>
           <div className="sm:col-span-2">
-            <Label htmlFor="address">Adress</Label>
+            <Label htmlFor="address">{f.address}</Label>
             <Input id="address" name="address" required />
           </div>
           <div>
-            <Label htmlFor="postal_code">Postnummer</Label>
+            <Label htmlFor="postal_code">{f.postalCode}</Label>
             <Input
               id="postal_code"
               name="postal_code"
@@ -120,14 +118,14 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
             />
           </div>
           <div>
-            <Label htmlFor="city">Ort</Label>
+            <Label htmlFor="city">{f.city}</Label>
             <Input id="city" name="city" required autoComplete="address-level2" />
           </div>
         </div>
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <p className="text-sm font-medium text-slate-800">Anställda</p>
+            <p className="text-sm font-medium text-slate-800">{f.employeesHeading}</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
@@ -137,7 +135,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                   setRowKeys((keys) => [...keys, `${Date.now()}-${keys.length}`])
                 }
               >
-                + Lägg till rad
+                {f.addRow}
               </Button>
               <Button
                 type="button"
@@ -150,7 +148,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                   )
                 }
               >
-                Ta bort sista raden
+                {f.removeLastRow}
               </Button>
             </div>
           </div>
@@ -161,10 +159,10 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
               className="grid gap-4 rounded-2xl border border-candy-100 bg-candy-50/40 p-4 sm:grid-cols-2"
             >
               <p className="sm:col-span-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                Person {index + 1}
+                {f.personLabel.replace("{n}", String(index + 1))}
               </p>
               <div>
-                <Label htmlFor={`emp_first_${key}`}>Förnamn</Label>
+                <Label htmlFor={`emp_first_${key}`}>{f.firstName}</Label>
                 <Input
                   id={`emp_first_${key}`}
                   name="emp_first_name"
@@ -173,7 +171,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                 />
               </div>
               <div>
-                <Label htmlFor={`emp_last_${key}`}>Efternamn</Label>
+                <Label htmlFor={`emp_last_${key}`}>{f.lastName}</Label>
                 <Input
                   id={`emp_last_${key}`}
                   name="emp_last_name"
@@ -182,16 +180,14 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
                 />
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor={`emp_birth_${key}`}>Födelsedatum</Label>
+                <Label htmlFor={`emp_birth_${key}`}>{f.birthdate}</Label>
                 <Input
                   id={`emp_birth_${key}`}
                   name="emp_birthday"
                   type="date"
                   required
                 />
-                <p className="mt-1 text-xs text-slate-500">
-                  {messages.forms.employee.birthdateHint}
-                </p>
+                <p className="mt-1 text-xs text-slate-500">{f.birthdateHint}</p>
               </div>
             </div>
           ))}
@@ -199,9 +195,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
 
         {action === "add" && (
           <div className="max-w-md">
-            <Label htmlFor="number_of_people">
-              Antal personer på avdelningen
-            </Label>
+            <Label htmlFor="number_of_people">{f.deptSizeLabel}</Label>
             <Input
               id="number_of_people"
               name="number_of_people"
@@ -211,15 +205,12 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
               required
               inputMode="numeric"
             />
-            <p className="mt-1 text-xs text-slate-500">
-              Gäller er avdelning som helhet (samma värde för alla som läggs till
-              i detta ärende).
-            </p>
+            <p className="mt-1 text-xs text-slate-500">{f.deptSizeHint}</p>
           </div>
         )}
 
         <div>
-          <Label htmlFor="submitted_by_email">Din mejl (för bekräftelse)</Label>
+          <Label htmlFor="submitted_by_email">{f.confirmationEmail}</Label>
           <Input
             id="submitted_by_email"
             name="submitted_by_email"
@@ -230,7 +221,7 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col gap-2">
-          <Label htmlFor="employee-message">Meddelande (valfritt)</Label>
+          <Label htmlFor="employee-message">{f.messageOptional}</Label>
           <Textarea
             id="employee-message"
             name="message"
