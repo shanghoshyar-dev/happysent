@@ -18,52 +18,82 @@ declare global {
   }
 }
 
-function sendPageView(measurementId: string, path: string): void {
+function grantAnalyticsConsent(measurementId: string): void {
   if (!window.gtag) return;
-  window.gtag("config", measurementId, { page_path: path });
+  window.gtag("consent", "update", {
+    analytics_storage: "granted",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+  });
+  window.gtag("config", measurementId, { send_page_view: false });
+}
+
+function sendPageView(measurementId: string, path: string): void {
+  if (!window.gtag || !hasAnalyticsConsent()) return;
+  window.gtag("event", "page_view", {
+    page_path: path,
+    send_to: measurementId,
+  });
+}
+
+export function trackGaEvent(
+  name: string,
+  params?: Record<string, string | number | boolean>,
+): void {
+  if (!getGaMeasurementId() || !hasAnalyticsConsent() || !window.gtag) return;
+  window.gtag("event", name, params);
 }
 
 export function GoogleAnalytics() {
   const pathname = usePathname();
   const measurementId = getGaMeasurementId();
-  const [enabled, setEnabled] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [analyticsGranted, setAnalyticsGranted] = useState(false);
+
+  useEffect(() => {
+    if (!measurementId) return;
+
+    const check = () => {
+      if (typeof window.gtag === "function") {
+        setReady(true);
+      }
+    };
+    check();
+    const timer = window.setInterval(check, 50);
+    return () => window.clearInterval(timer);
+  }, [measurementId]);
 
   useEffect(() => {
     if (!measurementId) return;
 
     const sync = () => {
-      setEnabled(hasAnalyticsConsent());
+      const granted = hasAnalyticsConsent();
+      setAnalyticsGranted(granted);
+      if (granted && window.gtag) {
+        grantAnalyticsConsent(measurementId);
+      }
     };
 
     sync();
     window.addEventListener(COOKIE_CONSENT_CHANGED_EVENT, sync);
     return () => window.removeEventListener(COOKIE_CONSENT_CHANGED_EVENT, sync);
-  }, [measurementId]);
+  }, [measurementId, ready]);
 
   useEffect(() => {
-    if (!measurementId || !enabled || !pathname || !isAnalyticsPath(pathname)) {
+    if (
+      !measurementId ||
+      !ready ||
+      !analyticsGranted ||
+      !pathname ||
+      !isAnalyticsPath(pathname)
+    ) {
       return;
     }
+    sendPageView(measurementId, pathname);
+  }, [measurementId, ready, analyticsGranted, pathname]);
 
-    let cancelled = false;
-    const trySend = (attempt = 0) => {
-      if (cancelled) return;
-      if (window.gtag) {
-        sendPageView(measurementId, pathname);
-        return;
-      }
-      if (attempt < 20) {
-        window.setTimeout(() => trySend(attempt + 1), 50);
-      }
-    };
-    trySend();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [measurementId, enabled, pathname]);
-
-  if (!measurementId || !enabled) {
+  if (!measurementId) {
     return null;
   }
 
@@ -72,8 +102,9 @@ export function GoogleAnalytics() {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
+        onLoad={() => setReady(true)}
       />
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="gtag-consent-default" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -81,11 +112,14 @@ export function GoogleAnalytics() {
             analytics_storage: 'denied',
             ad_storage: 'denied',
             ad_user_data: 'denied',
-            ad_personalization: 'denied'
+            ad_personalization: 'denied',
+            wait_for_update: 500
           });
-          gtag('consent', 'update', { analytics_storage: 'granted' });
           gtag('js', new Date());
-          gtag('config', '${measurementId}', { send_page_view: false });
+          gtag('config', '${measurementId}', {
+            send_page_view: false,
+            anonymize_ip: true
+          });
         `}
       </Script>
     </>

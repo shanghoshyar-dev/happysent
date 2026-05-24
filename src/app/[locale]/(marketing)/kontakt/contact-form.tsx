@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 import { BrandName } from "@/components/brand-name";
+import { trackGaEvent } from "@/components/google-analytics";
 import { HoneypotField } from "@/components/marketing/honeypot-field";
 import { LocalizedLink } from "@/components/marketing/localized-link";
 import { useLocale } from "@/i18n/locale-provider";
@@ -39,6 +41,12 @@ export function ContactForm({ className }: { className?: string }) {
   const [state, formAction] = useFormState(submitContactForm, initialState);
   const { messages } = useLocale();
   const f = messages.forms.contact;
+
+  useEffect(() => {
+    if (state.status === "success") {
+      trackGaEvent("generate_lead", { form_name: "contact" });
+    }
+  }, [state.status]);
 
   if (state.status === "success") {
     return (

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
+import { trackGaEvent } from "@/components/google-analytics";
 import { HoneypotField } from "@/components/marketing/honeypot-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,12 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
   const [state, formAction] = useFormState(submitEmployeeRequest, initialState);
   const [action, setAction] = useState<"add" | "remove">("add");
   const [rowKeys, setRowKeys] = useState<string[]>(() => ["0"]);
+
+  useEffect(() => {
+    if (state.status === "success") {
+      trackGaEvent("generate_lead", { form_name: "employee_request" });
+    }
+  }, [state.status]);
 
   if (state.status === "success") {
     return (
