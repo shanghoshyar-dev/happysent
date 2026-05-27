@@ -47,6 +47,9 @@ export const metadata: Metadata = {
       "Automatiska födelsedagstårtor för företag i Malmö. Vi sköter påminnelser och leveranser.",
   },
   robots: { index: true, follow: true },
+  verification: {
+    google: "ZdSz2gV1QC1G8VAcz2bJ2ZSLH4_wvis6bz0q9WJBa_o",
+  },
 };
 
 export default function RootLayout({
