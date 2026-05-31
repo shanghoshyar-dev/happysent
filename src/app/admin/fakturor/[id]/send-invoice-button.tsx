@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function SendInvoiceButton({ id, billingEmail, sentAt }: Props) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
 
@@ -34,6 +36,7 @@ export function SendInvoiceButton({ id, billingEmail, sentAt }: Props) {
           startTransition(async () => {
             const result = await sendInvoiceToCustomer(id);
             if (result.ok) {
+              router.refresh();
               setMessage(`Skickad till ${billingEmail}.`);
             } else {
               setMessage(result.error ?? "Något gick fel.");

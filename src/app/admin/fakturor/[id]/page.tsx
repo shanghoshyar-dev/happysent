@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate, formatSek } from "@/lib/utils";
 
 import { DownloadInvoiceButton } from "./download-invoice-button";
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default async function InvoiceDetailPage({ params }: Props) {
-  const supabase = createClient();
+  const supabase = createAdminClient();
   const { data: invoice } = await supabase
     .from("invoices")
     .select(

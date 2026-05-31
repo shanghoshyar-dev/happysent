@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { generateInvoicesForMonth } from "./actions";
 
 export function GenerateInvoicesForm() {
+  const router = useRouter();
   const now = new Date();
   const defaultMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
   const [month, setMonth] = useState(defaultMonth);
@@ -20,10 +22,11 @@ export function GenerateInvoicesForm() {
     startTransition(async () => {
       try {
         const result = await generateInvoicesForMonth(month);
+        router.refresh();
         setMessage(
           result.invoices === 0
             ? "Inga beställningar att fakturera den här månaden."
-            : `Skapade/uppdaterade ${result.invoices} faktura(r).`,
+            : `Skapade/uppdaterade ${result.invoices} faktura(r). Listan uppdateras nedan — ladda ner PDF eller öppna fakturan och klicka «Skicka PDF till kund» (skickas inte automatiskt).`,
         );
       } catch (err) {
         setMessage(err instanceof Error ? err.message : "Något gick fel");

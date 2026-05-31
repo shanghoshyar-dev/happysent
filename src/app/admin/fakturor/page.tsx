@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSek } from "@/lib/utils";
 
 import { GenerateInvoicesForm } from "./generate-button";
@@ -13,8 +13,8 @@ import { GenerateInvoicesForm } from "./generate-button";
 export const dynamic = "force-dynamic";
 
 export default async function FakturorPage() {
-  const supabase = createClient();
-  const { data: invoices } = await supabase
+  const supabase = createAdminClient();
+  const { data: invoices, error } = await supabase
     .from("invoices")
     .select(
       "id, month, total_amount, status, sent_at, companies:company_id ( name )",
@@ -39,12 +39,18 @@ export default async function FakturorPage() {
         <p className="mb-4 text-sm text-slate-500">
           Sammanställer alla beställningar med status “Levererad” eller
           “Fakturerad” för vald månad och skapar (eller uppdaterar) en faktura
-          per företag.
+          per företag. Mejl skickas inte automatiskt — använd “Ladda ner” eller
+          öppna fakturan och klicka “Skicka PDF till kund”.
         </p>
         <GenerateInvoicesForm />
       </Card>
 
-      {!invoices || invoices.length === 0 ? (
+      {error ? (
+        <EmptyState
+          title="Kunde inte hämta fakturor"
+          description={error.message}
+        />
+      ) : !invoices || invoices.length === 0 ? (
         <EmptyState
           title="Inga fakturor ännu"
           description="Generera första månadens faktura med formuläret ovan."
