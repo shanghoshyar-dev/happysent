@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatSek } from "@/lib/utils";
 
 import { GenerateInvoicesForm } from "./generate-button";
+import { MarkPaidButton } from "./mark-paid-button";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,7 @@ export default async function FakturorPage() {
   const { data: invoices, error } = await supabase
     .from("invoices")
     .select(
-      "id, month, total_amount, status, sent_at, companies:company_id ( name )",
+      "id, month, total_amount, status, sent_at, orders, companies:company_id ( name )",
     )
     .order("month", { ascending: false });
 
@@ -63,12 +64,17 @@ export default async function FakturorPage() {
               <TH>Företag</TH>
               <TH>Belopp</TH>
               <TH>Status</TH>
+              <TH className="text-right">Betalning</TH>
               <TH className="text-right">PDF</TH>
             </TR>
           </THead>
           <TBody>
             {invoices.map((inv) => {
               const company = inv.companies as { name: string } | null;
+              const orderCount = Array.isArray(inv.orders)
+                ? (inv.orders as string[]).length
+                : 0;
+              const isPaid = inv.status === "paid";
               return (
                 <TR key={inv.id}>
                   <TD className="font-medium text-slate-900">
@@ -92,6 +98,14 @@ export default async function FakturorPage() {
                         Skickad
                       </span>
                     ) : null}
+                  </TD>
+                  <TD className="text-right">
+                    <MarkPaidButton
+                      id={inv.id}
+                      alreadyPaid={isPaid}
+                      orderCount={orderCount}
+                      compact
+                    />
                   </TD>
                   <TD className="text-right">
                     <a

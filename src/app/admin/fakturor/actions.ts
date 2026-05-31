@@ -12,7 +12,6 @@ import { loadInvoicePdfData } from "@/lib/invoices/load-invoice-data";
 import { sendCustomerInvoiceEmail } from "@/lib/resend/templates";
 import { creditDonationForPaidInvoice } from "@/lib/donation-fund";
 import { formatSek } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -77,19 +76,45 @@ export async function generateInvoicesForMonth(month: string) {
   return { invoices: count };
 }
 
-export async function markInvoicePaid(id: string) {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from("invoices")
-    .update({ status: "paid" })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
+export interface MarkInvoicePaidResult {
+  donationKr: number;
+  orderCount: number;
+}
 
-  await creditDonationForPaidInvoice(id);
+export async function markInvoicePaid(
+  id: string,
+): Promise<MarkInvoicePaidResult> {
+  const supabase = createAdminClient();
+
+  const { data: invoice, error: loadErr } = await supabase
+    .from("invoices")
+    .select("orders, status")
+    .eq("id", id)
+    .maybeSingle();
+  if (loadErr || !invoice) {
+    throw new Error(loadErr?.message ?? "Faktura hittades inte.");
+  }
+
+  const orderIds = Array.isArray(invoice.orders)
+    ? (invoice.orders as string[])
+    : [];
+  const orderCount = orderIds.length;
+
+  if (invoice.status !== "paid") {
+    const { error } = await supabase
+      .from("invoices")
+      .update({ status: "paid" })
+      .eq("id", id);
+    if (error) throw new Error(error.message);
+  }
+
+  const { amountKr } = await creditDonationForPaidInvoice(id);
 
   revalidatePath("/admin/fakturor");
   revalidatePath(`/admin/fakturor/${id}`);
   revalidatePath("/", "layout");
+
+  return { donationKr: amountKr, orderCount };
 }
 
 export interface SendInvoiceResult {

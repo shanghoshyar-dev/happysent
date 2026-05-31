@@ -10,7 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate, formatSek } from "@/lib/utils";
 
 import { DownloadInvoiceButton } from "./download-invoice-button";
-import { MarkPaidButton } from "./mark-paid-button";
+import { MarkPaidButton } from "../mark-paid-button";
 import { SendInvoiceButton } from "./send-invoice-button";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +47,15 @@ export default async function InvoiceDetailPage({ params }: Props) {
        employees:employee_id ( first_name, last_name )`,
     )
     .in("id", orderIds.length ? orderIds : ["00000000-0000-0000-0000-000000000000"]);
+
+  const { data: donation } =
+    invoice.status === "paid"
+      ? await supabase
+          .from("donation_contributions")
+          .select("amount_kr")
+          .eq("invoice_id", invoice.id)
+          .maybeSingle()
+      : { data: null };
 
   return (
     <div>
@@ -101,13 +110,21 @@ export default async function InvoiceDetailPage({ params }: Props) {
         </Card>
       </div>
 
-      <div className="mb-8 flex flex-wrap gap-3">
+      <div className="mb-8 flex flex-wrap items-start gap-3">
         <DownloadInvoiceButton invoiceId={invoice.id} />
         <SendInvoiceButton
           id={invoice.id}
           billingEmail={company?.billing_email ?? null}
           sentAt={sentAt}
         />
+        <div className="w-full sm:ml-auto sm:max-w-md">
+          <MarkPaidButton
+            id={invoice.id}
+            alreadyPaid={invoice.status === "paid"}
+            orderCount={orderIds.length}
+            donationKr={donation?.amount_kr ?? null}
+          />
+        </div>
       </div>
 
       <h2 className="mb-3 font-display text-xl text-slate-900">Rader</h2>
@@ -136,13 +153,6 @@ export default async function InvoiceDetailPage({ params }: Props) {
           })}
         </TBody>
       </Table>
-
-      <div className="mt-6">
-        <MarkPaidButton
-          id={invoice.id}
-          alreadyPaid={invoice.status === "paid"}
-        />
-      </div>
     </div>
   );
 }
