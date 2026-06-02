@@ -31,6 +31,14 @@ export default async function ForetagDetailPage({ params }: Props) {
 
   if (!company || !bakeries || !florists) notFound();
 
+  const { data: bakeryProducts } = await supabase
+    .from("products")
+    .select("id, name")
+    .eq("bakery_id", company.bakery_id)
+    .eq("is_active", true)
+    .order("sort_order")
+    .order("name");
+
   const updateAction = updateCompany.bind(null, company.id);
   const deleteAction = deleteCompany.bind(null, company.id);
 
@@ -50,6 +58,7 @@ export default async function ForetagDetailPage({ params }: Props) {
         <CompanyForm
           bakeries={bakeries}
           florists={florists}
+          bakeryProducts={bakeryProducts ?? []}
           company={company}
           action={updateAction}
           submitLabel="Spara ändringar"

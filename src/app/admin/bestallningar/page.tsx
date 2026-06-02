@@ -21,9 +21,10 @@ export default async function BestallningarPage() {
   const { data: orders } = await supabase
     .from("orders")
     .select(
-      `id, delivery_date, status, price,
+      `id, delivery_date, status, price, cake_selection_status,
        employees:employee_id ( first_name, last_name ),
-       companies:company_id ( name )`,
+       companies:company_id ( name ),
+       products:product_id ( name )`,
     )
     .order("delivery_date", { ascending: false })
     .limit(500);
@@ -33,6 +34,7 @@ export default async function BestallningarPage() {
       | { first_name: string; last_name: string }
       | null;
     const company = o.companies as { name: string } | null;
+    const product = o.products as { name: string } | null;
     const today = todayInStockholm();
     const daysAway = diffInDays(parseDateString(o.delivery_date), today);
     const canCancel =
@@ -45,6 +47,8 @@ export default async function BestallningarPage() {
       price: o.price,
       companyName: company?.name ?? "—",
       employeeName: emp ? `${emp.first_name} ${emp.last_name}` : "—",
+      productName: product?.name ?? null,
+      selectionStatus: o.cake_selection_status,
       canCancel,
     };
   });

@@ -32,6 +32,11 @@ function parsePricePerFlowers(formData: FormData): number | null {
   return n;
 }
 
+function parseDefaultProductId(formData: FormData): string | null {
+  const raw = String(formData.get("default_product_id") ?? "").trim();
+  return raw || null;
+}
+
 function parseFlowerPartnerFields(formData: FormData): {
   offers_flowers: boolean;
   florist_id: string | null;
@@ -100,6 +105,7 @@ async function createCompanyInternal(
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
     price_per_flowers: parsePricePerFlowers(formData),
+    default_product_id: parseDefaultProductId(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
   const {
@@ -211,6 +217,7 @@ export async function updateCompany(id: string, formData: FormData) {
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
     price_per_flowers: parsePricePerFlowers(formData),
+    default_product_id: parseDefaultProductId(formData),
     status: String(formData.get("status") ?? "active") as "active" | "paused",
   };
   const { error, strippedColumns } = await updateCompanyRow(

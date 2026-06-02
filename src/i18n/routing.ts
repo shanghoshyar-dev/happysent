@@ -30,7 +30,8 @@ export function isMarketingPath(pathname: string): boolean {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
-    pathname.startsWith("/api")
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/valja-tarta")
   ) {
     return false;
   }

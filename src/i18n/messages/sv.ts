@@ -123,6 +123,7 @@ export const sv = {
   footer: {
     privacy: "Integritetspolicy",
     terms: "Användarvillkor",
+    cakeCatalog: "Tårtkatalog (PDF)",
     cookieSettings: "Cookie-inställningar",
   },
   cookieBanner: {

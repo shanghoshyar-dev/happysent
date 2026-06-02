@@ -6,7 +6,7 @@ import {
 } from "@/components/admin/filterable-table";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatSek } from "@/lib/utils";
-import type { OrderStatus } from "@/types/database";
+import type { CakeSelectionStatus, OrderStatus } from "@/types/database";
 
 import { CancelOrderButton } from "./cancel-button";
 
@@ -36,7 +36,16 @@ export type OrderTableRow = {
   price: number;
   companyName: string;
   employeeName: string;
+  productName: string | null;
+  selectionStatus: CakeSelectionStatus;
   canCancel: boolean;
+};
+
+const SELECTION_LABELS: Record<CakeSelectionStatus, string> = {
+  pending: "Väntar val",
+  customer: "Kund valde",
+  auto: "Auto-val",
+  default: "Standard",
 };
 
 interface Props {
@@ -80,6 +89,29 @@ export function OrdersTable({ rows }: Props) {
       sortValue: (r) => r.price,
       searchText: (r) => String(r.price),
       cell: (r) => formatSek(r.price),
+    },
+    {
+      id: "cake",
+      header: "Tårta",
+      sortable: true,
+      sortValue: (r) => r.productName ?? "",
+      searchText: (r) =>
+        [r.productName, SELECTION_LABELS[r.selectionStatus]]
+          .filter(Boolean)
+          .join(" "),
+      cell: (r) =>
+        r.productName ? (
+          <span>
+            {r.productName}
+            <span className="ml-1 text-xs text-slate-500">
+              ({SELECTION_LABELS[r.selectionStatus]})
+            </span>
+          </span>
+        ) : (
+          <span className="text-slate-400">
+            {SELECTION_LABELS[r.selectionStatus]}
+          </span>
+        ),
     },
     {
       id: "status",

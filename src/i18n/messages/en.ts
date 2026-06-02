@@ -126,6 +126,7 @@ export const en: Messages = {
   footer: {
     privacy: "Privacy policy",
     terms: "Terms and conditions",
+    cakeCatalog: "Cake catalog (PDF)",
     cookieSettings: "Cookie settings",
   },
   cookieBanner: {

@@ -5,6 +5,13 @@ import {
   shouldProcessDelivery,
   type GiftType,
 } from "@/lib/celebrations";
+import { CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE } from "@/lib/cake-selection/constants";
+import {
+  applyAutoPickToOrder,
+  getOrderProductName,
+} from "@/lib/cake-selection/auto-pick";
+import { selectionDeadlineFromDelivery } from "@/lib/cake-selection/deadline";
+import { cakeSelectionUrl } from "@/lib/cake-selection/selection-url";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { diffInDays } from "@/lib/holidays/swedish";
 import {
@@ -94,7 +101,9 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
         const deliveryIso = delivery.deliveryIso;
         const daysAway = diffInDays(delivery.deliveryDate, today);
 
-        if (![14, 7, 1, 0].includes(daysAway)) continue;
+        if (![14, CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE, 7, 1, 0].includes(daysAway)) {
+          continue;
+        }
 
         if (giftType === "cake") {
           if (!company.bakeries) {
@@ -123,7 +132,18 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
         });
         if (order.created) result.ordersUpserted++;
 
-        const actions: ReminderAction[] = buildActions({
+        if (
+          daysAway === CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE &&
+          giftType === "cake"
+        ) {
+          await applyAutoPickToOrder(order.id);
+        }
+
+        if (daysAway === 7 && giftType === "cake") {
+          await applyAutoPickToOrder(order.id);
+        }
+
+        const actions: ReminderAction[] = await buildActions({
           daysAway,
           company,
           bakery: company.bakeries,
@@ -131,6 +151,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           giftType,
           emp,
           deliveryIso,
+          orderId: order.id,
+          selectionToken: order.selectionToken,
         });
 
         for (const action of actions) {
@@ -204,6 +226,7 @@ interface CompanyJoin {
 
 interface OrderRow {
   id: string;
+  selectionToken: string;
   created: boolean;
 }
 
@@ -217,15 +240,30 @@ async function ensureOrder(args: {
 }): Promise<OrderRow> {
   const { supabase, employeeId, companyId, deliveryIso, price, giftType } = args;
 
+  const deadline =
+    giftType === "cake" ? selectionDeadlineFromDelivery(deliveryIso) : null;
+
   const { data: existing, error: selErr } = await supabase
     .from("orders")
-    .select("id")
+    .select("id, selection_token, selection_deadline")
     .eq("employee_id", employeeId)
     .eq("delivery_date", deliveryIso)
     .maybeSingle();
 
   if (selErr) throw new Error(`Lookup order failed: ${selErr.message}`);
-  if (existing) return { id: existing.id, created: false };
+  if (existing) {
+    if (giftType === "cake" && deadline && !existing.selection_deadline) {
+      await supabase
+        .from("orders")
+        .update({ selection_deadline: deadline })
+        .eq("id", existing.id);
+    }
+    return {
+      id: existing.id,
+      selectionToken: existing.selection_token,
+      created: false,
+    };
+  }
 
   const { data: inserted, error: insErr } = await supabase
     .from("orders")
@@ -236,14 +274,19 @@ async function ensureOrder(args: {
       price,
       gift_type: giftType,
       status: "scheduled",
+      selection_deadline: deadline,
     })
-    .select("id")
+    .select("id, selection_token")
     .single();
 
   if (insErr || !inserted) {
     throw new Error(`Insert order failed: ${insErr?.message ?? "no row"}`);
   }
-  return { id: inserted.id, created: true };
+  return {
+    id: inserted.id,
+    selectionToken: inserted.selection_token,
+    created: true,
+  };
 }
 
 async function reminderAlreadySent(
@@ -261,7 +304,7 @@ async function reminderAlreadySent(
   return !!data;
 }
 
-function buildActions(args: {
+async function buildActions(args: {
   daysAway: number;
   company: CompanyJoin;
   bakery: Partner | null;
@@ -274,8 +317,20 @@ function buildActions(args: {
     number_of_people: number;
   };
   deliveryIso: string;
-}): ReminderAction[] {
-  const { daysAway, company, bakery, florist, giftType, emp, deliveryIso } = args;
+  orderId: string;
+  selectionToken: string;
+}): Promise<ReminderAction[]> {
+  const {
+    daysAway,
+    company,
+    bakery,
+    florist,
+    giftType,
+    emp,
+    deliveryIso,
+    orderId,
+    selectionToken,
+  } = args;
   const baseCompany = {
     to: company.contact_email,
     companyName: company.name,
@@ -304,8 +359,9 @@ function buildActions(args: {
       : bakery
         ? {
             type: "7_days_bakery" as const,
-            send: () =>
-              send7DayBakery({
+            send: async () => {
+              const productName = await getOrderProductName(orderId);
+              return send7DayBakery({
                 to: bakery.email,
                 bakeryName: bakery.name,
                 companyName: company.name,
@@ -316,7 +372,9 @@ function buildActions(args: {
                 employeeLastName: emp.last_name,
                 deliveryDate: deliveryIso,
                 numberOfPeople: emp.number_of_people,
-              }),
+                productName,
+              });
+            },
           }
         : null;
 
@@ -325,7 +383,13 @@ function buildActions(args: {
       return [
         {
           type: "14_days",
-          send: () => send14DayCompany(baseCompany),
+          send: () =>
+            send14DayCompany({
+              ...baseCompany,
+              includeCakeSelection: giftType === "cake",
+              selectionUrl: cakeSelectionUrl(selectionToken),
+              selectionDeadline: selectionDeadlineFromDelivery(deliveryIso),
+            }),
         },
       ];
     case 7: {

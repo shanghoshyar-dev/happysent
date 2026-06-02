@@ -39,6 +39,14 @@ export function MarketingFooter() {
           <LocalizedLink href="/kontakt" className="hover:text-candy-600">
             {messages.nav.contact}
           </LocalizedLink>
+          <a
+            href="/marketing/tartkatalog.pdf"
+            className="hover:text-candy-600"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {messages.footer.cakeCatalog}
+          </a>
           <LocalizedLink
             href="/integritetspolicy"
             className="hover:text-candy-600"

@@ -1,5 +1,9 @@
 import "server-only";
 
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
 import { formatOrganizationNumber } from "@/lib/organization-number";
 import { formatSek } from "@/lib/utils";
 import { getResend } from "@/lib/resend/client";
@@ -43,21 +47,59 @@ interface BaseArgs {
 // 1) 14 days before — to company
 export interface FourteenDayCompanyArgs extends BaseArgs {
   to: string;
+  selectionUrl: string;
+  selectionDeadline: string;
+  includeCakeSelection: boolean;
 }
+
+async function loadCatalogPdfBase64(): Promise<string | null> {
+  try {
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "marketing",
+      "tartkatalog.pdf",
+    );
+    const buf = await readFile(filePath);
+    return buf.toString("base64");
+  } catch {
+    return null;
+  }
+}
+
 export async function send14DayCompany(a: FourteenDayCompanyArgs) {
-  const subject = `🎂 ${a.employeeFirstName} fyller år om två veckor!`;
-  const text =
+  const subject = `🎂 ${a.employeeFirstName} fyller år om två veckor – välj tårta`;
+  const deadlineLabel = formatDeadlineSv(a.selectionDeadline);
+
+  let text =
     `Hej ${a.companyName}!\n\n` +
-    `Vi vill påminna om att ${a.employeeFirstName} ${a.employeeLastName} fyller år om 14 dagar, den ${formatSwedishDate(a.deliveryDate)}.\n\n` +
-    `En tårta är bokad och levereras automatiskt den dagen.\n` +
-    `Ni behöver inte göra någonting!\n\n` +
-    `Hälsningar,\nHappySent`;
+    `Vi vill påminna om att ${a.employeeFirstName} ${a.employeeLastName} fyller år om 14 dagar, den ${formatSwedishDate(a.deliveryDate)}.\n\n`;
+
+  if (a.includeCakeSelection) {
+    text +=
+      `Välj vilken tårta ni vill ha senast ${deadlineLabel} (5 dagar):\n` +
+      `${a.selectionUrl}\n\n` +
+      `Tårtkatalogen finns bifogad som PDF. Om ni inte hinner välja väljer HappySent åt er utifrån ert företags storlek och tidigare beställningar.\n\n`;
+  } else {
+    text +=
+      `En tårta är bokad och levereras automatiskt den dagen.\n` +
+      `Ni behöver inte göra någonting!\n\n`;
+  }
+
+  text += `Hälsningar,\nHappySent`;
+
+  const catalogPdf = a.includeCakeSelection
+    ? await loadCatalogPdfBase64()
+    : null;
 
   return getResend().emails.send({
     from: await mailFrom(),
     to: a.to,
     subject,
     text,
+    attachments: catalogPdf
+      ? [{ filename: "HappySent-tartkatalog.pdf", content: catalogPdf }]
+      : undefined,
   });
 }
 
@@ -73,6 +115,7 @@ export interface SevenDayBakeryArgs {
   employeeLastName: string;
   deliveryDate: string;
   numberOfPeople: number;
+  productName?: string | null;
 }
 export async function send7DayBakery(a: SevenDayBakeryArgs) {
   const subject = `Beställning – Tårta till ${a.companyName} den ${formatSwedishDate(a.deliveryDate)}`;
@@ -90,6 +133,7 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
     `Leveransadress:   ${deliveryAddress}\n` +
     `Kontakt telefon:  ${contactTel}\n` +
     `Antal personer:   ${a.numberOfPeople}\n` +
+    (a.productName ? `Tårta:            ${a.productName}\n` : "") +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
     `Skicka faktura till: ${await adminInbox()}\n\n` +
     `Tack!\nHappySent`;

@@ -7,6 +7,7 @@ import type { Tables } from "@/types/database";
 export interface CompanyFormProps {
   bakeries: Pick<Tables<"bakeries">, "id" | "name" | "city">[];
   florists: Pick<Tables<"florists">, "id" | "name" | "city">[];
+  bakeryProducts?: Pick<Tables<"products">, "id" | "name">[];
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
@@ -27,6 +28,7 @@ export interface CompanyFormProps {
 export function CompanyForm({
   bakeries,
   florists,
+  bakeryProducts = [],
   company,
   action,
   submitLabel,
@@ -151,6 +153,26 @@ export function CompanyForm({
           }
         />
       </div>
+      {bakeryProducts.length > 0 ? (
+        <div className="md:col-span-2">
+          <Label htmlFor="default_product_id">Standardtårta (valfritt)</Label>
+          <Select
+            id="default_product_id"
+            name="default_product_id"
+            defaultValue={company?.default_product_id ?? ""}
+          >
+            <option value="">Ingen standard — HappySent väljer vid behov</option>
+            {bakeryProducts.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
+          <p className="mt-1 text-xs text-slate-500">
+            Används om kunden inte hinner välja inom 5 dagar efter 14-dagarsmejlet.
+          </p>
+        </div>
+      ) : null}
       <div>
         <Label htmlFor="price_per_cake">Pris per tårta (SEK)</Label>
         <Input

@@ -11,14 +11,20 @@ interface Props {
   id: string;
   name: string;
   isActive: boolean;
+  subtitle?: string;
 }
 
-export function ProductRow({ id, name, isActive }: Props) {
+export function ProductRow({ id, name, isActive, subtitle }: Props) {
   const [pending, startTransition] = useTransition();
   return (
     <div className="flex items-center justify-between rounded-xl border border-candy-100 bg-white px-4 py-3">
       <div className="flex items-center gap-3">
-        <span className="font-medium text-slate-900">{name}</span>
+        <div>
+          <span className="font-medium text-slate-900">{name}</span>
+          {subtitle ? (
+            <p className="text-xs text-slate-500">{subtitle}</p>
+          ) : null}
+        </div>
         <Badge tone={isActive ? "success" : "neutral"}>
           {isActive ? "Aktiv" : "Inaktiv"}
         </Badge>

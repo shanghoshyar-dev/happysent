@@ -42,6 +42,7 @@ export type ReminderType =
 
 export type CelebrationFrequency = "every_year" | "twice_yearly" | "decade";
 export type GiftType = "cake" | "flowers";
+export type CakeSelectionStatus = "pending" | "customer" | "auto" | "default";
 
 export type Database = {
   public: {
@@ -226,6 +227,7 @@ export type Database = {
           florist_id: string | null;
           price_per_cake: number;
           price_per_flowers: number | null;
+          default_product_id: string | null;
           status: CompanyStatus;
           created_at: string;
         };
@@ -242,6 +244,7 @@ export type Database = {
           florist_id?: string | null;
           price_per_cake: number;
           price_per_flowers?: number | null;
+          default_product_id?: string | null;
           status?: CompanyStatus;
           created_at?: string;
         };
@@ -258,6 +261,7 @@ export type Database = {
           florist_id?: string | null;
           price_per_cake?: number;
           price_per_flowers?: number | null;
+          default_product_id?: string | null;
           status?: CompanyStatus;
           created_at?: string;
         };
@@ -393,6 +397,11 @@ export type Database = {
           status: OrderStatus;
           price: number;
           gift_type: GiftType;
+          product_id: string | null;
+          selection_token: string;
+          selection_deadline: string | null;
+          cake_selection_status: CakeSelectionStatus;
+          selected_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -403,6 +412,11 @@ export type Database = {
           status?: OrderStatus;
           price: number;
           gift_type?: GiftType;
+          product_id?: string | null;
+          selection_token?: string;
+          selection_deadline?: string | null;
+          cake_selection_status?: CakeSelectionStatus;
+          selected_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -413,6 +427,11 @@ export type Database = {
           status?: OrderStatus;
           price?: number;
           gift_type?: GiftType;
+          product_id?: string | null;
+          selection_token?: string;
+          selection_deadline?: string | null;
+          cake_selection_status?: CakeSelectionStatus;
+          selected_at?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -428,6 +447,13 @@ export type Database = {
             columns: ["company_id"];
             isOneToOne: false;
             referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
             referencedColumns: ["id"];
           },
         ];
@@ -520,18 +546,44 @@ export type Database = {
           id: string;
           name: string;
           is_active: boolean;
+          bakery_id: string | null;
+          description: string | null;
+          dietary_notes: string | null;
+          min_people: number | null;
+          max_people: number | null;
+          sort_order: number;
         };
         Insert: {
           id?: string;
           name: string;
           is_active?: boolean;
+          bakery_id?: string | null;
+          description?: string | null;
+          dietary_notes?: string | null;
+          min_people?: number | null;
+          max_people?: number | null;
+          sort_order?: number;
         };
         Update: {
           id?: string;
           name?: string;
           is_active?: boolean;
+          bakery_id?: string | null;
+          description?: string | null;
+          dietary_notes?: string | null;
+          min_people?: number | null;
+          max_people?: number | null;
+          sort_order?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "products_bakery_id_fkey";
+            columns: ["bakery_id"];
+            isOneToOne: false;
+            referencedRelation: "bakeries";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       logs: {
         Row: {
