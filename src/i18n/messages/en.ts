@@ -463,8 +463,9 @@ export const en: Messages = {
       name: "Name",
       company: "Company",
       organizationNumber: "Organization number",
-      organizationNumberPlaceholder: "e.g. 556123-4567",
-      organizationNumberHint: "Ten digits (XXXXXX-XXXX).",
+      organizationNumberPlaceholder: "e.g. 556123-4567 or personal ID",
+      organizationNumberHint:
+        "All Swedish company forms (Ltd, partnership, sole trader, etc.) — 10 digits (XXXXXX-XXXX). Sole traders may use a personal ID with or without century (12 digits).",
       email: "Email",
       phone: "Phone",
       phoneHint: "So we can reach you quickly about your request.",

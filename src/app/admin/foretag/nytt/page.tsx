@@ -94,13 +94,13 @@ export default async function NyttForetagPage({
             </p>
           ) : null}
           <p className="mt-2 text-slate-600">
-            Fyll i adress, stad och bageri nedan. När du sparas flyttas kunden
-            från kön till aktiva företag.
+            Fyll i adress, stad och bageri nedan. Efter sparning kan du lägga in
+            anställda och skicka välkomstmejl — inget mejl går till kunden förrän
+            du gjort det.
             {applicationPrefill.hasEmployeesExcel ? (
               <>
                 {" "}
-                De bifogade Excel-raderna för personal läggs in automatiskt vid
-                godkännande (samma mall som under Anställda).
+                Bifogad Excel kan importeras på nästa steg.
               </>
             ) : null}
           </p>

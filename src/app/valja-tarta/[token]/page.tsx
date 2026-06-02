@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BrandLogo } from "@/components/marketing/brand-logo";
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
+import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
@@ -22,7 +23,7 @@ export default async function ValjaTartaPage({ params }: Props) {
       `
       id, delivery_date, gift_type, cake_selection_status, selection_deadline, product_id,
       employees:employee_id ( first_name, last_name ),
-      companies:company_id ( name, bakery_id ),
+      companies:company_id ( name, city, bakery_id ),
       products:product_id ( name )
     `,
     )
@@ -33,27 +34,31 @@ export default async function ValjaTartaPage({ params }: Props) {
     notFound();
   }
 
-  const company = order.companies as { name: string; bakery_id: string } | null;
+  const company = order.companies as {
+    name: string;
+    city: string;
+    bakery_id: string;
+  } | null;
   const emp = order.employees as
     | { first_name: string; last_name: string }
     | null;
   const chosen = order.products as { name: string } | null;
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id, name, dietary_notes")
-    .eq("bakery_id", company?.bakery_id ?? "")
-    .eq("is_active", true)
-    .order("sort_order")
-    .order("name");
+  const products = company?.city
+    ? await getSelectableProductsForCity(
+        company.city,
+        company.bakery_id ?? null,
+      )
+    : [];
 
-  if (!products?.length) {
+  if (!products.length) {
     return (
       <main className="min-h-screen bg-cream px-6 py-12">
         <div className="mx-auto max-w-lg text-center">
           <BrandLogo className="justify-center" />
           <p className="mt-6 text-slate-600">
-            Sortimentet är inte konfigurerat än. Kontakta HappySent på{" "}
+            Tårtsortimentet för {company?.city ? company.city : "er stad"} är inte
+            konfigurerat än. Kontakta HappySent på{" "}
             <a href="mailto:info@happysent.com" className="text-coral-600">
               info@happysent.com
             </a>

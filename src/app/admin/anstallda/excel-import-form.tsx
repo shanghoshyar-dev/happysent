@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -16,17 +17,28 @@ interface Company {
 interface Props {
   companies: Company[];
   defaultCompanyId?: string;
+  lockCompanyId?: string;
 }
 
-export function ExcelImportForm({ companies, defaultCompanyId }: Props) {
+export function ExcelImportForm({
+  companies,
+  defaultCompanyId,
+  lockCompanyId,
+}: Props) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [result, setResult] = useState<ExcelImportResult | null>(null);
+  const companyId = lockCompanyId ?? defaultCompanyId ?? "";
 
   async function action(formData: FormData) {
     setResult(null);
+    if (lockCompanyId) {
+      formData.set("company_id", lockCompanyId);
+    }
     startTransition(async () => {
       const r = await importEmployeesExcel(formData);
       setResult(r);
+      if (r.ok) router.refresh();
     });
   }
 
@@ -50,24 +62,28 @@ export function ExcelImportForm({ companies, defaultCompanyId }: Props) {
       </div>
 
       <form action={action} className="grid gap-4 sm:grid-cols-[1fr,1fr,auto]">
-        <div>
-          <Label htmlFor="import_company_id">Företag</Label>
-          <Select
-            id="import_company_id"
-            name="company_id"
-            defaultValue={defaultCompanyId ?? ""}
-            required
-          >
-            <option value="" disabled>
-              Välj företag...
-            </option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
+        {lockCompanyId ? (
+          <input type="hidden" name="company_id" value={lockCompanyId} />
+        ) : (
+          <div>
+            <Label htmlFor="import_company_id">Företag</Label>
+            <Select
+              id="import_company_id"
+              name="company_id"
+              defaultValue={companyId}
+              required
+            >
+              <option value="" disabled>
+                Välj företag...
               </option>
-            ))}
-          </Select>
-        </div>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
         <div>
           <Label htmlFor="import_file">Excel-fil</Label>
           <input

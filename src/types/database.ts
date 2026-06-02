@@ -229,6 +229,7 @@ export type Database = {
           price_per_flowers: number | null;
           default_product_id: string | null;
           status: CompanyStatus;
+          welcome_email_sent_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -246,6 +247,7 @@ export type Database = {
           price_per_flowers?: number | null;
           default_product_id?: string | null;
           status?: CompanyStatus;
+          welcome_email_sent_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -263,6 +265,7 @@ export type Database = {
           price_per_flowers?: number | null;
           default_product_id?: string | null;
           status?: CompanyStatus;
+          welcome_email_sent_at?: string | null;
           created_at?: string;
         };
         Relationships: [

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,22 +18,31 @@ interface CompanyOption {
 interface NewEmployeeFormProps {
   companies: CompanyOption[];
   defaultCompanyId?: string;
+  /** Dölj företagsväljare — används vid aktivering efter godkänd ansökan. */
+  lockCompanyId?: string;
 }
 
 export function NewEmployeeForm({
   companies,
   defaultCompanyId,
+  lockCompanyId,
 }: NewEmployeeFormProps) {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const companyId = lockCompanyId ?? defaultCompanyId ?? companies[0]?.id;
 
   async function action(formData: FormData) {
     setPending(true);
     setError(null);
     try {
+      if (lockCompanyId) {
+        formData.set("company_id", lockCompanyId);
+      }
       await createEmployee(formData);
       formRef.current?.reset();
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Något gick fel");
     } finally {
@@ -50,21 +60,25 @@ export function NewEmployeeForm({
 
   return (
     <form ref={formRef} action={action} className="grid gap-4 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <Label htmlFor="company_id">Företag</Label>
-        <Select
-          id="company_id"
-          name="company_id"
-          required
-          defaultValue={defaultCompanyId ?? companies[0].id}
-        >
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-      </div>
+      {lockCompanyId ? (
+        <input type="hidden" name="company_id" value={lockCompanyId} />
+      ) : (
+        <div className="md:col-span-2">
+          <Label htmlFor="company_id">Företag</Label>
+          <Select
+            id="company_id"
+            name="company_id"
+            required
+            defaultValue={companyId}
+          >
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
       <div>
         <Label htmlFor="first_name">Förnamn</Label>
         <Input id="first_name" name="first_name" required />

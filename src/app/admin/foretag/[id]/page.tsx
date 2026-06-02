@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteCompany, updateCompany } from "../actions";
@@ -19,7 +20,13 @@ export default async function ForetagDetailPage({ params }: Props) {
   const supabase = createClient();
   const [{ data: company }, { data: bakeries }, { data: florists }, { data: employees }] =
     await Promise.all([
-      supabase.from("companies").select("*").eq("id", params.id).maybeSingle(),
+      supabase
+        .from("companies")
+        .select(
+          "*, welcome_email_sent_at",
+        )
+        .eq("id", params.id)
+        .maybeSingle(),
       supabase.from("bakeries").select("id, name, city").order("name"),
       supabase.from("florists").select("id, name, city").order("name"),
       supabase
@@ -31,13 +38,11 @@ export default async function ForetagDetailPage({ params }: Props) {
 
   if (!company || !bakeries || !florists) notFound();
 
-  const { data: bakeryProducts } = await supabase
-    .from("products")
-    .select("id, name")
-    .eq("bakery_id", company.bakery_id)
-    .eq("is_active", true)
-    .order("sort_order")
-    .order("name");
+  const cityProducts = await getSelectableProductsForCity(
+    company.city,
+    company.bakery_id,
+  );
+  const bakeryProducts = cityProducts.map((p) => ({ id: p.id, name: p.name }));
 
   const updateAction = updateCompany.bind(null, company.id);
   const deleteAction = deleteCompany.bind(null, company.id);
@@ -48,9 +53,16 @@ export default async function ForetagDetailPage({ params }: Props) {
         title={company.name}
         description="Redigera företagets uppgifter eller ta bort dem helt."
         action={
-          <Link href="/admin/foretag">
-            <Button variant="secondary">Tillbaka</Button>
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {!company.welcome_email_sent_at ? (
+              <Link href={`/admin/foretag/${company.id}/aktivera`}>
+                <Button>Lägg till anställda / välkomstmejl</Button>
+              </Link>
+            ) : null}
+            <Link href="/admin/foretag">
+              <Button variant="secondary">Tillbaka</Button>
+            </Link>
+          </div>
         }
       />
 

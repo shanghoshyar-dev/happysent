@@ -267,7 +267,7 @@ export async function submitContactForm(
     return {
       status: "error",
       message:
-        "Organisationsnumret ser inte giltigt ut. Ange 10 siffror (t.ex. 556123-4567).",
+        "Organisationsnumret ser inte giltigt ut. Ange 10 siffror (t.ex. 556123-4567) eller personnummer för enskild firma.",
     };
   }
   if (!isValidEmail(email)) {

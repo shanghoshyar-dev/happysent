@@ -4,7 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export type CreateCompanyResult =
+  | { ok: true; companyId: string; redirectTo: "aktivera" | "list" }
+  | { ok: false; error: string };
+
+export type SendWelcomeEmailResult =
   | { ok: true }
+  | { ok: false; error: string };
+
+export type ImportApplicationExcelResult =
+  | { ok: true; imported: number }
   | { ok: false; error: string };
 
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
@@ -72,12 +80,11 @@ async function createCompanyInternal(
 ): Promise<CreateCompanyResult> {
   const supabase = createClient();
   const applicationId = String(formData.get("application_id") ?? "").trim();
-  let excelStoragePath: string | null = null;
 
   if (applicationId) {
     const { data: pending, error: pendErr } = await supabase
       .from("company_applications")
-      .select("id, employees_import_storage_path")
+      .select("id")
       .eq("id", applicationId)
       .eq("status", "pending")
       .maybeSingle();
@@ -89,7 +96,6 @@ async function createCompanyInternal(
           "Förfrågan finns inte eller är redan hanterad. Uppdatera sidan.",
       };
     }
-    excelStoragePath = pending.employees_import_storage_path ?? null;
   }
 
   const flowers = parseFlowerPartnerFields(formData);
@@ -124,81 +130,161 @@ async function createCompanyInternal(
   if (error) {
     return { ok: false, error: error.message ?? "Kunde inte spara företaget." };
   }
-
-  const admin = createAdminClient();
-
-  if (excelStoragePath && created?.id) {
-    const { data: bin, error: dlErr } = await admin.storage
-      .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
-      .download(excelStoragePath);
-
-    if (dlErr || !bin) {
-      await supabase.from("companies").delete().eq("id", created.id);
-      return {
-        ok: false,
-        error: `Kunde inte hämta bifogad Excel: ${dlErr?.message ?? "saknad fil"}`,
-      };
-    }
-
-    const buf = await bin.arrayBuffer();
-    const importResult = await importEmployeesExcelBuffer(
-      supabase,
-      created.id,
-      buf,
-    );
-
-    const importFailed =
-      !importResult.ok ||
-      importResult.globalError ||
-      importResult.imported < 1;
-
-    if (importFailed) {
-      await supabase.from("companies").delete().eq("id", created.id);
-      const detail =
-        importResult.globalError ??
-        (importResult.imported < 1
-          ? "Excel innehöll inga giltiga rader att importera."
-          : "Importen misslyckades.");
-      return { ok: false, error: detail };
-    }
-
-    await admin.storage
-      .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
-      .remove([excelStoragePath]);
-
-    revalidatePath("/admin/anstallda");
+  if (!created?.id) {
+    return { ok: false, error: "Företaget skapades men inget id returnerades." };
   }
 
-  if (applicationId && created?.id) {
+  if (applicationId) {
     const { error: upErr } = await supabase
       .from("company_applications")
       .update({
         status: "approved",
         processed_at: new Date().toISOString(),
         created_company_id: created.id,
-        employees_import_storage_path: null,
       })
       .eq("id", applicationId)
       .eq("status", "pending");
     if (upErr) {
       console.error("[createCompany] kunde inte markera ansökan godkänd:", upErr);
     }
-  }
 
-  // Fire-and-forget welcome email — don't block navigation if it fails.
-  if (payload.contact_email) {
-    try {
-      await sendCompanyWelcome({
-        to: payload.contact_email,
-        companyName: payload.name,
-      });
-    } catch (err) {
-      console.error("[createCompany] welcome email failed:", err);
-    }
+    revalidatePath("/admin/foretag");
+    revalidatePath("/admin/kolista");
+    return {
+      ok: true,
+      companyId: created.id,
+      redirectTo: "aktivera",
+    };
   }
 
   revalidatePath("/admin/foretag");
   revalidatePath("/admin/kolista");
+  return {
+    ok: true,
+    companyId: created.id,
+    redirectTo: "list",
+  };
+}
+
+export async function importApplicationEmployeesExcel(
+  companyId: string,
+): Promise<ImportApplicationExcelResult> {
+  const supabase = createClient();
+  const admin = createAdminClient();
+
+  const { data: app, error: appErr } = await supabase
+    .from("company_applications")
+    .select("id, employees_import_storage_path")
+    .eq("created_company_id", companyId)
+    .not("employees_import_storage_path", "is", null)
+    .maybeSingle();
+
+  if (appErr) return { ok: false, error: appErr.message };
+  const path = app?.employees_import_storage_path;
+  if (!path) {
+    return { ok: false, error: "Ingen bifogad Excel finns kvar för den här ansökan." };
+  }
+
+  const { data: bin, error: dlErr } = await admin.storage
+    .from(COMPANY_APPLICATION_UPLOADS_BUCKET)
+    .download(path);
+
+  if (dlErr || !bin) {
+    return {
+      ok: false,
+      error: `Kunde inte hämta Excel: ${dlErr?.message ?? "saknad fil"}`,
+    };
+  }
+
+  const importResult = await importEmployeesExcelBuffer(
+    supabase,
+    companyId,
+    await bin.arrayBuffer(),
+  );
+
+  if (!importResult.ok || importResult.globalError) {
+    return {
+      ok: false,
+      error: importResult.globalError ?? "Importen misslyckades.",
+    };
+  }
+  if (importResult.imported < 1) {
+    return {
+      ok: false,
+      error: "Excel innehöll inga giltiga rader att importera.",
+    };
+  }
+
+  await admin.storage.from(COMPANY_APPLICATION_UPLOADS_BUCKET).remove([path]);
+  await supabase
+    .from("company_applications")
+    .update({ employees_import_storage_path: null })
+    .eq("id", app.id);
+
+  revalidatePath("/admin/anstallda");
+  revalidatePath(`/admin/foretag/${companyId}/aktivera`);
+  return { ok: true, imported: importResult.imported };
+}
+
+export async function sendCompanyWelcomeEmail(
+  companyId: string,
+): Promise<SendWelcomeEmailResult> {
+  const supabase = createClient();
+
+  const { data: company, error: coErr } = await supabase
+    .from("companies")
+    .select("id, name, contact_email, welcome_email_sent_at")
+    .eq("id", companyId)
+    .maybeSingle();
+
+  if (coErr || !company) {
+    return { ok: false, error: "Företaget hittades inte." };
+  }
+  if (company.welcome_email_sent_at) {
+    return { ok: false, error: "Välkomstmejlet är redan skickat." };
+  }
+  if (!company.contact_email?.trim()) {
+    return { ok: false, error: "Företaget saknar kontaktmejl." };
+  }
+
+  const { count, error: countErr } = await supabase
+    .from("employees")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", companyId);
+
+  if (countErr) return { ok: false, error: countErr.message };
+  const employeeCount = count ?? 0;
+  if (employeeCount < 1) {
+    return {
+      ok: false,
+      error: "Lägg till minst en anställd innan välkomstmejlet skickas.",
+    };
+  }
+
+  try {
+    await sendCompanyWelcome({
+      to: company.contact_email,
+      companyName: company.name,
+      employeeCount,
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Mejlet kunde inte skickas.",
+    };
+  }
+
+  const { error: updErr } = await supabase
+    .from("companies")
+    .update({ welcome_email_sent_at: new Date().toISOString() })
+    .eq("id", companyId);
+
+  if (updErr) {
+    console.error("[sendCompanyWelcomeEmail] sparade inte sent_at:", updErr);
+  }
+
+  revalidatePath(`/admin/foretag/${companyId}/aktivera`);
+  revalidatePath(`/admin/foretag/${companyId}`);
   return { ok: true };
 }
 

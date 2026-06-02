@@ -23,7 +23,11 @@ export function CreateCompanyForm({ saveAction, ...formProps }: Props) {
         setError(result.error);
         return;
       }
-      router.push("/admin/foretag");
+      if (result.redirectTo === "aktivera") {
+        router.push(`/admin/foretag/${result.companyId}/aktivera`);
+      } else {
+        router.push("/admin/foretag");
+      }
       router.refresh();
     });
   }

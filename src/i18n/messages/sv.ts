@@ -459,8 +459,9 @@ export const sv = {
       name: "Namn",
       company: "Företag",
       organizationNumber: "Organisationsnummer",
-      organizationNumberPlaceholder: "t.ex. 556123-4567",
-      organizationNumberHint: "Tio siffror (XXXXXX-XXXX).",
+      organizationNumberPlaceholder: "t.ex. 556123-4567 eller personnummer",
+      organizationNumberHint:
+        "AB, HB, KB, ekonomisk förening, enskild firma m.fl. — 10 siffror (XXXXXX-XXXX). Enskild firma: personnummer går bra, även med århundrade (12 siffror).",
       email: "Mejl",
       phone: "Telefon",
       phoneHint: "Så vi snabbt kan nå er vid frågor om er förfrågan.",

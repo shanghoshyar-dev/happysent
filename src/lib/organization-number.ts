@@ -17,9 +17,24 @@ export function isValidSwedishOrganizationNumber(digits: string): boolean {
   return check === Number(digits[9]);
 }
 
-/** Returnerar 10 siffror om giltigt, annars null. */
+/** 12 siffror med inledande århundrade (personnummer / vissa inmatningar) → 10 siffror. */
+function toTenDigitForm(digits: string): string {
+  if (
+    digits.length === 12 &&
+    (digits.startsWith("19") || digits.startsWith("20"))
+  ) {
+    return digits.slice(2);
+  }
+  return digits;
+}
+
+/**
+ * Returnerar 10 siffror om giltigt, annars null.
+ * Gäller alla svenska organisationsformer (AB, HB, KB, ekonomisk förening, enskild firma m.fl.)
+ * — samma kontrollsiffra; enskild firma använder ofta personnummer.
+ */
 export function normalizeOrganizationNumber(raw: string): string | null {
-  const digits = digitsOnlyOrganizationNumber(raw);
+  const digits = toTenDigitForm(digitsOnlyOrganizationNumber(raw));
   if (!isValidSwedishOrganizationNumber(digits)) return null;
   return digits;
 }

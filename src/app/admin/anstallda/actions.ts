@@ -56,6 +56,7 @@ export async function createEmployee(formData: FormData) {
     },
   ]);
   revalidatePath("/admin/anstallda");
+  revalidatePath(`/admin/foretag/${payload.company_id}/aktivera`);
 }
 
 export async function updateEmployee(id: string, formData: FormData) {
@@ -142,6 +143,7 @@ export async function importEmployeesExcel(
   const result = await importEmployeesExcelBuffer(supabase, companyId, arrayBuffer);
   if (result.ok) {
     revalidatePath("/admin/anstallda");
+    revalidatePath(`/admin/foretag/${companyId}/aktivera`);
   }
   return result;
 }

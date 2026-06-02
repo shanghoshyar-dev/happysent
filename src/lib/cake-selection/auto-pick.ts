@@ -2,11 +2,14 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { getSelectableProductsForCity } from "./products";
+
 export type CakeSelectionStatus = "pending" | "customer" | "auto" | "default";
 
 interface PickContext {
   companyId: string;
-  bakeryId: string;
+  city: string;
+  bakeryId: string | null;
   numberOfPeople: number;
   defaultProductId: string | null;
 }
@@ -24,17 +27,17 @@ function fitsPeople(p: ProductRow, n: number): boolean {
   return true;
 }
 
-async function loadBakeryProducts(bakeryId: string): Promise<ProductRow[]> {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, min_people, max_people, sort_order")
-    .eq("bakery_id", bakeryId)
-    .eq("is_active", true)
-    .order("sort_order")
-    .order("name");
-  if (error) throw new Error(error.message);
-  return data ?? [];
+async function loadCityProducts(
+  city: string,
+  bakeryId: string | null,
+): Promise<ProductRow[]> {
+  const products = await getSelectableProductsForCity(city, bakeryId);
+  return products.map((p) => ({
+    id: p.id,
+    min_people: p.min_people,
+    max_people: p.max_people,
+    sort_order: p.sort_order,
+  }));
 }
 
 async function lastProductForCompany(companyId: string): Promise<string | null> {
@@ -53,9 +56,9 @@ async function lastProductForCompany(companyId: string): Promise<string | null> 
 export async function pickProductForOrder(
   ctx: PickContext,
 ): Promise<{ productId: string; status: CakeSelectionStatus }> {
-  const products = await loadBakeryProducts(ctx.bakeryId);
+  const products = await loadCityProducts(ctx.city, ctx.bakeryId);
   if (products.length === 0) {
-    throw new Error("Bageriet saknar aktiva produkter i sortimentet.");
+    throw new Error("Staden saknar aktiva produkter i sortimentet.");
   }
 
   const activeIds = new Set(products.map((p) => p.id));
@@ -85,7 +88,7 @@ export async function applyAutoPickToOrder(orderId: string): Promise<boolean> {
       `
       id, company_id, product_id, cake_selection_status, gift_type,
       employees:employee_id ( number_of_people ),
-      companies:company_id ( default_product_id, bakery_id )
+      companies:company_id ( default_product_id, bakery_id, city )
     `,
     )
     .eq("id", orderId)
@@ -99,12 +102,14 @@ export async function applyAutoPickToOrder(orderId: string): Promise<boolean> {
   const company = order.companies as {
     default_product_id: string | null;
     bakery_id: string;
+    city: string;
   } | null;
   const emp = order.employees as { number_of_people: number } | null;
-  if (!company?.bakery_id) return false;
+  if (!company?.city?.trim()) return false;
 
   const { productId, status } = await pickProductForOrder({
     companyId: order.company_id,
+    city: company.city,
     bakeryId: company.bakery_id,
     numberOfPeople: emp?.number_of_people ?? 8,
     defaultProductId: company.default_product_id,

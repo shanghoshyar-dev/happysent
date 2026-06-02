@@ -396,13 +396,18 @@ export async function sendContactConfirmation(a: ContactConfirmationArgs) {
 export interface WelcomeCompanyArgs {
   to: string;
   companyName: string;
+  employeeCount: number;
 }
 export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
   const subject = `Välkommen till HappySent! 🎂`;
+  const employeeLine =
+    a.employeeCount === 1
+      ? `Vi har registrerat 1 anställd i vårt system.\n`
+      : `Vi har registrerat ${a.employeeCount} anställda i vårt system.\n`;
   const text =
     `Hej ${a.companyName}!\n\n` +
     `Välkommen till HappySent!\n\n` +
-    `Era anställda är nu registrerade i vårt system.\n` +
+    employeeLine +
     `Ni behöver inte göra någonting – vi sköter allt.\n` +
     `Tårtan levereras automatiskt på rätt dag.\n\n` +
     `Hör av er om ni har frågor på ${await adminInbox()}\n\n` +
