@@ -429,11 +429,11 @@ export interface CompanyPortalInviteArgs {
 }
 
 export async function sendCompanyPortalInviteEmail(a: CompanyPortalInviteArgs) {
-  const subject = `Inbjudan till HappySent kundportal`;
+  const subject = `Inbjudan till HappySent kundportal – aktivera konto`;
   const text =
     `Hej ${a.companyName}!\n\n` +
     `Ni är inbjudna till HappySent kundportal där ni kan hantera era anställda och se kommande födelsedagar.\n\n` +
-    `Aktivera kontot och välj lösenord (länken gäller begränsad tid):\n` +
+    `Aktivera kontot och välj lösenord (länken gäller begränsad tid). Länken börjar med https://happysent.com:\n` +
     `${a.activateUrl}\n\n` +
     `När kontot är aktiverat loggar ni in här:\n` +
     `${a.loginUrl}\n\n` +

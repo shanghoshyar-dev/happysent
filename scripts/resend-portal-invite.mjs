@@ -144,6 +144,8 @@ async function main() {
   const linkResult = await createPortalInviteLink(admin, email, company.id);
   if (!linkResult.ok) throw new Error(linkResult.error);
 
+  console.log("Länk i mejlet:", linkResult.actionLink);
+
   const loginUrl = `${getSiteUrl()}/kund/login`;
   const text =
     `Hej ${company.name}!\n\n` +
@@ -158,7 +160,7 @@ async function main() {
   const { error: mailErr } = await resend.emails.send({
     from: `HappySent <${adminEmail}>`,
     to: email,
-    subject: "Inbjudan till HappySent kundportal",
+    subject: "Inbjudan till HappySent kundportal – aktivera konto",
     text,
   });
   if (mailErr) throw mailErr;
