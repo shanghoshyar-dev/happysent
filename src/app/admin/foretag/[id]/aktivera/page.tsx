@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
 import { ImportApplicationExcelButton } from "./import-application-excel-button";
+import { SendPortalInviteButton } from "./send-portal-invite-button";
 import { SendWelcomeButton } from "./send-welcome-button";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ export default async function AktiveraForetagPage({ params }: Props) {
     await Promise.all([
       supabase
         .from("companies")
-        .select("id, name, contact_email, welcome_email_sent_at")
+        .select("id, name, contact_email, welcome_email_sent_at, portal_invite_sent_at")
         .eq("id", params.id)
         .maybeSingle(),
       supabase
@@ -48,6 +49,7 @@ export default async function AktiveraForetagPage({ params }: Props) {
 
   const employeeCount = employees?.length ?? 0;
   const welcomeSent = Boolean(company.welcome_email_sent_at);
+  const inviteSent = Boolean(company.portal_invite_sent_at);
   const hasPendingExcel = Boolean(
     application?.employees_import_storage_path?.trim(),
   );
@@ -80,6 +82,12 @@ export default async function AktiveraForetagPage({ params }: Props) {
           contactEmail={company.contact_email}
           employeeCount={employeeCount}
           welcomeAlreadySent={welcomeSent}
+        />
+        <SendPortalInviteButton
+          companyId={company.id}
+          contactEmail={company.contact_email}
+          employeeCount={employeeCount}
+          inviteAlreadySent={inviteSent}
         />
       </div>
 

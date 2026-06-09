@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import { getPostLoginRedirectPath } from "./actions";
+import { getPostLoginRedirectPath } from "../../login/actions";
 
 type Mode = "password" | "magic";
 type Status = "idle" | "sending" | "sent" | "error";
 
-export function LoginForm() {
+export function KundLoginForm() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
@@ -39,10 +39,12 @@ export function LoginForm() {
         return;
       }
       const path = await getPostLoginRedirectPath();
-      if (path.includes("no_access")) {
+      if (path.includes("no_access") || path.startsWith("/admin")) {
         await supabase.auth.signOut();
         setStatus("error");
-        setError("Du har inte admin-åtkomst. Använd kundportalens inloggning.");
+        setError(
+          "Inget kundkonto hittades. Öppna inbjudan från HappySent eller kontakta oss.",
+        );
         return;
       }
       router.push(path);
@@ -54,7 +56,7 @@ export function LoginForm() {
     const { error: err } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${origin}/auth/callback?next=/admin`,
+        emailRedirectTo: `${origin}/auth/callback?next=/kund`,
         shouldCreateUser: false,
       },
     });
@@ -72,8 +74,7 @@ export function LoginForm() {
       <div className="rounded-2xl bg-emerald-50 p-6 text-sm text-emerald-800">
         <p className="font-semibold">Kolla din inkorg!</p>
         <p className="mt-1">
-          Vi har skickat en magisk länk till <strong>{email}</strong>. Öppna
-          länken i samma webbläsare för att logga in.
+          Vi har skickat en inloggningslänk till <strong>{email}</strong>.
         </p>
       </div>
     );
@@ -121,7 +122,6 @@ export function LoginForm() {
             type="email"
             required
             autoComplete="email"
-            placeholder="du@happysent.se"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -150,7 +150,7 @@ export function LoginForm() {
             ? "Skickar…"
             : mode === "password"
               ? "Logga in"
-              : "Skicka magisk länk"}
+              : "Skicka inloggningslänk"}
         </Button>
       </form>
     </div>

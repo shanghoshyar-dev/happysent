@@ -14,6 +14,7 @@ export const sv = {
     blog: "Blogg",
     contact: "Kontakt",
     login: "Logga in",
+    customerLogin: "Kundportal",
     getStarted: "Kom igång",
     openMenu: "Öppna meny",
     closeMenu: "Stäng meny",

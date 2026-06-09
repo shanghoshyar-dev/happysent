@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminTopBar } from "@/components/admin/topbar";
+import { isAdminUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,11 @@ export default async function AdminLayout({
 
   if (!user) {
     redirect("/login?next=/admin");
+  }
+
+  const admin = await isAdminUser(user.id);
+  if (!admin) {
+    redirect("/kund/login?error=no_access");
   }
 
   return (

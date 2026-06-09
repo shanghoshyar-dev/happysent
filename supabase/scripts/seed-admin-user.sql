@@ -1,0 +1,8 @@
+-- Lägg till HappySent-admin i admin_users efter migration 20260603120000_customer_portal.sql
+--
+-- 1. Skapa Auth-användare i Supabase Dashboard → Authentication → Users (samma mejl som ADMIN_EMAIL)
+-- 2. Kör denna SQL med rätt user_id (UUID från auth.users):
+--
+-- insert into public.admin_users (user_id)
+-- select id from auth.users where email = 'din@happysent.se'
+-- on conflict (user_id) do nothing;

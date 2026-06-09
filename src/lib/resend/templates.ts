@@ -421,6 +421,30 @@ export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
   });
 }
 
+export interface CompanyPortalInviteArgs {
+  to: string;
+  companyName: string;
+  loginUrl: string;
+}
+
+export async function sendCompanyPortalInviteEmail(a: CompanyPortalInviteArgs) {
+  const subject = `Inbjudan till HappySent kundportal`;
+  const text =
+    `Hej ${a.companyName}!\n\n` +
+    `Ni är inbjudna till HappySent kundportal där ni kan hantera era anställda och se kommande födelsedagar.\n\n` +
+    `1. Öppna inbjudan i din inkorg och välj ett lösenord.\n` +
+    `2. Logga sedan in här: ${a.loginUrl}\n\n` +
+    `Har ni frågor? Mejla ${await adminInbox()}\n\n` +
+    `Hälsningar,\nHappySent`;
+
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: a.to,
+    subject,
+    text,
+  });
+}
+
 /** Batch notification: tillagda och/eller borttagna anställda (max en mejl per företag och kalenderdag, nästa morgon via cron). */
 export interface EmployeeChangesDigestArgs {
   to: string;

@@ -1,5 +1,6 @@
 "use server";
 
+import { isAdminUser } from "@/lib/auth/session";
 import { runDailyCheck } from "@/lib/cron/daily-check";
 import { runDonationCampaignClose } from "@/lib/cron/donation-campaign-close";
 import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
@@ -29,6 +30,9 @@ export async function triggerDailyCheckManually(): Promise<ManualCheckResult> {
   } = await supabase.auth.getUser();
   if (!user) {
     return { ok: false, error: "Du måste vara inloggad." };
+  }
+  if (!(await isAdminUser(user.id))) {
+    return { ok: false, error: "Du har inte admin-åtkomst." };
   }
 
   const today = todayInStockholm();

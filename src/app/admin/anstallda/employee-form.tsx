@@ -11,6 +11,8 @@ interface EmployeeFormProps {
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
   defaultCompanyId?: string;
+  /** Dölj företagsväljare (kundportal). */
+  hideCompanySelect?: boolean;
 }
 
 export function EmployeeForm({
@@ -19,26 +21,32 @@ export function EmployeeForm({
   action,
   submitLabel,
   defaultCompanyId,
+  hideCompanySelect = false,
 }: EmployeeFormProps) {
+  const companyId =
+    employee?.company_id ?? defaultCompanyId ?? companies[0]?.id ?? "";
+
   return (
     <form action={action} className="grid gap-4 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <Label htmlFor="company_id">Företag</Label>
-        <Select
-          id="company_id"
-          name="company_id"
-          required
-          defaultValue={
-            employee?.company_id ?? defaultCompanyId ?? companies[0]?.id ?? ""
-          }
-        >
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-      </div>
+      {hideCompanySelect ? (
+        <input type="hidden" name="company_id" value={companyId} />
+      ) : (
+        <div className="md:col-span-2">
+          <Label htmlFor="company_id">Företag</Label>
+          <Select
+            id="company_id"
+            name="company_id"
+            required
+            defaultValue={companyId}
+          >
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
       <div>
         <Label htmlFor="first_name">Förnamn</Label>
         <Input

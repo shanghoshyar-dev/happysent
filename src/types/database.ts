@@ -230,6 +230,7 @@ export type Database = {
           default_product_id: string | null;
           status: CompanyStatus;
           welcome_email_sent_at: string | null;
+          portal_invite_sent_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -248,6 +249,7 @@ export type Database = {
           default_product_id?: string | null;
           status?: CompanyStatus;
           welcome_email_sent_at?: string | null;
+          portal_invite_sent_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -266,6 +268,7 @@ export type Database = {
           default_product_id?: string | null;
           status?: CompanyStatus;
           welcome_email_sent_at?: string | null;
+          portal_invite_sent_at?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -645,6 +648,82 @@ export type Database = {
         };
         Relationships: [];
       };
+      admin_users: {
+        Row: {
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      company_portal_invites: {
+        Row: {
+          id: string;
+          company_id: string;
+          email: string;
+          invited_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          email: string;
+          invited_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          email?: string;
+          invited_at?: string;
+          accepted_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_portal_invites_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      company_users: {
+        Row: {
+          id: string;
+          user_id: string;
+          company_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          company_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          company_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_users_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       blog_posts: {
         Row: {
           id: string;
@@ -763,7 +842,9 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      current_company_id: { Args: Record<string, never>; Returns: string | null };
+      is_admin: { Args: Record<string, never>; Returns: boolean };
+      is_company_user: { Args: Record<string, never>; Returns: boolean };
     };
     Enums: {
       [_ in never]: never;

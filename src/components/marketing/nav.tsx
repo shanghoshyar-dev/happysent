@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -101,6 +102,12 @@ export function MarketingNav() {
           {...linkMotionProps}
         >
           <LanguageSwitcher />
+          <Link
+            href="/kund/login"
+            className="text-sm font-medium text-slate-700 transition-colors hover:text-candy-600"
+          >
+            {messages.nav.customerLogin}
+          </Link>
           <LocalizedLink href="/kontakt">
             <CtaButton size="sm">{messages.nav.getStarted}</CtaButton>
           </LocalizedLink>
@@ -166,6 +173,13 @@ export function MarketingNav() {
                 animate={{ y: 0 }}
                 transition={reduceMotion ? { duration: 0 } : { delay: 0.35 }}
               >
+                <Link
+                  href="/kund/login"
+                  className="mb-3 block rounded-2xl px-4 py-3 text-lg font-medium text-slate-900 hover:bg-white"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {messages.nav.customerLogin}
+                </Link>
                 <LocalizedLink href="/kontakt" onClick={() => setIsOpen(false)}>
                   <CtaButton size="md" fullWidth>
                     {messages.nav.getStarted}

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
+import { isAdminUser } from "@/lib/auth/session";
 import type { Database } from "@/types/database";
 
 export async function updateSession(request: NextRequest) {
@@ -52,21 +53,72 @@ export async function updateSession(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
     const isAdminRoute = pathname.startsWith("/admin");
+    const isKundRoute =
+      pathname.startsWith("/kund") && !pathname.startsWith("/kund/login");
+    const isAdminLogin = pathname === "/login";
+    const isKundLogin = pathname === "/kund/login";
     const isAuthRoute =
-      pathname.startsWith("/login") || pathname.startsWith("/auth");
+      pathname.startsWith("/auth") || isAdminLogin || isKundLogin;
 
-    if (isAdminRoute && !user) {
+    if ((isAdminRoute || isKundRoute) && !user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/login";
+      url.pathname = isKundRoute ? "/kund/login" : "/login";
       url.searchParams.set("next", pathname);
       return NextResponse.redirect(url);
     }
 
-    if (isAuthRoute && user && pathname === "/login") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin";
-      url.search = "";
-      return NextResponse.redirect(url);
+    if (user && isAdminRoute) {
+      const admin = await isAdminUser(user.id);
+      if (!admin) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/kund";
+        url.search = "";
+        return NextResponse.redirect(url);
+      }
+    }
+
+    if (user && isKundRoute) {
+      const { data: membership } = await supabase
+        .from("company_users")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (!membership) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/kund/login";
+        url.searchParams.set("error", "no_access");
+        return NextResponse.redirect(url);
+      }
+    }
+
+    if (user && isAdminLogin) {
+      const admin = await isAdminUser(user.id);
+      if (admin) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin";
+        url.search = "";
+        return NextResponse.redirect(url);
+      }
+    }
+
+    if (user && isKundLogin) {
+      const { data: membership } = await supabase
+        .from("company_users")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (membership) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/kund";
+        url.search = "";
+        return NextResponse.redirect(url);
+      }
+    }
+
+    if (isAuthRoute && user && pathname.startsWith("/auth")) {
+      // callback hanterar redirect
     }
 
     return supabaseResponse;

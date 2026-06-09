@@ -52,7 +52,17 @@ cp .env.local.example .env.local
 
 ### 5. Skapa admin-användare
 
-I Supabase Dashboard → **Authentication → Users → Add user**, lägg till din mailadress (samma som `ADMIN_EMAIL`). Logga sedan in på `/login` med en magic link.
+1. I Supabase Dashboard → **Authentication → Users → Add user**, lägg till din mailadress (samma som `ADMIN_EMAIL`).
+2. Efter migration `20260603120000_customer_portal.sql`: kör SQL i [`supabase/scripts/seed-admin-user.sql`](supabase/scripts/seed-admin-user.sql) så användaren läggs i `admin_users` (krävs för `/admin` efter RLS-härdning).
+3. Logga in på `/login` (lösenord eller magisk länk).
+
+**Supabase Auth → URL configuration:** lägg till redirect URLs `https://happysent.com/auth/callback` (och `http://localhost:3000/auth/callback` i dev).
+
+### Kundportal (HR)
+
+- Inloggning: `/kund/login`
+- Admin skickar inbjudan från **Aktivera företag** efter att anställda lagts in.
+- HR hanterar anställda på `/kund` — ser bara sitt eget företag (RLS).
 
 ### 6. Starta dev-servern
 

@@ -3,6 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
+import { sendCompanyPortalInviteEmail, sendCompanyWelcome } from "@/lib/resend/templates";
+import { getSiteUrl } from "@/lib/site-url";
+import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  insertCompanyRow,
+  updateCompanyRow,
+} from "@/lib/supabase/companies-write";
+import { createClient } from "@/lib/supabase/server";
+
 export type CreateCompanyResult =
   | { ok: true; companyId: string; redirectTo: "aktivera" | "list" }
   | { ok: false; error: string };
@@ -11,19 +22,13 @@ export type SendWelcomeEmailResult =
   | { ok: true }
   | { ok: false; error: string };
 
+export type SendPortalInviteResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 export type ImportApplicationExcelResult =
   | { ok: true; imported: number }
   | { ok: false; error: string };
-
-import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
-import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
-import { createAdminClient } from "@/lib/supabase/admin";
-import {
-  insertCompanyRow,
-  updateCompanyRow,
-} from "@/lib/supabase/companies-write";
-import { createClient } from "@/lib/supabase/server";
-import { sendCompanyWelcome } from "@/lib/resend/templates";
 
 function parseContactPhone(formData: FormData): string | null {
   const t = String(formData.get("contact_phone") ?? "").trim();
@@ -281,6 +286,88 @@ export async function sendCompanyWelcomeEmail(
 
   if (updErr) {
     console.error("[sendCompanyWelcomeEmail] sparade inte sent_at:", updErr);
+  }
+
+  revalidatePath(`/admin/foretag/${companyId}/aktivera`);
+  revalidatePath(`/admin/foretag/${companyId}`);
+  return { ok: true };
+}
+
+export async function sendCompanyPortalInvite(
+  companyId: string,
+): Promise<SendPortalInviteResult> {
+  const supabase = createClient();
+  const admin = createAdminClient();
+
+  const { data: company, error: coErr } = await supabase
+    .from("companies")
+    .select("id, name, contact_email, portal_invite_sent_at")
+    .eq("id", companyId)
+    .maybeSingle();
+
+  if (coErr || !company) {
+    return { ok: false, error: "Företaget hittades inte." };
+  }
+  if (company.portal_invite_sent_at) {
+    return { ok: false, error: "Inbjudan till kundportalen är redan skickad." };
+  }
+  const email = company.contact_email?.trim();
+  if (!email) {
+    return { ok: false, error: "Företaget saknar kontaktmejl." };
+  }
+
+  const { count, error: countErr } = await supabase
+    .from("employees")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", companyId);
+
+  if (countErr) return { ok: false, error: countErr.message };
+  if ((count ?? 0) < 1) {
+    return {
+      ok: false,
+      error: "Lägg till minst en anställd innan inbjudan skickas.",
+    };
+  }
+
+  const siteUrl = getSiteUrl();
+  const redirectTo = `${siteUrl}/auth/callback?next=/kund`;
+
+  const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, {
+    data: { company_id: companyId },
+    redirectTo,
+  });
+
+  if (inviteErr) {
+    return { ok: false, error: inviteErr.message };
+  }
+
+  await admin.from("company_portal_invites").upsert(
+    {
+      company_id: companyId,
+      email,
+      invited_at: new Date().toISOString(),
+      accepted_at: null,
+    },
+    { onConflict: "company_id,email" },
+  );
+
+  try {
+    await sendCompanyPortalInviteEmail({
+      to: email,
+      companyName: company.name,
+      loginUrl: `${siteUrl}/kund/login`,
+    });
+  } catch (err) {
+    console.error("[sendCompanyPortalInvite] Resend failed:", err);
+  }
+
+  const { error: updErr } = await supabase
+    .from("companies")
+    .update({ portal_invite_sent_at: new Date().toISOString() })
+    .eq("id", companyId);
+
+  if (updErr) {
+    console.error("[sendCompanyPortalInvite] portal_invite_sent_at:", updErr);
   }
 
   revalidatePath(`/admin/foretag/${companyId}/aktivera`);

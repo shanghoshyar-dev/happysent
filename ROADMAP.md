@@ -1,37 +1,28 @@
 # HappySent roadmap
 
-## Klart / pågår
+## Klart
 
 - [x] Tårtkatalog PDF (`public/marketing/tartkatalog.pdf`)
 - [x] 9 tårtor i databas (migration `20260601120100_seed_catalog_products.sql`)
 - [x] Tårtval via länk i 14-dagarsmejl (`/valja-tarta/[token]`) — HR ser tårtor för **företagets stad**, inget bagerinamn
 - [x] Auto-val 9 dagar före leverans om kunden inte svarat
 - [x] Bageri-mejl inkluderar tårtnamn
+- [x] Aktivera företag efter ansökan (anställda + välkomstmejl manuellt)
+- [x] **Kundportal (F) — MVP**
+  - [x] `admin_users`, `company_users`, RLS per `company_id`
+  - [x] `/kund` — översikt, anställda (CRUD, Excel, pausa)
+  - [x] Inbjudan från Aktivera-sidan (`sendCompanyPortalInvite`)
 
-## Nästa steg: kundportal (F)
+Er **adminportal (`/admin`)** är backoffice: priser, bagerier, fakturor, alla företag.
 
-> **Påminnelse:** Full kundportal så HR själva hanterar anställda och tårtval utan att ringa er.
+### Nya kunder
 
-Planerat:
+| Kanal | Flöde |
+|-------|--------|
+| Kontaktformulär / telefon | Admin → godkänn → **Aktivera** → anställda → välkomstmejl → **inbjudan kundportal** |
+| HR själva | Loggar in på `/kund` efter inbjudan |
 
-1. **`company_users`** — inloggning kopplad till ett företag
-2. **`/kund`-område** — dashboard: anställda, kommande födelsedagar, tårtval, pausa leverans
-3. **RLS** — kund ser bara sitt `company_id`, admin ser allt som idag
-4. **Inbjudan** — mejl med aktiveringslänk när företaget skapas (gäller alla vägar in, se nedan)
-
-Er **adminportal (`/admin`)** behålls oförändrad som backoffice: priser, bagerier, fakturor, alla företag.
-
-### Nya kunder — samma flöde oavsett kanal
-
-| Hur kunden kommer in | Idag | När F är klart |
-|----------------------|------|----------------|
-| Kontaktformulär → kö → godkänn | Ni skapar i admin | + **inbjudningsmejl** till kontaktmejl |
-| **Telefon / möte / mail till er** | Ni skapar i admin direkt | + **samma inbjudningsmejl** |
-| Excel med anställda | Ni importerar i admin | HR kan göra det själv i portalen |
-
-Ingen separat “telefon-version” — bara **Admin → Nytt företag** med rätt `contact_email`, sedan automatisk inbjudan när portalen finns.
-
-Tills dess: ni lägger in anställda i admin; tårtval sker via länk i 14-dagarsmejlet (`/valja-tarta/[token]`).
+Tårtval sker fortfarande via länk i 14-dagarsmejlet (inloggat tårtval i `/kund` = senare).
 
 ## Supabase-migrationer att köra i prod
 
@@ -39,5 +30,18 @@ Kör i SQL Editor (eller `npm run db:push` efter `supabase link`):
 
 1. `20260601120000_cake_selection.sql`
 2. `20260601120100_seed_catalog_products.sql`
+3. `20260602120000_companies_welcome_email_sent_at.sql`
+4. **`20260603120000_customer_portal.sql`**
+
+Sedan: [`supabase/scripts/seed-admin-user.sql`](supabase/scripts/seed-admin-user.sql) — lägg er admin i `admin_users`.
 
 (Tidigare om ej kört: `20260528120000_invoices_sent_at.sql`, `20260531120000_invoices_grants.sql`)
+
+## Prod-testchecklista (kundportal)
+
+1. [ ] Migration + `admin_users` seed — admin kan öppna `/admin`
+2. [ ] Godkänn ansökan → Aktivera → minst 1 anställd
+3. [ ] Skicka välkomstmejl
+4. [ ] Skicka inbjudan kundportal → HR accepterar invite → `/kund`
+5. [ ] HR ser bara egna anställda; `/admin` nekas för HR
+6. [ ] HR kan lägga till/redigera/pausa anställd

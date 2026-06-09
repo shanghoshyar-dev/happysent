@@ -16,6 +16,7 @@ export const en: Messages = {
     blog: "Blog",
     contact: "Contact",
     login: "Log in",
+    customerLogin: "Customer portal",
     getStarted: "Get started",
     openMenu: "Open menu",
     closeMenu: "Close menu",

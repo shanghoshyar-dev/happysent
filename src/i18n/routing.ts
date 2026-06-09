@@ -28,6 +28,7 @@ export function localizedPath(path: string, locale: Locale): string {
 export function isMarketingPath(pathname: string): boolean {
   if (
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/kund") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/api") ||
