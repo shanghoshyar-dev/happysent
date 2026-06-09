@@ -7,6 +7,28 @@ export function portalInviteRedirectUrl(): string {
   return `${getAuthSiteUrl()}/auth/callback?next=/kund/aktivera`;
 }
 
+function buildPortalActivateUrl(
+  hashedToken: string,
+  verificationType: string,
+): string {
+  const url = new URL(portalInviteRedirectUrl());
+  url.searchParams.set("token_hash", hashedToken);
+  url.searchParams.set("type", verificationType);
+  return url.toString();
+}
+
+function linkFromGenerateResponse(
+  properties: { hashed_token?: string; verification_type?: string } | undefined,
+): string | null {
+  if (properties?.hashed_token && properties.verification_type) {
+    return buildPortalActivateUrl(
+      properties.hashed_token,
+      properties.verification_type,
+    );
+  }
+  return null;
+}
+
 /** Skapar inbjudningslänk (välj lösenord) — skickas i HappySent-mejlet, inte bara /kund/login. */
 export async function createPortalInviteLink(
   email: string,
@@ -24,7 +46,9 @@ export async function createPortalInviteLink(
     },
   });
 
-  const actionLink = invite.data.properties?.action_link;
+  const actionLink = linkFromGenerateResponse(
+    invite.data.properties ?? undefined,
+  );
   if (!invite.error && actionLink) {
     return { ok: true, actionLink };
   }
@@ -38,7 +62,9 @@ export async function createPortalInviteLink(
         redirectTo,
       },
     });
-    const recoveryLink = recovery.data.properties?.action_link;
+    const recoveryLink = linkFromGenerateResponse(
+      recovery.data.properties ?? undefined,
+    );
     if (!recovery.error && recoveryLink) {
       return { ok: true, actionLink: recoveryLink };
     }
