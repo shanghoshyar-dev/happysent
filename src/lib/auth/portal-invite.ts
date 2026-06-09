@@ -1,10 +1,10 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getSiteUrl } from "@/lib/site-url";
+import { getAuthSiteUrl } from "@/lib/site-url";
 
 export function portalInviteRedirectUrl(): string {
-  return `${getSiteUrl()}/auth/callback?next=/kund/aktivera`;
+  return `${getAuthSiteUrl()}/auth/callback?next=/kund/aktivera`;
 }
 
 /** Skapar inbjudningslänk (välj lösenord) — skickas i HappySent-mejlet, inte bara /kund/login. */

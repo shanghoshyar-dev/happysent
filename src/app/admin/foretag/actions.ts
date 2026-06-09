@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { sendCompanyPortalInviteEmail, sendCompanyWelcome } from "@/lib/resend/templates";
 import { createPortalInviteLink } from "@/lib/auth/portal-invite";
-import { getSiteUrl } from "@/lib/site-url";
+import { getAuthSiteUrl, getSiteUrl } from "@/lib/site-url";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -327,7 +327,8 @@ export async function sendCompanyPortalInvite(
     };
   }
 
-  const siteUrl = getSiteUrl();
+  const siteUrl = getAuthSiteUrl();
+  const loginUrl = `${getSiteUrl()}/kund/login`;
 
   const linkResult = await createPortalInviteLink(email, companyId);
   if (!linkResult.ok) {
@@ -339,7 +340,7 @@ export async function sendCompanyPortalInvite(
       to: email,
       companyName: company.name,
       activateUrl: linkResult.actionLink,
-      loginUrl: `${siteUrl}/kund/login`,
+      loginUrl,
     });
   } catch (err) {
     return {
