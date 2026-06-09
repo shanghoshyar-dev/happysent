@@ -26,7 +26,7 @@ export function SendPortalInviteButton({
   const [isError, setIsError] = useState(false);
   const [sent, setSent] = useState(inviteAlreadySent);
 
-  const canSend = employeeCount >= 1 && !sent;
+  const canSend = employeeCount >= 1;
 
   return (
     <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-4">
@@ -36,18 +36,19 @@ export function SendPortalInviteButton({
         <a href={`mailto:${contactEmail}`} className="text-coral-600 hover:underline">
           {contactEmail}
         </a>
-        . HR kan logga in på <strong>/kund</strong> och hantera anställda själva.
+        . HR klickar på länken i mejlet, väljer lösenord och loggar sedan in på{" "}
+        <strong>/kund</strong>.
       </p>
       {sent ? (
         <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
-          Inbjudan skickad.
+          Inbjudan skickad. Om länken inte fungerade kan du skicka om nedan.
         </p>
       ) : employeeCount < 1 ? (
         <p className="mt-3 text-sm text-amber-800">
           Lägg till minst en anställd innan inbjudan kan skickas.
         </p>
       ) : null}
-      {message && !sent ? (
+      {message ? (
         <p
           className={`mt-3 text-sm ${isError ? "text-red-700" : "text-emerald-800"}`}
           role="alert"
@@ -67,7 +68,11 @@ export function SendPortalInviteButton({
             if (res.ok) {
               setSent(true);
               setIsError(false);
-              setMessage("Inbjudan skickad.");
+              setMessage(
+                sent
+                  ? "Ny inbjudan skickad med aktiveringslänk."
+                  : "Inbjudan skickad.",
+              );
               router.refresh();
             } else {
               setIsError(true);
@@ -76,7 +81,11 @@ export function SendPortalInviteButton({
           });
         }}
       >
-        {pending ? "Skickar…" : "Skicka inbjudan till kundportalen"}
+        {pending
+          ? "Skickar…"
+          : sent
+            ? "Skicka om inbjudan"
+            : "Skicka inbjudan till kundportalen"}
       </Button>
     </div>
   );

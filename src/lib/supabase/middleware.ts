@@ -53,8 +53,11 @@ export async function updateSession(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
     const isAdminRoute = pathname.startsWith("/admin");
+    const isKundAktivera = pathname === "/kund/aktivera";
     const isKundRoute =
-      pathname.startsWith("/kund") && !pathname.startsWith("/kund/login");
+      pathname.startsWith("/kund") &&
+      !pathname.startsWith("/kund/login") &&
+      !isKundAktivera;
     const isAdminLogin = pathname === "/login";
     const isKundLogin = pathname === "/kund/login";
     const isAuthRoute =

@@ -33,6 +33,12 @@ export default function KundLoginPage({ searchParams }: Props) {
             inbjudan från HappySent.
           </p>
         ) : null}
+        {err === "auth" ? (
+          <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Aktiveringslänken gick ut eller har redan använts. Be HappySent
+            skicka en ny inbjudan, eller kontakta oss om du behöver hjälp.
+          </p>
+        ) : null}
         <div className="mt-8">
           <KundLoginForm />
         </div>

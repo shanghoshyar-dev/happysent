@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { sendCompanyPortalInviteEmail, sendCompanyWelcome } from "@/lib/resend/templates";
+import { createPortalInviteLink } from "@/lib/auth/portal-invite";
 import { getSiteUrl } from "@/lib/site-url";
 import { COMPANY_APPLICATION_UPLOADS_BUCKET } from "@/lib/storage/company-application-uploads";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -308,9 +309,6 @@ export async function sendCompanyPortalInvite(
   if (coErr || !company) {
     return { ok: false, error: "Företaget hittades inte." };
   }
-  if (company.portal_invite_sent_at) {
-    return { ok: false, error: "Inbjudan till kundportalen är redan skickad." };
-  }
   const email = company.contact_email?.trim();
   if (!email) {
     return { ok: false, error: "Företaget saknar kontaktmejl." };
@@ -330,15 +328,25 @@ export async function sendCompanyPortalInvite(
   }
 
   const siteUrl = getSiteUrl();
-  const redirectTo = `${siteUrl}/auth/callback?next=/kund`;
 
-  const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: { company_id: companyId },
-    redirectTo,
-  });
+  const linkResult = await createPortalInviteLink(email, companyId);
+  if (!linkResult.ok) {
+    return { ok: false, error: linkResult.error };
+  }
 
-  if (inviteErr) {
-    return { ok: false, error: inviteErr.message };
+  try {
+    await sendCompanyPortalInviteEmail({
+      to: email,
+      companyName: company.name,
+      activateUrl: linkResult.actionLink,
+      loginUrl: `${siteUrl}/kund/login`,
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      error:
+        err instanceof Error ? err.message : "Inbjudningsmejlet kunde inte skickas.",
+    };
   }
 
   await admin.from("company_portal_invites").upsert(
@@ -350,16 +358,6 @@ export async function sendCompanyPortalInvite(
     },
     { onConflict: "company_id,email" },
   );
-
-  try {
-    await sendCompanyPortalInviteEmail({
-      to: email,
-      companyName: company.name,
-      loginUrl: `${siteUrl}/kund/login`,
-    });
-  } catch (err) {
-    console.error("[sendCompanyPortalInvite] Resend failed:", err);
-  }
 
   const { error: updErr } = await supabase
     .from("companies")

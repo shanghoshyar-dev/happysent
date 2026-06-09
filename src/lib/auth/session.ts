@@ -118,5 +118,5 @@ export async function resolvePostLoginRedirect(
   );
   if (companyId) return "/kund";
 
-  return "/login?error=no_access";
+  return "/kund/login?error=no_access";
 }

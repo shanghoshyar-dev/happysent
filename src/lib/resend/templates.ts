@@ -424,6 +424,7 @@ export async function sendCompanyWelcome(a: WelcomeCompanyArgs) {
 export interface CompanyPortalInviteArgs {
   to: string;
   companyName: string;
+  activateUrl: string;
   loginUrl: string;
 }
 
@@ -432,8 +433,10 @@ export async function sendCompanyPortalInviteEmail(a: CompanyPortalInviteArgs) {
   const text =
     `Hej ${a.companyName}!\n\n` +
     `Ni är inbjudna till HappySent kundportal där ni kan hantera era anställda och se kommande födelsedagar.\n\n` +
-    `1. Öppna inbjudan i din inkorg och välj ett lösenord.\n` +
-    `2. Logga sedan in här: ${a.loginUrl}\n\n` +
+    `Aktivera kontot och välj lösenord (länken gäller begränsad tid):\n` +
+    `${a.activateUrl}\n\n` +
+    `När kontot är aktiverat loggar ni in här:\n` +
+    `${a.loginUrl}\n\n` +
     `Har ni frågor? Mejla ${await adminInbox()}\n\n` +
     `Hälsningar,\nHappySent`;
 
