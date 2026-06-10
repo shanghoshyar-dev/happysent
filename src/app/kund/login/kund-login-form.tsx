@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,13 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import { getPostLoginRedirectPath } from "../../login/actions";
-
 type Mode = "password" | "magic";
 type Status = "idle" | "sending" | "sent" | "error";
 
 export function KundLoginForm() {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,17 +34,7 @@ export function KundLoginForm() {
         setError(err.message);
         return;
       }
-      const path = await getPostLoginRedirectPath();
-      if (path.includes("no_access") || path.startsWith("/admin")) {
-        await supabase.auth.signOut();
-        setStatus("error");
-        setError(
-          "Inget kundkonto hittades. Öppna inbjudan från HappySent eller kontakta oss.",
-        );
-        return;
-      }
-      router.push(path);
-      router.refresh();
+      window.location.assign("/kund");
       return;
     }
 

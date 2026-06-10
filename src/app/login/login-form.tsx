@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,13 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-import { getPostLoginRedirectPath } from "./actions";
-
 type Mode = "password" | "magic";
 type Status = "idle" | "sending" | "sent" | "error";
 
 export function LoginForm() {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,15 +34,8 @@ export function LoginForm() {
         setError(err.message);
         return;
       }
-      const path = await getPostLoginRedirectPath();
-      if (path.includes("no_access")) {
-        await supabase.auth.signOut();
-        setStatus("error");
-        setError("Du har inte admin-åtkomst. Använd kundportalens inloggning.");
-        return;
-      }
-      router.push(path);
-      router.refresh();
+      // Full sidladdning så session-cookies hinner med (router.push fastnade på "Skickar…").
+      window.location.assign("/admin");
       return;
     }
 
