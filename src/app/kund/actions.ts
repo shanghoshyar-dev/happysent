@@ -173,6 +173,7 @@ export async function createKundEmployee(formData: FormData) {
   ]);
 
   revalidateKund(session.companyId);
+  redirect("/kund/anstallda");
 }
 
 export async function updateKundEmployee(id: string, formData: FormData) {
@@ -199,6 +200,7 @@ export async function updateKundEmployee(id: string, formData: FormData) {
   if (error) throw new Error(error.message);
   revalidateKund(session.companyId);
   revalidatePath(`/kund/anstallda/${id}`);
+  redirect("/kund/anstallda");
 }
 
 export async function deleteKundEmployee(id: string) {
