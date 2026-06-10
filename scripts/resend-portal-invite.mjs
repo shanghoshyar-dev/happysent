@@ -57,6 +57,7 @@ async function createPortalInviteLink(admin, email, companyId) {
     const url = new URL(redirectTo);
     url.searchParams.set("token_hash", properties.hashed_token);
     url.searchParams.set("type", properties.verification_type);
+    url.searchParams.set("company_id", companyId);
     return url.toString();
   }
 

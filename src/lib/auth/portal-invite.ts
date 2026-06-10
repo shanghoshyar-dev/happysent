@@ -10,20 +10,24 @@ export function portalInviteRedirectUrl(): string {
 function buildPortalActivateUrl(
   hashedToken: string,
   verificationType: string,
+  companyId: string,
 ): string {
   const url = new URL(portalInviteRedirectUrl());
   url.searchParams.set("token_hash", hashedToken);
   url.searchParams.set("type", verificationType);
+  url.searchParams.set("company_id", companyId);
   return url.toString();
 }
 
 function linkFromGenerateResponse(
   properties: { hashed_token?: string; verification_type?: string } | undefined,
+  companyId: string,
 ): string | null {
   if (properties?.hashed_token && properties.verification_type) {
     return buildPortalActivateUrl(
       properties.hashed_token,
       properties.verification_type,
+      companyId,
     );
   }
   return null;
@@ -48,6 +52,7 @@ export async function createPortalInviteLink(
 
   const actionLink = linkFromGenerateResponse(
     invite.data.properties ?? undefined,
+    companyId,
   );
   if (!invite.error && actionLink) {
     return { ok: true, actionLink };
@@ -64,6 +69,7 @@ export async function createPortalInviteLink(
     });
     const recoveryLink = linkFromGenerateResponse(
       recovery.data.properties ?? undefined,
+      companyId,
     );
     if (!recovery.error && recoveryLink) {
       return { ok: true, actionLink: recoveryLink };

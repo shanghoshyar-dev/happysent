@@ -19,11 +19,13 @@ async function finishAuthRedirect(
   origin: string,
   next: string,
   user: { id: string; email?: string; user_metadata?: Record<string, unknown> },
+  companyIdFromUrl?: string,
 ) {
   const companyIdMeta =
-    typeof user.user_metadata?.company_id === "string"
+    companyIdFromUrl ||
+    (typeof user.user_metadata?.company_id === "string"
       ? user.user_metadata.company_id
-      : undefined;
+      : undefined);
 
   if (!(await isAdminUser(user.id))) {
     await ensureCompanyUserFromInvite(user.id, user.email, companyIdMeta);
@@ -43,13 +45,14 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "";
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
+  const companyId = searchParams.get("company_id") ?? undefined;
 
   const supabase = createClient();
 
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.user) {
-      return finishAuthRedirect(origin, next, data.user);
+      return finishAuthRedirect(origin, next, data.user, companyId);
     }
   }
 
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
       type,
     });
     if (!error && data.user) {
-      return finishAuthRedirect(origin, next, data.user);
+      return finishAuthRedirect(origin, next, data.user, companyId);
     }
   }
 

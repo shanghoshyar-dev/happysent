@@ -35,7 +35,7 @@ export async function getCompanySession(): Promise<CompanySession | null> {
     .from("company_users")
     .select("company_id, companies:company_id ( name )")
     .eq("user_id", user.id)
-    .order("created_at")
+    .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
@@ -56,52 +56,71 @@ export async function getCompanySession(): Promise<CompanySession | null> {
 export async function ensureCompanyUserFromInvite(
   userId: string,
   email: string | undefined,
-  companyIdFromMeta: string | undefined,
+  companyIdHint: string | undefined,
 ): Promise<string | null> {
   const admin = createAdminClient();
+  const normalizedEmail = email?.trim();
 
-  const { data: existing } = await admin
-    .from("company_users")
-    .select("company_id")
-    .eq("user_id", userId)
-    .maybeSingle();
+  let targetCompanyId = companyIdHint?.trim() || null;
 
-  if (existing?.company_id) return existing.company_id;
-
-  let companyId = companyIdFromMeta?.trim() || null;
-
-  if (!companyId && email) {
+  if (!targetCompanyId && normalizedEmail) {
     const { data: invite } = await admin
       .from("company_portal_invites")
       .select("company_id")
-      .ilike("email", email.trim())
+      .ilike("email", normalizedEmail)
       .is("accepted_at", null)
       .order("invited_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    companyId = invite?.company_id ?? null;
+    targetCompanyId = invite?.company_id ?? null;
   }
 
-  if (!companyId) return null;
+  const { data: existingRows } = await admin
+    .from("company_users")
+    .select("company_id")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
-  const { error: insErr } = await admin.from("company_users").insert({
-    user_id: userId,
-    company_id: companyId,
-  });
-  if (insErr && !insErr.message.includes("duplicate")) {
-    console.error("[auth] ensureCompanyUserFromInvite:", insErr.message);
-    return null;
+  const existingCompanyId = existingRows?.[0]?.company_id ?? null;
+
+  if (targetCompanyId) {
+    if (normalizedEmail) {
+      const { data: inviteRow } = await admin
+        .from("company_portal_invites")
+        .select("company_id")
+        .eq("company_id", targetCompanyId)
+        .ilike("email", normalizedEmail)
+        .maybeSingle();
+
+      if (!inviteRow && existingCompanyId !== targetCompanyId) {
+        return existingCompanyId;
+      }
+    }
+
+    if (existingCompanyId !== targetCompanyId) {
+      await admin.from("company_users").delete().eq("user_id", userId);
+      const { error: insErr } = await admin.from("company_users").insert({
+        user_id: userId,
+        company_id: targetCompanyId,
+      });
+      if (insErr && !insErr.message.includes("duplicate")) {
+        console.error("[auth] ensureCompanyUserFromInvite:", insErr.message);
+        return existingCompanyId;
+      }
+    }
+
+    if (normalizedEmail) {
+      await admin
+        .from("company_portal_invites")
+        .update({ accepted_at: new Date().toISOString() })
+        .eq("company_id", targetCompanyId)
+        .ilike("email", normalizedEmail);
+    }
+
+    return targetCompanyId;
   }
 
-  if (email) {
-    await admin
-      .from("company_portal_invites")
-      .update({ accepted_at: new Date().toISOString() })
-      .eq("company_id", companyId)
-      .ilike("email", email.trim());
-  }
-
-  return companyId;
+  return existingCompanyId;
 }
 
 export async function resolvePostLoginRedirect(
