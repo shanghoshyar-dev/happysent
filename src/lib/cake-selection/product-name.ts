@@ -1,5 +1,9 @@
-/** Synligt tårtnamn utan osynliga tecken (DB kan ha unika suffix per bageri). */
+/** Synligt tårtnamn utan osynliga tecken (DB kan ha unikt suffix per bageri). */
 export function displayProductName(name: string): string {
+  const separator = name.indexOf("\u200B");
+  if (separator !== -1) {
+    return name.slice(0, separator);
+  }
   return name.replace(/[\u200B-\u200D\uFEFF]/g, "");
 }
 

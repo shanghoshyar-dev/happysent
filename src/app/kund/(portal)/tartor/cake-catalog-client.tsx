@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { getCakeImageUrl } from "@/lib/cake-selection/catalog-images";
 import { cn } from "@/lib/utils";
 
 import { assignPreferredCake, clearPreferredCake } from "../../actions";
@@ -22,12 +24,11 @@ export interface CakeEmployee {
 }
 
 interface Props {
-  catalogPdfUrl: string;
   products: CakeProduct[];
   employees: CakeEmployee[];
 }
 
-export function CakeCatalogClient({ catalogPdfUrl, products, employees }: Props) {
+export function CakeCatalogClient({ products, employees }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
@@ -89,36 +90,18 @@ export function CakeCatalogClient({ catalogPdfUrl, products, employees }: Props)
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-sm text-slate-600">
-          Bläddra bland tårtorna och koppla en favorit till en eller flera
-          anställda. Valet används automatiskt vid kommande födelsedagar.
-        </p>
-        <p className="mt-3">
-          <a
-            href={catalogPdfUrl}
-            className="text-sm font-medium text-coral-600 hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ladda ner tårtkatalog (PDF)
-          </a>
-        </p>
-        <div className="mt-4 overflow-hidden rounded-xl border border-candy-100 bg-white">
-          <iframe
-            title="Tårtkatalog"
-            src={catalogPdfUrl}
-            className="h-64 w-full"
-          />
-        </div>
-      </div>
+      <p className="text-sm text-slate-600">
+        Bläddra bland tårtorna och koppla en favorit till en eller flera
+        anställda. Valet används automatiskt vid kommande födelsedagar.
+      </p>
 
       <section>
         <h2 className="font-semibold text-slate-900">Välj tårta</h2>
-        <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+        <div className="mt-3 flex gap-4 overflow-x-auto pb-2">
           {products.map((product) => {
             const linked = employeesByProduct.get(product.id) ?? [];
             const isSelected = selectedProductId === product.id;
+            const imageUrl = getCakeImageUrl(product.name);
             return (
               <button
                 key={product.id}
@@ -128,25 +111,42 @@ export function CakeCatalogClient({ catalogPdfUrl, products, employees }: Props)
                   setMessage(null);
                 }}
                 className={cn(
-                  "min-w-[180px] shrink-0 rounded-xl border p-4 text-left transition-colors",
+                  "w-[200px] shrink-0 overflow-hidden rounded-xl border text-left transition-colors",
                   isSelected
                     ? "border-candy-400 bg-candy-50 ring-1 ring-candy-300"
                     : "border-candy-100 bg-white hover:border-candy-200",
                 )}
               >
-                <span className="font-medium text-slate-900">{product.name}</span>
-                {product.dietaryNotes ? (
-                  <span className="mt-1 block text-xs text-slate-500">
-                    {product.dietaryNotes}
-                  </span>
-                ) : null}
-                {linked.length > 0 ? (
-                  <span className="mt-2 block text-xs font-medium text-emerald-700">
-                    {linked.length} anställd
-                    {linked.length === 1 ? "" : "a"} kopplad
-                    {linked.length === 1 ? "" : "e"}
-                  </span>
-                ) : null}
+                <div className="relative aspect-[4/3] bg-cream-100">
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="200px"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                      Ingen bild
+                    </div>
+                  )}
+                </div>
+                <div className="p-3">
+                  <span className="font-medium text-slate-900">{product.name}</span>
+                  {product.dietaryNotes ? (
+                    <span className="mt-1 block text-xs text-slate-500">
+                      {product.dietaryNotes}
+                    </span>
+                  ) : null}
+                  {linked.length > 0 ? (
+                    <span className="mt-2 block text-xs font-medium text-emerald-700">
+                      {linked.length} anställd
+                      {linked.length === 1 ? "" : "a"} kopplad
+                      {linked.length === 1 ? "" : "e"}
+                    </span>
+                  ) : null}
+                </div>
               </button>
             );
           })}

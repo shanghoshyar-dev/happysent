@@ -3,11 +3,8 @@ import { notFound } from "next/navigation";
 
 import { BrandLogo } from "@/components/marketing/brand-logo";
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
-import { getBakeryCatalogPdfUrl } from "@/lib/cake-selection/catalog-url";
-import {
-  getBakeryCatalogPdfPath,
-  getSelectableProductsForCity,
-} from "@/lib/cake-selection/products";
+import { displayProductName } from "@/lib/cake-selection/product-name";
+import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
@@ -54,10 +51,7 @@ export default async function ValjaTartaPage({ params }: Props) {
         company.bakery_id ?? null,
       )
     : [];
-  const catalogPdfPath = company?.bakery_id
-    ? await getBakeryCatalogPdfPath(company.bakery_id)
-    : null;
-  const catalogPdfUrl = getBakeryCatalogPdfUrl(catalogPdfPath);
+  const chosenName = chosen?.name ? displayProductName(chosen.name) : null;
 
   if (!products.length) {
     return (
@@ -106,16 +100,6 @@ export default async function ValjaTartaPage({ params }: Props) {
             åt er utifrån ert företags storlek och tidigare val.
           </p>
         ) : null}
-        <p className="mt-4">
-          <a
-            href={catalogPdfUrl}
-            className="text-sm font-medium text-coral-600 hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ladda ner tårtkatalog (PDF)
-          </a>
-        </p>
         <div className="mt-8">
           <CakeSelectionForm
             token={params.token}
@@ -124,7 +108,7 @@ export default async function ValjaTartaPage({ params }: Props) {
               name: p.name,
               dietaryNotes: p.dietary_notes,
             }))}
-            alreadyChosen={chosen?.name ?? null}
+            alreadyChosen={chosenName}
           />
         </div>
         <p className="mt-8 text-center text-xs text-slate-400">

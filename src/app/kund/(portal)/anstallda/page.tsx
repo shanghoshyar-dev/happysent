@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { getCompanySession } from "@/lib/auth/session";
+import { displayProductName } from "@/lib/cake-selection/product-name";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
@@ -81,7 +82,7 @@ export default async function KundAnstalldaPage() {
                   <TD>{e.gift_type === "flowers" ? "Blommor" : "Tårta"}</TD>
                   <TD>
                     {e.gift_type === "cake" && product?.name ? (
-                      product.name
+                      displayProductName(product.name)
                     ) : e.gift_type === "cake" ? (
                       <Link
                         href="/kund/tartor"

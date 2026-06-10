@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
+import { getCakeImageUrl } from "@/lib/cake-selection/catalog-images";
+import { cn } from "@/lib/utils";
+
 import { selectCakeForOrder } from "./actions";
 
 interface ProductOption {
@@ -56,31 +60,53 @@ export function CakeSelectionForm({
         });
       }}
     >
-      <fieldset className="space-y-2">
+      <fieldset>
         <legend className="sr-only">Välj tårta</legend>
-        {products.map((p) => (
-          <label
-            key={p.id}
-            className="flex cursor-pointer items-start gap-3 rounded-xl border border-candy-100 bg-white p-4 has-[:checked]:border-candy-400 has-[:checked]:ring-1 has-[:checked]:ring-candy-300"
-          >
-            <input
-              type="radio"
-              name="product"
-              value={p.id}
-              checked={selected === p.id}
-              onChange={() => setSelected(p.id)}
-              className="mt-1"
-            />
-            <span>
-              <span className="font-medium text-slate-900">{p.name}</span>
-              {p.dietaryNotes ? (
-                <span className="ml-2 text-sm text-slate-500">
-                  ({p.dietaryNotes})
-                </span>
-              ) : null}
-            </span>
-          </label>
-        ))}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {products.map((p) => {
+            const imageUrl = getCakeImageUrl(p.name);
+            const isSelected = selected === p.id;
+            return (
+              <label
+                key={p.id}
+                className={cn(
+                  "cursor-pointer overflow-hidden rounded-xl border bg-white transition-colors",
+                  isSelected
+                    ? "border-candy-400 ring-1 ring-candy-300"
+                    : "border-candy-100 hover:border-candy-200",
+                )}
+              >
+                <input
+                  type="radio"
+                  name="product"
+                  value={p.id}
+                  checked={isSelected}
+                  onChange={() => setSelected(p.id)}
+                  className="sr-only"
+                />
+                <div className="relative aspect-[4/3] bg-cream-100">
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={p.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 240px"
+                    />
+                  ) : null}
+                </div>
+                <div className="p-3">
+                  <span className="font-medium text-slate-900">{p.name}</span>
+                  {p.dietaryNotes ? (
+                    <span className="mt-1 block text-sm text-slate-500">
+                      {p.dietaryNotes}
+                    </span>
+                  ) : null}
+                </div>
+              </label>
+            );
+          })}
+        </div>
       </fieldset>
       <Button type="submit" disabled={pending || !selected} className="w-full">
         {pending ? "Sparar…" : "Bekräfta val"}

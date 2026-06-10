@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getCompanySession } from "@/lib/auth/session";
-import { getBakeryCatalogPdfUrl } from "@/lib/cake-selection/catalog-url";
-import {
-  getBakeryCatalogPdfPath,
-  getSelectableProductsForCity,
-} from "@/lib/cake-selection/products";
+import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
 import { createClient } from "@/lib/supabase/server";
 
 import { CakeCatalogClient } from "./cake-catalog-client";
@@ -40,10 +36,6 @@ export default async function KundTartorPage() {
   const products = company?.city
     ? await getSelectableProductsForCity(company.city, company.bakery_id)
     : [];
-  const catalogPdfPath = company?.bakery_id
-    ? await getBakeryCatalogPdfPath(company.bakery_id)
-    : null;
-  const catalogPdfUrl = getBakeryCatalogPdfUrl(catalogPdfPath);
 
   return (
     <div>
@@ -53,7 +45,6 @@ export default async function KundTartorPage() {
       </p>
       <div className="mt-8">
         <CakeCatalogClient
-          catalogPdfUrl={catalogPdfUrl}
           products={products.map((p) => ({
             id: p.id,
             name: p.name,
