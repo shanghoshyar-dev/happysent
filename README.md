@@ -63,6 +63,7 @@ cp .env.local.example .env.local
 - Inloggning: `/kund/login`
 - Admin skickar inbjudan från **Aktivera företag** efter att anställda lagts in.
 - HR hanterar anställda på `/kund` — ser bara sitt eget företag (RLS).
+- Favorittårtor väljs på `/kund/tartor` (kräver migration `20260604120000_employee_preferred_product.sql`).
 
 ### 6. Starta dev-servern
 

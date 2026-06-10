@@ -61,7 +61,13 @@ export default async function KundDashboardPage() {
             {upcoming?.length ?? 0}
           </p>
           <p className="mt-3 text-sm text-slate-500">
-            Tårtval sker via mejl 14 dagar före leverans.
+            <Link
+              href="/kund/tartor"
+              className="font-medium text-coral-600 hover:underline"
+            >
+              Välj favorittårtor
+            </Link>{" "}
+            för anställda — annars skickas val-länk 14 dagar före leverans.
           </p>
         </Card>
       </div>

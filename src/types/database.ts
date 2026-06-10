@@ -358,6 +358,7 @@ export type Database = {
           celebration_frequency: CelebrationFrequency;
           gift_type: GiftType;
           is_active: boolean;
+          preferred_product_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -370,6 +371,7 @@ export type Database = {
           celebration_frequency?: CelebrationFrequency;
           gift_type?: GiftType;
           is_active?: boolean;
+          preferred_product_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -382,6 +384,7 @@ export type Database = {
           celebration_frequency?: CelebrationFrequency;
           gift_type?: GiftType;
           is_active?: boolean;
+          preferred_product_id?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -390,6 +393,13 @@ export type Database = {
             columns: ["company_id"];
             isOneToOne: false;
             referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "employees_preferred_product_id_fkey";
+            columns: ["preferred_product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
             referencedColumns: ["id"];
           },
         ];

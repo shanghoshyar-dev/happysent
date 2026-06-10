@@ -8,6 +8,7 @@ import {
 import { CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE } from "@/lib/cake-selection/constants";
 import {
   applyAutoPickToOrder,
+  applyEmployeePreferredToOrder,
   getOrderProductName,
 } from "@/lib/cake-selection/auto-pick";
 import { selectionDeadlineFromDelivery } from "@/lib/cake-selection/deadline";
@@ -63,7 +64,7 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
       celebration_frequency, gift_type,
       companies:company_id (
         id, name, address, city, contact_email, contact_phone, billing_email,
-        price_per_cake, price_per_flowers, status, offers_flowers, florist_id,
+        price_per_cake, price_per_flowers, status, offers_flowers, florist_id, bakery_id,
         bakeries:bakery_id ( id, name, email ),
         florists:florist_id ( id, name, email )
       )
@@ -129,6 +130,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           deliveryIso,
           price,
           giftType,
+          companyCity: company.city,
+          companyBakeryId: company.bakery_id,
         });
         if (order.created) result.ordersUpserted++;
 
@@ -220,6 +223,7 @@ interface CompanyJoin {
   status: "active" | "paused";
   offers_flowers: boolean;
   florist_id: string | null;
+  bakery_id: string | null;
   bakeries: Partner | null;
   florists: Partner | null;
 }
@@ -237,8 +241,19 @@ async function ensureOrder(args: {
   deliveryIso: string;
   price: number;
   giftType: GiftType;
+  companyCity: string;
+  companyBakeryId: string | null;
 }): Promise<OrderRow> {
-  const { supabase, employeeId, companyId, deliveryIso, price, giftType } = args;
+  const {
+    supabase,
+    employeeId,
+    companyId,
+    deliveryIso,
+    price,
+    giftType,
+    companyCity,
+    companyBakeryId,
+  } = args;
 
   const deadline =
     giftType === "cake" ? selectionDeadlineFromDelivery(deliveryIso) : null;
@@ -282,6 +297,16 @@ async function ensureOrder(args: {
   if (insErr || !inserted) {
     throw new Error(`Insert order failed: ${insErr?.message ?? "no row"}`);
   }
+
+  if (giftType === "cake" && companyCity.trim()) {
+    await applyEmployeePreferredToOrder(
+      inserted.id,
+      employeeId,
+      companyCity,
+      companyBakeryId,
+    );
+  }
+
   return {
     id: inserted.id,
     selectionToken: inserted.selection_token,
@@ -383,13 +408,17 @@ async function buildActions(args: {
       return [
         {
           type: "14_days",
-          send: () =>
-            send14DayCompany({
+          send: async () => {
+            const productName =
+              giftType === "cake" ? await getOrderProductName(orderId) : null;
+            return send14DayCompany({
               ...baseCompany,
-              includeCakeSelection: giftType === "cake",
+              includeCakeSelection: giftType === "cake" && !productName,
+              preSelectedProductName: productName,
               selectionUrl: cakeSelectionUrl(selectionToken),
               selectionDeadline: selectionDeadlineFromDelivery(deliveryIso),
-            }),
+            });
+          },
         },
       ];
     case 7: {

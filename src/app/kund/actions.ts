@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { getCompanySession } from "@/lib/auth/session";
+import { validateProductForCompany } from "@/lib/cake-selection/assign-product";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
@@ -43,7 +44,104 @@ async function requireCompanySession() {
 function revalidateKund(companyId: string) {
   revalidatePath("/kund");
   revalidatePath("/kund/anstallda");
+  revalidatePath("/kund/tartor");
   revalidatePath(`/admin/foretag/${companyId}/aktivera`);
+}
+
+export type AssignPreferredCakeResult =
+  | { ok: true; count: number; productName: string }
+  | { ok: false; error: string };
+
+export async function assignPreferredCake(
+  productId: string,
+  employeeIds: string[],
+): Promise<AssignPreferredCakeResult> {
+  const session = await requireCompanySession();
+  if (!employeeIds.length) {
+    return { ok: false, error: "Välj minst en anställd." };
+  }
+
+  const supabase = createClient();
+  const { data: company, error: coErr } = await supabase
+    .from("companies")
+    .select("city, bakery_id")
+    .eq("id", session.companyId)
+    .maybeSingle();
+
+  if (coErr || !company?.city?.trim()) {
+    return { ok: false, error: "Företaget saknar stad." };
+  }
+
+  const product = await validateProductForCompany(
+    company.city,
+    productId,
+    company.bakery_id,
+  );
+  if (!product) {
+    return { ok: false, error: "Ogiltigt tårtval." };
+  }
+
+  const { data: employees, error: empErr } = await supabase
+    .from("employees")
+    .select("id")
+    .eq("company_id", session.companyId)
+    .eq("is_active", true)
+    .eq("gift_type", "cake")
+    .in("id", employeeIds);
+
+  if (empErr) return { ok: false, error: empErr.message };
+  if (!employees?.length) {
+    return { ok: false, error: "Inga giltiga anställda valdes." };
+  }
+
+  const ids = employees.map((e) => e.id);
+  const { error: updErr } = await supabase
+    .from("employees")
+    .update({ preferred_product_id: productId })
+    .eq("company_id", session.companyId)
+    .in("id", ids);
+
+  if (updErr) return { ok: false, error: updErr.message };
+
+  revalidateKund(session.companyId);
+  return { ok: true, count: ids.length, productName: product.name };
+}
+
+export type ClearPreferredCakeResult =
+  | { ok: true; count: number }
+  | { ok: false; error: string };
+
+export async function clearPreferredCake(
+  employeeIds: string[],
+): Promise<ClearPreferredCakeResult> {
+  const session = await requireCompanySession();
+  if (!employeeIds.length) {
+    return { ok: false, error: "Välj minst en anställd." };
+  }
+
+  const supabase = createClient();
+  const { data: employees, error: empErr } = await supabase
+    .from("employees")
+    .select("id")
+    .eq("company_id", session.companyId)
+    .in("id", employeeIds);
+
+  if (empErr) return { ok: false, error: empErr.message };
+  if (!employees?.length) {
+    return { ok: false, error: "Inga giltiga anställda valdes." };
+  }
+
+  const ids = employees.map((e) => e.id);
+  const { error: updErr } = await supabase
+    .from("employees")
+    .update({ preferred_product_id: null })
+    .eq("company_id", session.companyId)
+    .in("id", ids);
+
+  if (updErr) return { ok: false, error: updErr.message };
+
+  revalidateKund(session.companyId);
+  return { ok: true, count: ids.length };
 }
 
 export async function createKundEmployee(formData: FormData) {

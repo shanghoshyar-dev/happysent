@@ -17,7 +17,9 @@ export default async function KundAnstalldaPage() {
   const supabase = createClient();
   const { data: employees } = await supabase
     .from("employees")
-    .select("id, first_name, last_name, birthday, is_active, gift_type")
+    .select(
+      "id, first_name, last_name, birthday, is_active, gift_type, preferred_product_id, products:preferred_product_id ( name )",
+    )
     .eq("company_id", session.companyId)
     .order("last_name")
     .order("first_name");
@@ -62,18 +64,35 @@ export default async function KundAnstalldaPage() {
                 <TH>Namn</TH>
                 <TH>Födelsedag</TH>
                 <TH>Gåva</TH>
+                <TH>Favorittårta</TH>
                 <TH>Status</TH>
                 <TH />
               </TR>
             </THead>
             <TBody>
-              {employees.map((e) => (
+              {employees.map((e) => {
+                const product = e.products as { name: string } | null;
+                return (
                 <TR key={e.id}>
                   <TD>
                     {e.first_name} {e.last_name}
                   </TD>
                   <TD>{formatDate(e.birthday)}</TD>
                   <TD>{e.gift_type === "flowers" ? "Blommor" : "Tårta"}</TD>
+                  <TD>
+                    {e.gift_type === "cake" && product?.name ? (
+                      product.name
+                    ) : e.gift_type === "cake" ? (
+                      <Link
+                        href="/kund/tartor"
+                        className="text-sm text-coral-600 hover:underline"
+                      >
+                        Välj tårta
+                      </Link>
+                    ) : (
+                      "—"
+                    )}
+                  </TD>
                   <TD>
                     <Badge tone={e.is_active ? "success" : "neutral"}>
                       {e.is_active ? "Aktiv" : "Pausad"}
@@ -88,7 +107,8 @@ export default async function KundAnstalldaPage() {
                     </Link>
                   </TD>
                 </TR>
-              ))}
+              );
+              })}
             </TBody>
           </Table>
         </Card>

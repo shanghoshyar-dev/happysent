@@ -2,6 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { validateProductForCompany } from "./assign-product";
 import { getSelectableProductsForCity } from "./products";
 
 export type CakeSelectionStatus = "pending" | "customer" | "auto" | "default";
@@ -12,6 +13,7 @@ interface PickContext {
   bakeryId: string | null;
   numberOfPeople: number;
   defaultProductId: string | null;
+  employeePreferredProductId: string | null;
 }
 
 interface ProductRow {
@@ -63,6 +65,13 @@ export async function pickProductForOrder(
 
   const activeIds = new Set(products.map((p) => p.id));
 
+  if (
+    ctx.employeePreferredProductId &&
+    activeIds.has(ctx.employeePreferredProductId)
+  ) {
+    return { productId: ctx.employeePreferredProductId, status: "customer" };
+  }
+
   if (ctx.defaultProductId && activeIds.has(ctx.defaultProductId)) {
     return { productId: ctx.defaultProductId, status: "default" };
   }
@@ -87,7 +96,7 @@ export async function applyAutoPickToOrder(orderId: string): Promise<boolean> {
     .select(
       `
       id, company_id, product_id, cake_selection_status, gift_type,
-      employees:employee_id ( number_of_people ),
+      employees:employee_id ( number_of_people, preferred_product_id ),
       companies:company_id ( default_product_id, bakery_id, city )
     `,
     )
@@ -104,7 +113,10 @@ export async function applyAutoPickToOrder(orderId: string): Promise<boolean> {
     bakery_id: string;
     city: string;
   } | null;
-  const emp = order.employees as { number_of_people: number } | null;
+  const emp = order.employees as {
+    number_of_people: number;
+    preferred_product_id: string | null;
+  } | null;
   if (!company?.city?.trim()) return false;
 
   const { productId, status } = await pickProductForOrder({
@@ -113,6 +125,7 @@ export async function applyAutoPickToOrder(orderId: string): Promise<boolean> {
     bakeryId: company.bakery_id,
     numberOfPeople: emp?.number_of_people ?? 8,
     defaultProductId: company.default_product_id,
+    employeePreferredProductId: emp?.preferred_product_id ?? null,
   });
 
   const { error: updErr } = await supabase
@@ -138,4 +151,40 @@ export async function getOrderProductName(orderId: string): Promise<string | nul
   if (!data?.product_id) return null;
   const product = data.products as { name: string } | null;
   return product?.name ?? null;
+}
+
+/** Applicera anställds favorittårta direkt vid orderskapande. */
+export async function applyEmployeePreferredToOrder(
+  orderId: string,
+  employeeId: string,
+  companyCity: string,
+  bakeryId: string | null,
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data: emp } = await supabase
+    .from("employees")
+    .select("preferred_product_id, gift_type")
+    .eq("id", employeeId)
+    .maybeSingle();
+
+  if (!emp?.preferred_product_id || emp.gift_type !== "cake") return false;
+
+  const product = await validateProductForCompany(
+    companyCity,
+    emp.preferred_product_id,
+    bakeryId,
+  );
+  if (!product) return false;
+
+  const { error: updErr } = await supabase
+    .from("orders")
+    .update({
+      product_id: product.id,
+      cake_selection_status: "customer",
+      selected_at: new Date().toISOString(),
+    })
+    .eq("id", orderId);
+
+  if (updErr) throw new Error(updErr.message);
+  return true;
 }

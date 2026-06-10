@@ -50,6 +50,7 @@ export interface FourteenDayCompanyArgs extends BaseArgs {
   selectionUrl: string;
   selectionDeadline: string;
   includeCakeSelection: boolean;
+  preSelectedProductName?: string | null;
 }
 
 async function loadCatalogPdfBase64(): Promise<string | null> {
@@ -79,7 +80,13 @@ export async function send14DayCompany(a: FourteenDayCompanyArgs) {
     text +=
       `Välj vilken tårta ni vill ha senast ${deadlineLabel} (5 dagar):\n` +
       `${a.selectionUrl}\n\n` +
-      `Tårtkatalogen finns bifogad som PDF. Om ni inte hinner välja väljer HappySent åt er utifrån ert företags storlek och tidigare beställningar.\n\n`;
+      `Ni kan också välja i kundportalen under Tårtor. Tårtkatalogen finns bifogad som PDF. ` +
+      `Om ni inte hinner välja väljer HappySent åt er utifrån ert företags storlek och tidigare beställningar.\n\n`;
+  } else if (a.preSelectedProductName) {
+    text +=
+      `Ni har redan valt tårta: ${a.preSelectedProductName}.\n` +
+      `Den levereras automatiskt den ${formatSwedishDate(a.deliveryDate)}. ` +
+      `Vill ni ändra valet? Logga in på kundportalen under Tårtor.\n\n`;
   } else {
     text +=
       `En tårta är bokad och levereras automatiskt den dagen.\n` +

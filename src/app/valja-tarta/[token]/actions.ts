@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { isProductAllowedInCity } from "@/lib/cake-selection/products";
+import {
+  applyProductToOrder,
+  validateProductForCompany,
+} from "@/lib/cake-selection/assign-product";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type SelectCakeResult =
@@ -19,7 +22,7 @@ export async function selectCakeForOrder(
     .from("orders")
     .select(
       `
-      id, gift_type, cake_selection_status, selection_deadline, product_id,
+      id, gift_type, cake_selection_status, product_id,
       companies:company_id ( city, bakery_id )
     `,
     )
@@ -41,37 +44,16 @@ export async function selectCakeForOrder(
     return { ok: false, error: "Företaget saknar stad." };
   }
 
-  const allowed = await isProductAllowedInCity(
+  const product = await validateProductForCompany(
     company.city,
     productId,
     company.bakery_id ?? null,
   );
-  if (!allowed) {
+  if (!product) {
     return { ok: false, error: "Ogiltigt tårtval." };
   }
 
-  const { data: product, error: prodErr } = await supabase
-    .from("products")
-    .select("id, name, is_active")
-    .eq("id", productId)
-    .maybeSingle();
-
-  if (prodErr || !product || !product.is_active) {
-    return { ok: false, error: "Ogiltigt tårtval." };
-  }
-
-  const { error: updErr } = await supabase
-    .from("orders")
-    .update({
-      product_id: productId,
-      cake_selection_status: "customer",
-      selected_at: new Date().toISOString(),
-    })
-    .eq("id", order.id);
-
-  if (updErr) {
-    return { ok: false, error: updErr.message };
-  }
+  await applyProductToOrder(order.id, product.id);
 
   revalidatePath(`/valja-tarta/${token}`);
   return { ok: true, productName: product.name };
