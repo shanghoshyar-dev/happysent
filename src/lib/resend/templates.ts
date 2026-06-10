@@ -3,6 +3,7 @@ import "server-only";
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
 import { loadBakeryCatalogPdfBase64 } from "@/lib/cake-selection/catalog";
 import { formatOrganizationNumber } from "@/lib/organization-number";
+import { getSiteUrl } from "@/lib/site-url";
 import { formatSek } from "@/lib/utils";
 import { getResend } from "@/lib/resend/client";
 import {
@@ -45,6 +46,7 @@ interface BaseArgs {
 // 1) 14 days before — to company
 export interface FourteenDayCompanyArgs extends BaseArgs {
   to: string;
+  giftType: "cake" | "flowers";
   selectionUrl: string;
   selectionDeadline: string;
   includeCakeSelection: boolean;
@@ -53,27 +55,44 @@ export interface FourteenDayCompanyArgs extends BaseArgs {
 }
 
 export async function send14DayCompany(a: FourteenDayCompanyArgs) {
-  const subject = `🎂 ${a.employeeFirstName} fyller år om två veckor – välj tårta`;
+  const portalCakesUrl = `${getSiteUrl()}/kund/tartor`;
   const deadlineLabel = formatDeadlineSv(a.selectionDeadline);
+  const deliveryLabel = formatSwedishDate(a.deliveryDate);
+  const employeeName = `${a.employeeFirstName} ${a.employeeLastName}`;
+
+  let subject: string;
+  if (a.giftType === "flowers") {
+    subject = `🎂 ${a.employeeFirstName} fyller år om två veckor`;
+  } else if (a.includeCakeSelection) {
+    subject = `🎂 ${a.employeeFirstName} fyller år om två veckor – välj tårta`;
+  } else {
+    subject = `🎂 ${a.employeeFirstName} fyller år om två veckor – tårta bokad`;
+  }
 
   let text =
     `Hej ${a.companyName}!\n\n` +
-    `Vi vill påminna om att ${a.employeeFirstName} ${a.employeeLastName} fyller år om 14 dagar, den ${formatSwedishDate(a.deliveryDate)}.\n\n`;
+    `Vi vill påminna om att ${employeeName} fyller år om 14 dagar, den ${deliveryLabel}.\n\n`;
 
-  if (a.includeCakeSelection) {
+  if (a.giftType === "flowers") {
     text +=
-      `Välj vilken tårta ni vill ha senast ${deadlineLabel} (5 dagar):\n` +
-      `${a.selectionUrl}\n\n` +
-      `Ni kan också välja i kundportalen under Tårtor. Tårtkatalogen finns bifogad som PDF. ` +
-      `Om ni inte hinner välja väljer HappySent åt er utifrån ert företags storlek och tidigare beställningar.\n\n`;
+      `Blommorna är bokade och levereras automatiskt den ${deliveryLabel}.\n` +
+      `Ni behöver inte göra någonting!\n\n`;
+  } else if (a.includeCakeSelection) {
+    text +=
+      `Ni har inte valt tårta till ${a.employeeFirstName} ännu. Välj senast ${deadlineLabel} (5 dagar):\n\n` +
+      `• I kundportalen: ${portalCakesUrl}\n` +
+      `  Logga in och välj favorittårta för den anställda.\n` +
+      `• Eller via länk (utan inloggning): ${a.selectionUrl}\n\n` +
+      `Tårtkatalogen finns bifogad som PDF.\n\n` +
+      `Om ni inte hinner välja skickar vi en standardtårta till ${a.employeeFirstName}.\n\n`;
   } else if (a.preSelectedProductName) {
     text +=
-      `Ni har redan valt tårta: ${a.preSelectedProductName}.\n` +
-      `Den levereras automatiskt den ${formatSwedishDate(a.deliveryDate)}. ` +
-      `Vill ni ändra valet? Logga in på kundportalen under Tårtor.\n\n`;
+      `Ni har redan valt tårta till ${a.employeeFirstName}: ${a.preSelectedProductName}.\n` +
+      `Den levereras automatiskt den ${deliveryLabel}.\n` +
+      `Vill ni ändra valet? Logga in på ${portalCakesUrl}.\n\n`;
   } else {
     text +=
-      `En tårta är bokad och levereras automatiskt den dagen.\n` +
+      `En tårta är bokad och levereras automatiskt den ${deliveryLabel}.\n` +
       `Ni behöver inte göra någonting!\n\n`;
   }
 

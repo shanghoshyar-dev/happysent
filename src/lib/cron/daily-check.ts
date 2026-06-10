@@ -414,6 +414,7 @@ async function buildActions(args: {
               giftType === "cake" ? await getOrderProductName(orderId) : null;
             return send14DayCompany({
               ...baseCompany,
+              giftType,
               includeCakeSelection: giftType === "cake" && !productName,
               preSelectedProductName: productName,
               catalogPdfPath: bakery?.catalog_pdf_path ?? null,
