@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { EmployeeForm } from "@/app/admin/anstallda/employee-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getCompanySession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteKundEmployee, updateKundEmployee } from "../../../actions";
+import { KundEmployeeForm } from "../kund-employee-form";
 
 export const dynamic = "force-dynamic";
 
@@ -44,10 +44,10 @@ export default async function KundEditAnstalldPage({ params }: Props) {
         </Link>
       </div>
       <Card className="max-w-3xl p-6">
-        <EmployeeForm
+        <KundEmployeeForm
           employee={employee}
           companies={companies}
-          hideCompanySelect
+          companyId={session.companyId}
           action={update}
           submitLabel="Spara ändringar"
         />

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
@@ -33,11 +32,17 @@ export default async function KundAnstalldaPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/kund/anstallda/import">
-            <Button variant="secondary">Importera Excel</Button>
+          <Link
+            href="/kund/anstallda/import"
+            className="inline-flex h-10 items-center justify-center rounded-full border border-candy-200 bg-white px-4 text-sm font-medium text-candy-700 transition-all hover:bg-candy-50"
+          >
+            Importera Excel
           </Link>
-          <Link href="/kund/anstallda/ny">
-            <Button>Lägg till</Button>
+          <Link
+            href="/kund/anstallda/ny"
+            className="inline-flex h-10 items-center justify-center rounded-full bg-candy-500 px-4 text-sm font-medium text-white shadow-soft transition-all hover:bg-candy-600"
+          >
+            Lägg till
           </Link>
         </div>
       </div>

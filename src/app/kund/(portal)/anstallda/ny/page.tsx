@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { EmployeeForm } from "@/app/admin/anstallda/employee-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getCompanySession } from "@/lib/auth/session";
 
 import { createKundEmployee } from "../../../actions";
+import { KundEmployeeForm } from "../kund-employee-form";
 
 export const dynamic = "force-dynamic";
 
@@ -25,10 +25,9 @@ export default async function KundNyAnstalldPage() {
         </Link>
       </div>
       <Card className="max-w-3xl p-6">
-        <EmployeeForm
+        <KundEmployeeForm
           companies={companies}
-          defaultCompanyId={session.companyId}
-          hideCompanySelect
+          companyId={session.companyId}
           action={createKundEmployee}
           submitLabel="Lägg till"
         />
