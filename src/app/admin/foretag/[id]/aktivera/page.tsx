@@ -59,7 +59,7 @@ export default async function AktiveraForetagPage({ params }: Props) {
     <div>
       <PageHeader
         title={`Aktivera: ${company.name}`}
-        description="Lägg in anställda och skicka välkomstmejl när allt stämmer."
+        description="Skicka kundportal-inbjudan direkt, eller lägg in anställda först om du vill."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Företag", href: "/admin/foretag" },
@@ -86,7 +86,6 @@ export default async function AktiveraForetagPage({ params }: Props) {
         <SendPortalInviteButton
           companyId={company.id}
           contactEmail={company.contact_email}
-          employeeCount={employeeCount}
           inviteAlreadySent={inviteSent}
         />
       </div>
@@ -146,6 +145,9 @@ export default async function AktiveraForetagPage({ params }: Props) {
           </div>
         )}
         <p className="mt-4 text-sm text-slate-500">
+          Anställda du lägger in här syns också i kundportalen. Välkomstmejlet
+          kräver fortfarande minst en registrerad person.
+          <br />
           <Link
             href={`/admin/anstallda?company=${company.id}`}
             className="text-candy-600 hover:underline"

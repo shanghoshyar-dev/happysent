@@ -314,19 +314,6 @@ export async function sendCompanyPortalInvite(
     return { ok: false, error: "Företaget saknar kontaktmejl." };
   }
 
-  const { count, error: countErr } = await supabase
-    .from("employees")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", companyId);
-
-  if (countErr) return { ok: false, error: countErr.message };
-  if ((count ?? 0) < 1) {
-    return {
-      ok: false,
-      error: "Lägg till minst en anställd innan inbjudan skickas.",
-    };
-  }
-
   const siteUrl = getAuthSiteUrl();
   const loginUrl = `${getSiteUrl()}/kund/login`;
 

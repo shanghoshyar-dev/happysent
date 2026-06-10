@@ -36,6 +36,7 @@ export function KundEmployeeForm({
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(formData: FormData) {
+    if (pending) return;
     setPending(true);
     setError(null);
     formData.set("company_id", companyId);

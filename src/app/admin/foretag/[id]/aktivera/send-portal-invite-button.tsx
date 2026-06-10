@@ -10,14 +10,12 @@ import { sendCompanyPortalInvite } from "../../actions";
 interface Props {
   companyId: string;
   contactEmail: string;
-  employeeCount: number;
   inviteAlreadySent: boolean;
 }
 
 export function SendPortalInviteButton({
   companyId,
   contactEmail,
-  employeeCount,
   inviteAlreadySent,
 }: Props) {
   const router = useRouter();
@@ -25,8 +23,6 @@ export function SendPortalInviteButton({
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
   const [sent, setSent] = useState(inviteAlreadySent);
-
-  const canSend = employeeCount >= 1;
 
   return (
     <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-4">
@@ -36,16 +32,13 @@ export function SendPortalInviteButton({
         <a href={`mailto:${contactEmail}`} className="text-coral-600 hover:underline">
           {contactEmail}
         </a>
-        . HR klickar på länken i mejlet, väljer lösenord och loggar sedan in på{" "}
-        <strong>/kund</strong>.
+        . HR väljer lösenord via länken och lägger sedan in sina anställda själva i{" "}
+        <strong>/kund</strong>. Du behöver inte registrera personal innan inbjudan
+        skickas.
       </p>
       {sent ? (
         <p className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
           Inbjudan skickad. Om länken inte fungerade kan du skicka om nedan.
-        </p>
-      ) : employeeCount < 1 ? (
-        <p className="mt-3 text-sm text-amber-800">
-          Lägg till minst en anställd innan inbjudan kan skickas.
         </p>
       ) : null}
       {message ? (
@@ -60,7 +53,7 @@ export function SendPortalInviteButton({
         type="button"
         className="mt-4"
         variant="secondary"
-        disabled={!canSend || pending}
+        disabled={pending}
         onClick={() => {
           setMessage(null);
           startTransition(async () => {

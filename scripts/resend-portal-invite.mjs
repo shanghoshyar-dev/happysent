@@ -132,13 +132,6 @@ async function main() {
   const email = company.contact_email?.trim();
   if (!email) throw new Error(`${company.name} saknar contact_email.`);
 
-  const { count, error: countErr } = await admin
-    .from("employees")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", company.id);
-  if (countErr) throw countErr;
-  if ((count ?? 0) < 1) throw new Error("Företaget har inga anställda.");
-
   console.log(`Skickar inbjudan till ${email} (${company.name})…`);
 
   const linkResult = await createPortalInviteLink(admin, email, company.id);
