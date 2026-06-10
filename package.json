@@ -11,6 +11,7 @@
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
     "generate:excel-template": "node scripts/generate-excel-template.mjs",
+    "seed:catalog": "npx tsx supabase/scripts/seed-catalog-all-bakeries.ts",
     "mascots:white-bg": "node scripts/remove-mascot-background.mjs",
     "brand-cake:transparent": "node scripts/brand-cake-transparent.mjs",
     "test": "node --experimental-strip-types --import ./scripts/node-test-bootstrap.mjs --test src/lib/celebrations.test.ts"

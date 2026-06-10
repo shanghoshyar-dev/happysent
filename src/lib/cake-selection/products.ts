@@ -3,6 +3,10 @@ import "server-only";
 import { citiesMatch } from "@/lib/cities/normalize";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { displayProductName } from "./product-name";
+
+export { displayProductName, uniqueProductNameForBakery } from "./product-name";
+
 export interface SelectableProduct {
   id: string;
   name: string;
@@ -42,7 +46,10 @@ export async function getSelectableProductsForCity(
     .order("name");
 
   if (error) throw new Error(error.message);
-  return data ?? [];
+  return (data ?? []).map((p) => ({
+    ...p,
+    name: displayProductName(p.name),
+  }));
 }
 
 export async function isProductAllowedInCity(

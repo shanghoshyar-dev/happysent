@@ -35,6 +35,7 @@ Kör i SQL Editor (eller `npm run db:push` efter `supabase link`):
 4. **`20260603120000_customer_portal.sql`**
 5. **`20260604120000_employee_preferred_product.sql`**
 6. **`20260605120000_bakery_catalog_pdf.sql`**
+7. **`20260606120000_seed_catalog_all_bakeries.sql`** (valfritt — samma tårtnamn per bageri)
 
 Sedan: [`supabase/scripts/seed-admin-user.sql`](supabase/scripts/seed-admin-user.sql) — lägg er admin i `admin_users`.
 

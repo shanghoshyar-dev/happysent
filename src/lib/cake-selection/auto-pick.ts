@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { validateProductForCompany } from "./assign-product";
+import { displayProductName } from "./product-name";
 import { getSelectableProductsForCity } from "./products";
 
 export type CakeSelectionStatus = "pending" | "customer" | "auto" | "default";
@@ -150,7 +151,7 @@ export async function getOrderProductName(orderId: string): Promise<string | nul
     .maybeSingle();
   if (!data?.product_id) return null;
   const product = data.products as { name: string } | null;
-  return product?.name ?? null;
+  return product?.name ? displayProductName(product.name) : null;
 }
 
 /** Applicera anställds favorittårta direkt vid orderskapande. */

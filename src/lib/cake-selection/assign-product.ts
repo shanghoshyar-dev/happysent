@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { isProductAllowedInCity } from "./products";
+import { displayProductName } from "./product-name";
 
 export interface ValidatedProduct {
   id: string;
@@ -33,7 +34,7 @@ export async function validateProductForCompany(
     .maybeSingle();
 
   if (error || !product?.is_active) return null;
-  return { id: product.id, name: product.name };
+  return { id: product.id, name: displayProductName(product.name) };
 }
 
 /** Uppdaterar order med produkt om valt (status customer). */
