@@ -1,19 +1,22 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { citiesMatch } from "@/lib/cities/normalize";
 import type { Tables } from "@/types/database";
 
 export interface CompanyFormProps {
   bakeries: Pick<Tables<"bakeries">, "id" | "name" | "city">[];
   florists: Pick<Tables<"florists">, "id" | "name" | "city">[];
-  bakeryProducts?: Pick<Tables<"products">, "id" | "name">[];
+  bakeryProducts?: Pick<Tables<"products">, "id" | "name" | "bakery_id">[];
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
-  /** Used when creating a new company (no `company` row yet). */
   defaultPricePerCake?: number;
-  /** När ett företag godkänns från kön på /admin/foretag */
   applicationPrefill?: {
     applicationId: string;
     companyName: string;
@@ -36,6 +39,50 @@ export function CompanyForm({
   applicationPrefill,
 }: CompanyFormProps) {
   const pre = applicationPrefill;
+  const [city, setCity] = useState(company?.city ?? "");
+  const [bakeryId, setBakeryId] = useState(company?.bakery_id ?? "");
+  const [floristId, setFloristId] = useState(company?.florist_id ?? "");
+
+  const bakeriesInCity = useMemo(
+    () =>
+      city.trim()
+        ? bakeries.filter((b) => citiesMatch(b.city, city))
+        : [],
+    [bakeries, city],
+  );
+
+  const floristsInCity = useMemo(
+    () =>
+      city.trim()
+        ? florists.filter((f) => citiesMatch(f.city, city))
+        : [],
+    [florists, city],
+  );
+
+  const productsForBakery = useMemo(
+    () =>
+      bakeryId
+        ? bakeryProducts.filter((p) => p.bakery_id === bakeryId)
+        : [],
+    [bakeryProducts, bakeryId],
+  );
+
+  function handleCityChange(nextCity: string) {
+    setCity(nextCity);
+    if (bakeryId) {
+      const bakery = bakeries.find((b) => b.id === bakeryId);
+      if (!bakery || !citiesMatch(bakery.city, nextCity)) {
+        setBakeryId("");
+      }
+    }
+    if (floristId) {
+      const florist = florists.find((f) => f.id === floristId);
+      if (!florist || !citiesMatch(florist.city, nextCity)) {
+        setFloristId("");
+      }
+    }
+  }
+
   return (
     <form action={action} className="grid gap-5 md:grid-cols-2">
       {pre ? (
@@ -61,7 +108,16 @@ export function CompanyForm({
       </div>
       <div>
         <Label htmlFor="city">Stad</Label>
-        <Input id="city" name="city" required defaultValue={company?.city} />
+        <Input
+          id="city"
+          name="city"
+          required
+          value={city}
+          onChange={(e) => handleCityChange(e.target.value)}
+        />
+        <p className="mt-1 text-xs text-slate-500">
+          Bageri och blomsterbutik filtreras på stad.
+        </p>
       </div>
       <div>
         <Label htmlFor="bakery_id">Bageri</Label>
@@ -69,14 +125,20 @@ export function CompanyForm({
           id="bakery_id"
           name="bakery_id"
           required
-          defaultValue={company?.bakery_id ?? ""}
+          value={bakeryId}
+          onChange={(e) => setBakeryId(e.target.value)}
+          disabled={!city.trim()}
         >
           <option value="" disabled>
-            Välj bageri
+            {city.trim()
+              ? bakeriesInCity.length
+                ? "Välj bageri"
+                : "Inga bagerier i denna stad"
+              : "Ange stad först"}
           </option>
-          {bakeries.map((b) => (
+          {bakeriesInCity.map((b) => (
             <option key={b.id} value={b.id}>
-              {b.name} ({b.city})
+              {b.name}
             </option>
           ))}
         </Select>
@@ -103,15 +165,22 @@ export function CompanyForm({
         <Select
           id="florist_id"
           name="florist_id"
-          defaultValue={company?.florist_id ?? ""}
+          value={floristId}
+          onChange={(e) => setFloristId(e.target.value)}
+          disabled={!city.trim()}
         >
           <option value="">— Ingen / inte aktiverat ovan —</option>
-          {florists.map((f) => (
+          {floristsInCity.map((f) => (
             <option key={f.id} value={f.id}>
-              {f.name} ({f.city})
+              {f.name}
             </option>
           ))}
         </Select>
+        {city.trim() && floristsInCity.length === 0 ? (
+          <p className="mt-1 text-xs text-amber-700">
+            Inga blomsterbutiker registrerade i {city.trim()}.
+          </p>
+        ) : null}
       </div>
       <div>
         <Label htmlFor="contact_email">Kontakt-mail</Label>
@@ -120,9 +189,7 @@ export function CompanyForm({
           name="contact_email"
           type="email"
           required
-          defaultValue={
-            company?.contact_email ?? pre?.contactEmail
-          }
+          defaultValue={company?.contact_email ?? pre?.contactEmail}
         />
       </div>
       <div>
@@ -148,12 +215,10 @@ export function CompanyForm({
           name="billing_email"
           type="email"
           required
-          defaultValue={
-            company?.billing_email ?? pre?.contactEmail
-          }
+          defaultValue={company?.billing_email ?? pre?.contactEmail}
         />
       </div>
-      {bakeryProducts.length > 0 ? (
+      {productsForBakery.length > 0 ? (
         <div className="md:col-span-2">
           <Label htmlFor="default_product_id">Standardtårta (valfritt)</Label>
           <Select
@@ -162,15 +227,21 @@ export function CompanyForm({
             defaultValue={company?.default_product_id ?? ""}
           >
             <option value="">Ingen standard — HappySent väljer vid behov</option>
-            {bakeryProducts.map((p) => (
+            {productsForBakery.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
             ))}
           </Select>
           <p className="mt-1 text-xs text-slate-500">
-            Används om kunden inte hinner välja inom 5 dagar efter 14-dagarsmejlet.
+            Tårtor från valt bageri. Används om kunden inte hinner välja inom 5 dagar
+            efter 14-dagarsmejlet.
           </p>
+        </div>
+      ) : bakeryId ? (
+        <div className="md:col-span-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Valda bageriet har inga tårtor än. Lägg till produkter under Admin →
+          Produkter.
         </div>
       ) : null}
       <div>

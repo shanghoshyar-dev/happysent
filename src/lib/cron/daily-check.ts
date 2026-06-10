@@ -65,7 +65,7 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
       companies:company_id (
         id, name, address, city, contact_email, contact_phone, billing_email,
         price_per_cake, price_per_flowers, status, offers_flowers, florist_id, bakery_id,
-        bakeries:bakery_id ( id, name, email ),
+        bakeries:bakery_id ( id, name, email, catalog_pdf_path ),
         florists:florist_id ( id, name, email )
       )
     `,
@@ -208,6 +208,7 @@ interface Partner {
   id: string;
   name: string;
   email: string;
+  catalog_pdf_path?: string | null;
 }
 
 interface CompanyJoin {
@@ -415,6 +416,7 @@ async function buildActions(args: {
               ...baseCompany,
               includeCakeSelection: giftType === "cake" && !productName,
               preSelectedProductName: productName,
+              catalogPdfPath: bakery?.catalog_pdf_path ?? null,
               selectionUrl: cakeSelectionUrl(selectionToken),
               selectionDeadline: selectionDeadlineFromDelivery(deliveryIso),
             });

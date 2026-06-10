@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 
 import { BrandLogo } from "@/components/marketing/brand-logo";
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
-import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
+import { getBakeryCatalogPdfUrl } from "@/lib/cake-selection/catalog-url";
+import {
+  getBakeryCatalogPdfPath,
+  getSelectableProductsForCity,
+} from "@/lib/cake-selection/products";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 
@@ -50,6 +54,10 @@ export default async function ValjaTartaPage({ params }: Props) {
         company.bakery_id ?? null,
       )
     : [];
+  const catalogPdfPath = company?.bakery_id
+    ? await getBakeryCatalogPdfPath(company.bakery_id)
+    : null;
+  const catalogPdfUrl = getBakeryCatalogPdfUrl(catalogPdfPath);
 
   if (!products.length) {
     return (
@@ -100,7 +108,7 @@ export default async function ValjaTartaPage({ params }: Props) {
         ) : null}
         <p className="mt-4">
           <a
-            href="/marketing/tartkatalog.pdf"
+            href={catalogPdfUrl}
             className="text-sm font-medium text-coral-600 hover:underline"
             target="_blank"
             rel="noopener noreferrer"

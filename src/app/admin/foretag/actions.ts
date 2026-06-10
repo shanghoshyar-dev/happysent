@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
+import {
+  assertBakeryInCity,
+  assertFloristInCity,
+} from "@/lib/cake-selection/validate-partners";
 import { sendCompanyPortalInviteEmail, sendCompanyWelcome } from "@/lib/resend/templates";
 import { createPortalInviteLink } from "@/lib/auth/portal-invite";
 import { getAuthSiteUrl, getSiteUrl } from "@/lib/site-url";
@@ -105,14 +109,31 @@ async function createCompanyInternal(
   }
 
   const flowers = parseFlowerPartnerFields(formData);
+  const city = String(formData.get("city") ?? "").trim();
+  const bakeryId = String(formData.get("bakery_id") ?? "").trim();
+  if (!bakeryId) {
+    return { ok: false, error: "Välj bageri i företagets stad." };
+  }
+  try {
+    await assertBakeryInCity(bakeryId, city);
+    if (flowers.florist_id) {
+      await assertFloristInCity(flowers.florist_id, city);
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Ogiltigt bageri eller blomsterbutik.",
+    };
+  }
+
   const payload = {
     name: String(formData.get("name") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
-    city: String(formData.get("city") ?? "").trim(),
+    city,
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
     contact_phone: parseContactPhone(formData),
-    bakery_id: String(formData.get("bakery_id") ?? ""),
+    bakery_id: bakeryId,
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),
@@ -364,14 +385,24 @@ export async function sendCompanyPortalInvite(
 export async function updateCompany(id: string, formData: FormData) {
   const supabase = createClient();
   const flowers = parseFlowerPartnerFields(formData);
+  const city = String(formData.get("city") ?? "").trim();
+  const bakeryId = String(formData.get("bakery_id") ?? "").trim();
+  if (!bakeryId) {
+    throw new Error("Välj bageri i företagets stad.");
+  }
+  await assertBakeryInCity(bakeryId, city);
+  if (flowers.florist_id) {
+    await assertFloristInCity(flowers.florist_id, city);
+  }
+
   const payload = {
     name: String(formData.get("name") ?? "").trim(),
     address: String(formData.get("address") ?? "").trim(),
-    city: String(formData.get("city") ?? "").trim(),
+    city,
     contact_email: String(formData.get("contact_email") ?? "").trim(),
     billing_email: String(formData.get("billing_email") ?? "").trim(),
     contact_phone: parseContactPhone(formData),
-    bakery_id: String(formData.get("bakery_id") ?? ""),
+    bakery_id: bakeryId,
     offers_flowers: flowers.offers_flowers,
     florist_id: flowers.florist_id,
     price_per_cake: Number(formData.get("price_per_cake") ?? 0),

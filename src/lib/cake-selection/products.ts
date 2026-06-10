@@ -1,5 +1,6 @@
 import "server-only";
 
+import { citiesMatch } from "@/lib/cities/normalize";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface SelectableProduct {
@@ -12,89 +13,57 @@ export interface SelectableProduct {
   max_people: number | null;
 }
 
-/** Jämför stad utan skilja på versaler eller å/ä/ö (Malmö = Malmo). */
-function cityKey(city: string): string {
-  return city
-    .trim()
-    .toLocaleLowerCase("sv-SE")
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
-}
-
-async function bakeryIdsInCity(city: string): Promise<string[]> {
-  const supabase = createAdminClient();
-  const key = cityKey(city);
-  const { data, error } = await supabase.from("bakeries").select("id, city");
-  if (error) throw new Error(error.message);
-  return (data ?? [])
-    .filter((b) => cityKey(b.city) === key)
-    .map((b) => b.id);
-}
-
-function dedupeByName(
-  products: SelectableProduct[],
-  preferredBakeryId: string | null,
-): SelectableProduct[] {
-  const byName = new Map<string, SelectableProduct>();
-  for (const p of products) {
-    const key = p.name.trim().toLocaleLowerCase("sv-SE");
-    const existing = byName.get(key);
-    if (!existing) {
-      byName.set(key, p);
-      continue;
-    }
-    const preferNew =
-      preferredBakeryId &&
-      p.bakery_id === preferredBakeryId &&
-      existing.bakery_id !== preferredBakeryId;
-    const preferExisting =
-      preferredBakeryId &&
-      existing.bakery_id === preferredBakeryId &&
-      p.bakery_id !== preferredBakeryId;
-    if (preferNew) {
-      byName.set(key, p);
-    } else if (!preferExisting && p.sort_order < existing.sort_order) {
-      byName.set(key, p);
-    }
-  }
-  return [...byName.values()].sort(
-    (a, b) =>
-      a.sort_order - b.sort_order ||
-      a.name.localeCompare(b.name, "sv-SE"),
-  );
-}
-
-/** Aktiva tårtor för företagets stad — HR ser inget bageri, bara sortimentet. */
+/** Aktiva tårtor för företagets kopplade bageri (måste ligga i samma stad). */
 export async function getSelectableProductsForCity(
   city: string,
-  preferredBakeryId: string | null,
+  bakeryId: string | null,
 ): Promise<SelectableProduct[]> {
-  const trimmed = city.trim();
-  if (!trimmed) return [];
-
-  const bakeryIds = await bakeryIdsInCity(trimmed);
-  if (bakeryIds.length === 0) return [];
+  const trimmedCity = city.trim();
+  if (!trimmedCity || !bakeryId) return [];
 
   const supabase = createAdminClient();
+  const { data: bakery, error: bakeryErr } = await supabase
+    .from("bakeries")
+    .select("id, city")
+    .eq("id", bakeryId)
+    .maybeSingle();
+
+  if (bakeryErr) throw new Error(bakeryErr.message);
+  if (!bakery || !citiesMatch(bakery.city, trimmedCity)) return [];
+
   const { data, error } = await supabase
     .from("products")
     .select(
       "id, name, dietary_notes, bakery_id, sort_order, min_people, max_people",
     )
-    .in("bakery_id", bakeryIds)
+    .eq("bakery_id", bakeryId)
     .eq("is_active", true)
     .order("sort_order")
     .order("name");
 
   if (error) throw new Error(error.message);
-  return dedupeByName(data ?? [], preferredBakeryId);
+  return data ?? [];
 }
 
 export async function isProductAllowedInCity(
   city: string,
   productId: string,
-  preferredBakeryId: string | null,
+  bakeryId: string | null,
 ): Promise<boolean> {
-  const allowed = await getSelectableProductsForCity(city, preferredBakeryId);
+  const allowed = await getSelectableProductsForCity(city, bakeryId);
   return allowed.some((p) => p.id === productId);
+}
+
+export async function getBakeryCatalogPdfPath(
+  bakeryId: string | null,
+): Promise<string | null> {
+  if (!bakeryId) return null;
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("bakeries")
+    .select("catalog_pdf_path")
+    .eq("id", bakeryId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data?.catalog_pdf_path ?? null;
 }

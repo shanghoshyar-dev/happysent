@@ -1,9 +1,7 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
+import { loadBakeryCatalogPdfBase64 } from "@/lib/cake-selection/catalog";
 import { formatOrganizationNumber } from "@/lib/organization-number";
 import { formatSek } from "@/lib/utils";
 import { getResend } from "@/lib/resend/client";
@@ -51,21 +49,7 @@ export interface FourteenDayCompanyArgs extends BaseArgs {
   selectionDeadline: string;
   includeCakeSelection: boolean;
   preSelectedProductName?: string | null;
-}
-
-async function loadCatalogPdfBase64(): Promise<string | null> {
-  try {
-    const filePath = path.join(
-      process.cwd(),
-      "public",
-      "marketing",
-      "tartkatalog.pdf",
-    );
-    const buf = await readFile(filePath);
-    return buf.toString("base64");
-  } catch {
-    return null;
-  }
+  catalogPdfPath?: string | null;
 }
 
 export async function send14DayCompany(a: FourteenDayCompanyArgs) {
@@ -96,7 +80,7 @@ export async function send14DayCompany(a: FourteenDayCompanyArgs) {
   text += `Hälsningar,\nHappySent`;
 
   const catalogPdf = a.includeCakeSelection
-    ? await loadCatalogPdfBase64()
+    ? await loadBakeryCatalogPdfBase64(a.catalogPdfPath)
     : null;
 
   return getResend().emails.send({

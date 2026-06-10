@@ -34,6 +34,7 @@ Kör i SQL Editor (eller `npm run db:push` efter `supabase link`):
 3. `20260602120000_companies_welcome_email_sent_at.sql`
 4. **`20260603120000_customer_portal.sql`**
 5. **`20260604120000_employee_preferred_product.sql`**
+6. **`20260605120000_bakery_catalog_pdf.sql`**
 
 Sedan: [`supabase/scripts/seed-admin-user.sql`](supabase/scripts/seed-admin-user.sql) — lägg er admin i `admin_users`.
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 
+import { BakeryCatalogUpload } from "../bakery-catalog-upload";
 import { deleteBakeryAndRedirect, updateBakery } from "../actions";
 import { BakeryForm } from "../bakery-form";
 
@@ -45,6 +46,14 @@ export default async function BakeryDetailPage({ params }: Props) {
           bakery={bakery}
           action={updateAction}
           submitLabel="Spara ändringar"
+        />
+      </Card>
+
+      <Card className="mt-8 max-w-3xl">
+        <BakeryCatalogUpload
+          bakeryId={bakery.id}
+          bakeryName={bakery.name}
+          catalogPdfPath={bakery.catalog_pdf_path}
         />
       </Card>
 

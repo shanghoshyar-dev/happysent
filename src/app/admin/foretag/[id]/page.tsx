@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
 import { createClient } from "@/lib/supabase/server";
 
 import { deleteCompany, updateCompany } from "../actions";
@@ -38,11 +37,16 @@ export default async function ForetagDetailPage({ params }: Props) {
 
   if (!company || !bakeries || !florists) notFound();
 
-  const cityProducts = await getSelectableProductsForCity(
-    company.city,
-    company.bakery_id,
-  );
-  const bakeryProducts = cityProducts.map((p) => ({ id: p.id, name: p.name }));
+  const { data: allProducts } = await supabase
+    .from("products")
+    .select("id, name, bakery_id")
+    .eq("is_active", true)
+    .order("name");
+  const bakeryProducts = (allProducts ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    bakery_id: p.bakery_id,
+  }));
 
   const updateAction = updateCompany.bind(null, company.id);
   const deleteAction = deleteCompany.bind(null, company.id);

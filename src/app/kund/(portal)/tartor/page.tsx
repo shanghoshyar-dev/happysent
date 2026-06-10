@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
 
 import { getCompanySession } from "@/lib/auth/session";
-import { getSelectableProductsForCity } from "@/lib/cake-selection/products";
+import { getBakeryCatalogPdfUrl } from "@/lib/cake-selection/catalog-url";
+import {
+  getBakeryCatalogPdfPath,
+  getSelectableProductsForCity,
+} from "@/lib/cake-selection/products";
 import { createClient } from "@/lib/supabase/server";
 
 import { CakeCatalogClient } from "./cake-catalog-client";
@@ -36,16 +40,20 @@ export default async function KundTartorPage() {
   const products = company?.city
     ? await getSelectableProductsForCity(company.city, company.bakery_id)
     : [];
+  const catalogPdfPath = company?.bakery_id
+    ? await getBakeryCatalogPdfPath(company.bakery_id)
+    : null;
+  const catalogPdfUrl = getBakeryCatalogPdfUrl(catalogPdfPath);
 
   return (
     <div>
       <h1 className="font-display text-3xl text-slate-900">Tårtor</h1>
       <p className="mt-2 text-slate-600">
-        Sortiment för {company?.city ?? "ert område"} — välj favorittårta per
-        anställd.
+        Sortiment från ert bageri — välj favorittårta per anställd.
       </p>
       <div className="mt-8">
         <CakeCatalogClient
+          catalogPdfUrl={catalogPdfUrl}
           products={products.map((p) => ({
             id: p.id,
             name: p.name,

@@ -57,6 +57,7 @@ export type Database = {
           opening_hours: string | null;
           days_notice: number;
           notes: string | null;
+          catalog_pdf_path: string | null;
           created_at: string;
         };
         Insert: {
@@ -68,6 +69,7 @@ export type Database = {
           opening_hours?: string | null;
           days_notice?: number;
           notes?: string | null;
+          catalog_pdf_path?: string | null;
           created_at?: string;
         };
         Update: {
@@ -79,6 +81,7 @@ export type Database = {
           opening_hours?: string | null;
           days_notice?: number;
           notes?: string | null;
+          catalog_pdf_path?: string | null;
           created_at?: string;
         };
         Relationships: [];

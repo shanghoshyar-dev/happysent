@@ -18,9 +18,11 @@ export default async function NyttForetagPage({
   searchParams: { application?: string };
 }) {
   const supabase = createClient();
-  const [{ data: bakeries }, { data: florists }] = await Promise.all([
+  const [{ data: bakeries }, { data: florists }, { data: allProducts }] =
+    await Promise.all([
     supabase.from("bakeries").select("id, name, city").order("name"),
     supabase.from("florists").select("id, name, city").order("name"),
+    supabase.from("products").select("id, name, bakery_id").eq("is_active", true).order("name"),
   ]);
 
   if (!bakeries || !florists) notFound();
@@ -116,6 +118,11 @@ export default async function NyttForetagPage({
         <CreateCompanyForm
           bakeries={bakeries}
           florists={florists}
+          bakeryProducts={(allProducts ?? []).map((p) => ({
+            id: p.id,
+            name: p.name,
+            bakery_id: p.bakery_id,
+          }))}
           saveAction={createCompany}
           submitLabel="Spara företag"
           defaultPricePerCake={settings.default_price_per_cake}

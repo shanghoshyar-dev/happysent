@@ -27,7 +27,7 @@ export default async function ProdukterPage() {
     <div>
       <PageHeader
         title="Produkter"
-        description="Tårtor i katalogen — kopplas till bageri internt. HR ser sortiment per stad, inte bageri."
+        description="Tårtor kopplas till ett bageri — företag ser bara sortiment från sitt valda bageri."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Produkter" },
@@ -66,7 +66,12 @@ export default async function ProdukterPage() {
         </form>
         <div className="mt-4 rounded-lg border border-coral-200 bg-coral-50 px-4 py-3">
           <p className="text-sm text-slate-700">
-            <span className="font-medium">PDF-katalog:</span>{" "}
+            <span className="font-medium">PDF-katalog per bageri:</span> laddas upp
+            under{" "}
+            <a href="/admin/bagerier" className="font-semibold text-coral-700 underline">
+              Bagerier
+            </a>
+            . Standardkatalog:{" "}
             <a
               href="/marketing/tartkatalog.pdf"
               className="font-semibold text-coral-700 underline decoration-coral-400 underline-offset-2 hover:text-coral-800"

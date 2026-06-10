@@ -22,11 +22,12 @@ export interface CakeEmployee {
 }
 
 interface Props {
+  catalogPdfUrl: string;
   products: CakeProduct[];
   employees: CakeEmployee[];
 }
 
-export function CakeCatalogClient({ products, employees }: Props) {
+export function CakeCatalogClient({ catalogPdfUrl, products, employees }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
@@ -95,7 +96,7 @@ export function CakeCatalogClient({ products, employees }: Props) {
         </p>
         <p className="mt-3">
           <a
-            href="/marketing/tartkatalog.pdf"
+            href={catalogPdfUrl}
             className="text-sm font-medium text-coral-600 hover:underline"
             target="_blank"
             rel="noopener noreferrer"
@@ -106,7 +107,7 @@ export function CakeCatalogClient({ products, employees }: Props) {
         <div className="mt-4 overflow-hidden rounded-xl border border-candy-100 bg-white">
           <iframe
             title="Tårtkatalog"
-            src="/marketing/tartkatalog.pdf"
+            src={catalogPdfUrl}
             className="h-64 w-full"
           />
         </div>
