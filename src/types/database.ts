@@ -448,6 +448,8 @@ export type Database = {
           product_id: string | null;
           cake_name: string | null;
           people_count: number | null;
+          cake_quantity: number;
+          cake_lines: Json | null;
           selection_token: string;
           selection_deadline: string | null;
           cake_selection_status: CakeSelectionStatus;
@@ -467,6 +469,8 @@ export type Database = {
           product_id?: string | null;
           cake_name?: string | null;
           people_count?: number | null;
+          cake_quantity?: number;
+          cake_lines?: Json | null;
           selection_token?: string;
           selection_deadline?: string | null;
           cake_selection_status?: CakeSelectionStatus;
@@ -486,6 +490,8 @@ export type Database = {
           product_id?: string | null;
           cake_name?: string | null;
           people_count?: number | null;
+          cake_quantity?: number;
+          cake_lines?: Json | null;
           selection_token?: string;
           selection_deadline?: string | null;
           cake_selection_status?: CakeSelectionStatus;

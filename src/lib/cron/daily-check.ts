@@ -14,6 +14,10 @@ import {
 import { selectionDeadlineFromDelivery } from "@/lib/cake-selection/deadline";
 import { cakeSelectionUrl } from "@/lib/cake-selection/selection-url";
 import { resolveCakeOrderPrice, loadCakePriceRows } from "@/lib/pricing/resolve-order-price";
+import {
+  cakeLinesToDbJson,
+  type CakeOrderLine,
+} from "@/lib/pricing/cake-prices-data";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { diffInDays } from "@/lib/holidays/swedish";
 import {
@@ -124,6 +128,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
         let price: number;
         let orderCakeName: string | null = null;
         let orderPeopleCount: number | null = null;
+        let orderCakeQuantity = 1;
+        let orderCakeLines: CakeOrderLine[] = [];
 
         if (giftType === "flowers") {
           if (company.price_per_flowers == null) {
@@ -143,6 +149,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           price = resolved.price;
           orderCakeName = resolved.cakeName;
           orderPeopleCount = resolved.peopleCount;
+          orderCakeQuantity = resolved.quantity;
+          orderCakeLines = resolved.lines;
         }
 
         const order = await ensureOrder({
@@ -155,6 +163,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           price,
           cakeName: orderCakeName,
           peopleCount: orderPeopleCount,
+          cakeQuantity: orderCakeQuantity,
+          cakeLines: orderCakeLines,
           giftType,
           companyCity: company.city,
           companyBakeryId: company.bakery_id,
@@ -182,6 +192,10 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           deliveryIso,
           orderId: order.id,
           selectionToken: order.selectionToken,
+          cakeName: orderCakeName,
+          cakePeopleCount: orderPeopleCount,
+          cakeQuantity: orderCakeQuantity,
+          cakeLines: orderCakeLines,
         });
 
         for (const action of actions) {
@@ -270,6 +284,8 @@ async function ensureOrder(args: {
   price: number;
   cakeName: string | null;
   peopleCount: number | null;
+  cakeQuantity: number;
+  cakeLines: CakeOrderLine[];
   giftType: GiftType;
   companyCity: string;
   companyBakeryId: string | null;
@@ -284,6 +300,8 @@ async function ensureOrder(args: {
     price,
     cakeName,
     peopleCount,
+    cakeQuantity,
+    cakeLines,
     giftType,
     companyCity,
     companyBakeryId,
@@ -325,6 +343,8 @@ async function ensureOrder(args: {
       price,
       cake_name: cakeName,
       people_count: peopleCount,
+      cake_quantity: cakeQuantity,
+      cake_lines: cakeLines.length ? cakeLinesToDbJson(cakeLines) : null,
       gift_type: giftType,
       status: "scheduled",
       selection_deadline: deadline,
@@ -382,6 +402,10 @@ async function buildActions(args: {
   deliveryIso: string;
   orderId: string;
   selectionToken: string;
+  cakeName: string | null;
+  cakePeopleCount: number | null;
+  cakeQuantity: number;
+  cakeLines: CakeOrderLine[];
 }): Promise<ReminderAction[]> {
   const {
     daysAway,
@@ -393,6 +417,10 @@ async function buildActions(args: {
     deliveryIso,
     orderId,
     selectionToken,
+    cakeName,
+    cakePeopleCount,
+    cakeQuantity,
+    cakeLines,
   } = args;
   const baseCompany = {
     to: company.contact_email,
@@ -436,6 +464,10 @@ async function buildActions(args: {
                 deliveryDate: deliveryIso,
                 numberOfPeople: emp.number_of_people,
                 productName,
+                cakeName,
+                cakePeopleCount,
+                cakeQuantity,
+                cakeLines,
               });
             },
           }

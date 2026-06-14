@@ -1,7 +1,10 @@
-import "server-only";
-
 import { createAdminClient } from "@/lib/supabase/admin";
 import { orderEmployeeDisplayName } from "@/lib/orders/employee-name";
+import {
+  cakeLinesFromDbJson,
+  formatCakeOrderLabel,
+  formatCakeOrderLines,
+} from "@/lib/pricing/cake-prices-data";
 
 import type { InvoicePdfData } from "./types";
 
@@ -36,7 +39,8 @@ export async function loadInvoicePdfData(
   const { data: rows, error: rowsErr } = await supabase
     .from("orders")
     .select(
-      `delivery_date, price, cake_name, people_count, employee_first_name, employee_last_name,
+      `delivery_date, price, cake_name, people_count, cake_quantity, cake_lines,
+       employee_first_name, employee_last_name,
        employees:employee_id ( first_name, last_name )`,
     )
     .in(
@@ -49,10 +53,17 @@ export async function loadInvoicePdfData(
 
   const lineItems = (rows ?? []).map((row) => {
     const employeeName = orderEmployeeDisplayName(row);
+    const parsedLines = cakeLinesFromDbJson(row.cake_lines);
     const cakeLabel =
-      row.cake_name && row.people_count
-        ? `${row.cake_name}, ${row.people_count} pers.`
-        : null;
+      row.cake_name && parsedLines
+        ? formatCakeOrderLines(row.cake_name, parsedLines)
+        : row.cake_name && row.people_count
+          ? formatCakeOrderLabel({
+              cakeName: row.cake_name,
+              peopleCount: row.people_count,
+              quantity: row.cake_quantity ?? 1,
+            })
+          : null;
     return {
       deliveryDate: row.delivery_date,
       employeeName,

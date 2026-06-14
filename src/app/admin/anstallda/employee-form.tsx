@@ -127,7 +127,6 @@ export function EmployeeForm({
       <CakePriceFields
         cakePrices={cakePrices}
         defaultCakeName={employee?.cake_name}
-        defaultPeopleCount={employee?.people_count}
       />
       <div className="flex items-center gap-2 md:col-span-2">
         <input

@@ -5,15 +5,21 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 import {
+  resolveCakePriceForHeadcount,
   resolveFallbackCakePrice,
-  resolvePriceFromRows,
+  totalCakeQuantity,
+  type CakeOrderLine,
   type CakePriceRow,
 } from "./cake-prices-data";
 
 export interface ResolvedCakeOrderPrice {
   cakeName: string;
-  peopleCount: number;
+  lines: CakeOrderLine[];
   price: number;
+  /** @deprecated First line size — use lines instead. */
+  peopleCount: number;
+  /** @deprecated Total cake count — use lines instead. */
+  quantity: number;
 }
 
 type Client = SupabaseClient<Database>;
@@ -31,6 +37,34 @@ export async function loadCakePriceRows(
   return data ?? [];
 }
 
+async function countActiveEmployees(
+  supabase: Client,
+  companyId: string,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("employees")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", companyId)
+    .eq("is_active", true);
+
+  if (error) throw new Error(error.message);
+  return Math.max(1, count ?? 1);
+}
+
+function toResolved(lineup: {
+  cakeName: string;
+  lines: CakeOrderLine[];
+  price: number;
+}): ResolvedCakeOrderPrice {
+  return {
+    cakeName: lineup.cakeName,
+    lines: lineup.lines,
+    price: lineup.price,
+    peopleCount: lineup.lines[0]?.peopleCount ?? 0,
+    quantity: totalCakeQuantity(lineup.lines),
+  };
+}
+
 export async function resolveCakeOrderPrice(args: {
   supabase: Client;
   companyId: string;
@@ -39,28 +73,15 @@ export async function resolveCakeOrderPrice(args: {
   priceRows?: CakePriceRow[];
 }): Promise<ResolvedCakeOrderPrice> {
   const rows = args.priceRows ?? (await loadCakePriceRows(args.supabase));
+  const headcount = await countActiveEmployees(args.supabase, args.companyId);
 
-  if (args.employeeCakeName && args.employeePeopleCount) {
-    return {
-      cakeName: args.employeeCakeName,
-      peopleCount: args.employeePeopleCount,
-      price: resolvePriceFromRows(
-        rows,
-        args.employeeCakeName,
-        args.employeePeopleCount,
-      ),
-    };
+  if (args.employeeCakeName) {
+    return toResolved(
+      resolveCakePriceForHeadcount(rows, args.employeeCakeName, headcount),
+    );
   }
 
-  const { count, error: countErr } = await args.supabase
-    .from("employees")
-    .select("id", { count: "exact", head: true })
-    .eq("company_id", args.companyId)
-    .eq("is_active", true);
-
-  if (countErr) throw new Error(countErr.message);
-
-  return resolveFallbackCakePrice(rows, count ?? 1);
+  return toResolved(resolveFallbackCakePrice(rows, headcount));
 }
 
 export function parseEmployeeCakeFields(formData: FormData): {
@@ -68,22 +89,12 @@ export function parseEmployeeCakeFields(formData: FormData): {
   people_count: number | null;
 } {
   const cakeName = String(formData.get("cake_name") ?? "").trim();
-  const peopleRaw = String(formData.get("people_count") ?? "").trim();
 
-  if (!cakeName && !peopleRaw) {
+  if (!cakeName) {
     return { cake_name: null, people_count: null };
   }
 
-  if (!cakeName || !peopleRaw) {
-    throw new Error("Välj både tårttyp och tårtstorlek, eller lämna båda tomma.");
-  }
-
-  const peopleCount = Number(peopleRaw);
-  if (!Number.isInteger(peopleCount) || peopleCount < 1) {
-    throw new Error("Ogiltig tårtstorlek.");
-  }
-
-  return { cake_name: cakeName, people_count: peopleCount };
+  return { cake_name: cakeName, people_count: null };
 }
 
 export async function validateEmployeeCakeFields(
@@ -91,20 +102,22 @@ export async function validateEmployeeCakeFields(
   cakeName: string | null,
   peopleCount: number | null,
 ): Promise<void> {
-  if (!cakeName && peopleCount == null) return;
-  if (!cakeName || peopleCount == null) {
-    throw new Error("Välj både tårttyp och tårtstorlek, eller lämna båda tomma.");
+  if (!cakeName) {
+    if (peopleCount != null) {
+      throw new Error("Ogiltig tårttyp.");
+    }
+    return;
   }
 
   const { data, error } = await supabase
     .from("cake_prices")
     .select("id")
     .eq("cake_name", cakeName)
-    .eq("people_count", peopleCount)
+    .limit(1)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   if (!data) {
-    throw new Error(`Ogiltig tårtkombination: ${cakeName}, ${peopleCount} pers.`);
+    throw new Error(`Ogiltig tårttyp: ${cakeName}`);
   }
 }

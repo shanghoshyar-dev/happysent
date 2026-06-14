@@ -3,6 +3,10 @@ import "server-only";
 import { formatDeadlineSv } from "@/lib/cake-selection/deadline";
 import { loadBakeryCatalogPdfBase64 } from "@/lib/cake-selection/catalog";
 import { formatOrganizationNumber } from "@/lib/organization-number";
+import {
+  formatCakeOrderLines,
+  type CakeOrderLine,
+} from "@/lib/pricing/cake-prices-data";
 import { getSiteUrl } from "@/lib/site-url";
 import { formatSek } from "@/lib/utils";
 import { getResend } from "@/lib/resend/client";
@@ -126,6 +130,10 @@ export interface SevenDayBakeryArgs {
   deliveryDate: string;
   numberOfPeople: number;
   productName?: string | null;
+  cakeName?: string | null;
+  cakePeopleCount?: number | null;
+  cakeQuantity?: number;
+  cakeLines?: CakeOrderLine[];
 }
 export async function send7DayBakery(a: SevenDayBakeryArgs) {
   const subject = `Beställning – Tårta till ${a.companyName} den ${formatSwedishDate(a.deliveryDate)}`;
@@ -135,6 +143,17 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
   const contactTel = a.contactPhone?.trim()
     ? a.contactPhone.trim()
     : "(saknas i kundregistret — kontakta HappySent vid leveransfrågor)";
+  const cakeLine =
+    a.cakeName && a.cakeLines && a.cakeLines.length > 0
+      ? `Tårtor:           ${formatCakeOrderLines(a.cakeName, a.cakeLines)}\n`
+      : a.cakeName && a.cakePeopleCount
+        ? a.cakeQuantity && a.cakeQuantity > 1
+          ? `Tårtor:           ${a.cakeQuantity} st à ${a.cakePeopleCount} pers. (${a.cakeName})\n`
+          : `Tårta:            ${a.cakeName}, ${a.cakePeopleCount} pers.\n`
+        : "";
+  const cakeDetails = a.productName
+    ? `Tårta:            ${a.productName}\n`
+    : cakeLine;
   const text =
     `Hej ${a.bakeryName}!\n\n` +
     `Vi bekräftar följande beställning:\n\n` +
@@ -143,7 +162,7 @@ export async function send7DayBakery(a: SevenDayBakeryArgs) {
     `Leveransadress:   ${deliveryAddress}\n` +
     `Kontakt telefon:  ${contactTel}\n` +
     `Antal personer:   ${a.numberOfPeople}\n` +
-    (a.productName ? `Tårta:            ${a.productName}\n` : "") +
+    cakeDetails +
     `Leveransdatum:    ${formatSwedishDate(a.deliveryDate)}\n` +
     `Skicka faktura till: ${await adminInbox()}\n\n` +
     `Tack!\nHappySent`;
