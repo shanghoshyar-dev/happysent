@@ -116,7 +116,7 @@ export const sv = {
   },
   cta: {
     heading: "Redo att fira riktigt?",
-    body: "Boka en kort demo så visar vi hur",
+    body: "Hör av er så visar vi hur",
     bodyAfter: "passar er och vilka bagerier som levererar i er stad.",
     primary: "Kom igång",
     secondary: "Se priser",

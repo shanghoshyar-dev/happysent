@@ -119,7 +119,7 @@ export const en: Messages = {
   },
   cta: {
     heading: "Ready to celebrate properly?",
-    body: "Book a short demo and we'll show how",
+    body: "Get in touch and we'll show how",
     bodyAfter: "fits your team and which bakeries deliver in your city.",
     primary: "Get started",
     secondary: "See pricing",
