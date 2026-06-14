@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getCompanySession } from "@/lib/auth/session";
 import { validateProductForCompany } from "@/lib/cake-selection/assign-product";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
+import { catchUpEmployeeDelivery } from "@/lib/cron/catch-up-delivery";
 import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
@@ -172,8 +173,12 @@ export async function createKundEmployee(formData: FormData) {
     people_count: cakeFields.people_count,
   };
 
-  const { error } = await supabase.from("employees").insert(payload);
-  if (error) throw new Error(error.message);
+  const { data: inserted, error } = await supabase
+    .from("employees")
+    .insert(payload)
+    .select("id")
+    .single();
+  if (error || !inserted) throw new Error(error?.message ?? "Insert failed");
 
   await appendEmployeeAddDigestEntries(session.companyId, [
     {
@@ -185,8 +190,14 @@ export async function createKundEmployee(formData: FormData) {
     },
   ]);
 
+  const catchUp = await catchUpEmployeeDelivery(inserted.id);
+
   revalidateKund(session.companyId);
-  redirect("/kund/anstallda");
+  const catchUpQuery =
+    catchUp.triggered && catchUp.daysAway != null
+      ? `?catchupDays=${catchUp.daysAway}`
+      : "";
+  redirect(`/kund/anstallda${catchUpQuery}`);
 }
 
 export async function updateKundEmployee(id: string, formData: FormData) {

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { fetchEmployeeChangeRequestById } from "@/lib/admin/employee-change-requests";
+import { catchUpEmployeeDelivery } from "@/lib/cron/catch-up-delivery";
 import { findCompanyIdForContactMatch } from "@/lib/cron/employee-add-digest";
 import {
   errorMentionsColumn,
@@ -78,7 +79,10 @@ export async function approveEmployeeChangeRequest(
       is_active: true as const,
     }));
 
-    let { error } = await supabase.from("employees").insert(rows);
+    let { data: inserted, error } = await supabase
+      .from("employees")
+      .insert(rows)
+      .select("id");
 
     if (
       error &&
@@ -93,11 +97,16 @@ export async function approveEmployeeChangeRequest(
           ...rest
         }) => rest,
       );
-      const retry = await supabase.from("employees").insert(legacy);
+      const retry = await supabase.from("employees").insert(legacy).select("id");
+      inserted = retry.data;
       error = retry.error;
     }
 
     if (error) return { ok: false, error: error.message };
+
+    for (const row of inserted ?? []) {
+      await catchUpEmployeeDelivery(row.id);
+    }
   } else {
     for (const e of employees) {
       const { data: match, error: findErr } = await supabase

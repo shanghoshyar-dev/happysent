@@ -10,6 +10,7 @@ import {
   type GiftType,
 } from "@/lib/celebrations";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
+import { catchUpEmployeeDelivery } from "@/lib/cron/catch-up-delivery";
 import {
   errorMentionsColumn,
   isMissingColumnError,
@@ -22,6 +23,7 @@ export interface ExcelImportResult {
   failed: number;
   errors: Array<{ row: number; reason: string }>;
   globalError?: string;
+  catchUpTriggered?: number;
 }
 
 type EmployeeImportField =
@@ -242,8 +244,12 @@ export async function insertParsedEmployeeRows(
   parseErrors: ExcelImportResult["errors"],
 ): Promise<ExcelImportResult> {
   let imported = 0;
+  let catchUpTriggered = 0;
   if (validRows.length > 0) {
-    let { error } = await supabase.from("employees").insert(validRows);
+    let { data: inserted, error } = await supabase
+      .from("employees")
+      .insert(validRows)
+      .select("id");
 
     if (
       error &&
@@ -254,7 +260,11 @@ export async function insertParsedEmployeeRows(
       const legacyRows = validRows.map(
         ({ celebration_frequency: _cf, gift_type: _gt, ...rest }) => rest,
       );
-      const retry = await supabase.from("employees").insert(legacyRows);
+      const retry = await supabase
+        .from("employees")
+        .insert(legacyRows)
+        .select("id");
+      inserted = retry.data;
       error = retry.error;
     }
 
@@ -268,6 +278,10 @@ export async function insertParsedEmployeeRows(
       };
     }
     imported = validRows.length;
+    for (const row of inserted ?? []) {
+      const catchUp = await catchUpEmployeeDelivery(row.id);
+      if (catchUp.triggered) catchUpTriggered++;
+    }
     const companyId = validRows[0]?.company_id;
     if (companyId) {
       await appendEmployeeAddDigestEntries(
@@ -288,6 +302,7 @@ export async function insertParsedEmployeeRows(
     imported,
     failed: parseErrors.length,
     errors: parseErrors,
+    catchUpTriggered,
   };
 }
 

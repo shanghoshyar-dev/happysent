@@ -6,34 +6,16 @@ import {
   type GiftType,
 } from "@/lib/celebrations";
 import { CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE } from "@/lib/cake-selection/constants";
-import {
-  applyAutoPickToOrder,
-  applyEmployeePreferredToOrder,
-  getOrderProductName,
-} from "@/lib/cake-selection/auto-pick";
-import { selectionDeadlineFromDelivery } from "@/lib/cake-selection/deadline";
-import { cakeSelectionUrl } from "@/lib/cake-selection/selection-url";
-import { resolveCakeOrderPrice, loadCakePriceRows } from "@/lib/pricing/resolve-order-price";
-import {
-  cakeLinesToDbJson,
-  type CakeOrderLine,
-} from "@/lib/pricing/cake-prices-data";
+import { loadCakePriceRows } from "@/lib/pricing/resolve-order-price";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { diffInDays } from "@/lib/holidays/swedish";
-import {
-  send14DayCompany,
-  send1DayCompany,
-  send7DayBakery,
-  send7DayCompany,
-  send7DayFlorist,
-  sendDayOfCompany,
-} from "@/lib/resend/templates";
-import type { CelebrationFrequency, ReminderType } from "@/types/database";
+import type { CelebrationFrequency } from "@/types/database";
 
-interface ReminderAction {
-  type: ReminderType;
-  send: () => Promise<unknown>;
-}
+import {
+  cronActionsForDay,
+  processDeliverySlot,
+  type CompanyJoin,
+} from "./delivery-processing";
 
 export interface DailyCheckResult {
   scannedEmployees: number;
@@ -106,130 +88,48 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
         if (!shouldProcessDelivery(rule, delivery)) continue;
 
         result.deliverySlotsChecked++;
-        const deliveryIso = delivery.deliveryIso;
         const daysAway = diffInDays(delivery.deliveryDate, today);
 
-        if (![14, CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE, 7, 1, 0].includes(daysAway)) {
+        if (
+          ![14, CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE, 7, 1, 0].includes(
+            daysAway,
+          )
+        ) {
           continue;
         }
 
-        if (giftType === "cake") {
-          if (!company.bakeries) {
-            throw new Error("Aktivt företag saknar bageri");
-          }
-        } else {
-          if (!company.offers_flowers || !company.florists) {
-            throw new Error(
-              "Anställd har blommor men företaget saknar blomsterleverans eller florist",
-            );
-          }
-        }
+        const reminderTypes = cronActionsForDay(daysAway, giftType);
+        const runAutoPick =
+          giftType === "cake" &&
+          (daysAway === CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE || daysAway === 7);
 
-        let price: number;
-        let orderCakeName: string | null = null;
-        let orderPeopleCount: number | null = null;
-        let orderCakeQuantity = 1;
-        let orderCakeLines: CakeOrderLine[] = [];
-
-        if (giftType === "flowers") {
-          if (company.price_per_flowers == null) {
-            throw new Error(
-              `${company.name}: saknar pris per blombukett (price_per_flowers).`,
-            );
-          }
-          price = company.price_per_flowers;
-        } else {
-          const resolved = await resolveCakeOrderPrice({
-            supabase,
-            companyId: company.id,
-            employeeCakeName: emp.cake_name,
-            employeePeopleCount: emp.people_count,
-            priceRows: cakePriceRows,
-          });
-          price = resolved.price;
-          orderCakeName = resolved.cakeName;
-          orderPeopleCount = resolved.peopleCount;
-          orderCakeQuantity = resolved.quantity;
-          orderCakeLines = resolved.lines;
-        }
-
-        const order = await ensureOrder({
+        const slot = await processDeliverySlot({
           supabase,
-          employeeId: emp.id,
-          employeeFirstName: emp.first_name,
-          employeeLastName: emp.last_name,
-          companyId: company.id,
-          deliveryIso,
-          price,
-          cakeName: orderCakeName,
-          peopleCount: orderPeopleCount,
-          cakeQuantity: orderCakeQuantity,
-          cakeLines: orderCakeLines,
-          giftType,
-          companyCity: company.city,
-          companyBakeryId: company.bakery_id,
-        });
-        if (order.created) result.ordersUpserted++;
-
-        if (
-          daysAway === CAKE_SELECTION_AUTO_PICK_DAYS_BEFORE &&
-          giftType === "cake"
-        ) {
-          await applyAutoPickToOrder(order.id);
-        }
-
-        if (daysAway === 7 && giftType === "cake") {
-          await applyAutoPickToOrder(order.id);
-        }
-
-        const actions: ReminderAction[] = await buildActions({
-          daysAway,
+          emp: {
+            id: emp.id,
+            first_name: emp.first_name,
+            last_name: emp.last_name,
+            birthday: emp.birthday,
+            number_of_people: emp.number_of_people,
+            is_active: emp.is_active,
+            company_id: emp.company_id,
+            celebration_frequency: rule.celebration_frequency,
+            gift_type: giftType,
+            cake_name: emp.cake_name,
+            people_count: emp.people_count,
+          },
           company,
-          bakery: company.bakeries,
-          florist: company.florists,
-          giftType,
-          emp,
-          deliveryIso,
-          orderId: order.id,
-          selectionToken: order.selectionToken,
-          cakeName: orderCakeName,
-          cakePeopleCount: orderPeopleCount,
-          cakeQuantity: orderCakeQuantity,
-          cakeLines: orderCakeLines,
+          delivery,
+          today,
+          cakePriceRows,
+          reminderTypes,
+          runAutoPick,
+          applyStatus: daysAway === 0 || daysAway === 7,
         });
 
-        for (const action of actions) {
-          const alreadySent = await reminderAlreadySent(
-            supabase,
-            order.id,
-            action.type,
-          );
-          if (alreadySent) {
-            result.remindersSkipped++;
-            continue;
-          }
-
-          await action.send();
-          await supabase.from("reminder_log").insert({
-            employee_id: emp.id,
-            order_id: order.id,
-            type: action.type,
-          });
-          result.remindersSent++;
-        }
-
-        if (daysAway === 0) {
-          await supabase
-            .from("orders")
-            .update({ status: "delivered" })
-            .eq("id", order.id);
-        } else if (daysAway === 7) {
-          await supabase
-            .from("orders")
-            .update({ status: "sent_to_bakery" })
-            .eq("id", order.id)
-            .eq("status", "scheduled");
-        }
+        if (slot.orderCreated) result.ordersUpserted++;
+        result.remindersSent += slot.remindersSent.length;
+        result.remindersSkipped += slot.remindersSkipped.length;
       }
     } catch (err) {
       result.errors.push({
@@ -242,272 +142,14 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
   return result;
 }
 
-// ---- helpers ---------------------------------------------------------------
-
-interface Partner {
-  id: string;
-  name: string;
-  email: string;
-  catalog_pdf_path?: string | null;
-}
-
-interface CompanyJoin {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  contact_email: string;
-  contact_phone: string | null;
-  billing_email: string;
-  price_per_flowers: number | null;
-  status: "active" | "paused";
-  offers_flowers: boolean;
-  florist_id: string | null;
-  bakery_id: string | null;
-  bakeries: Partner | null;
-  florists: Partner | null;
-}
-
-interface OrderRow {
-  id: string;
-  selectionToken: string;
-  created: boolean;
-}
-
-async function ensureOrder(args: {
-  supabase: ReturnType<typeof createAdminClient>;
-  employeeId: string;
-  employeeFirstName: string;
-  employeeLastName: string;
-  companyId: string;
-  deliveryIso: string;
-  price: number;
-  cakeName: string | null;
-  peopleCount: number | null;
-  cakeQuantity: number;
-  cakeLines: CakeOrderLine[];
-  giftType: GiftType;
-  companyCity: string;
-  companyBakeryId: string | null;
-}): Promise<OrderRow> {
-  const {
-    supabase,
-    employeeId,
-    employeeFirstName,
-    employeeLastName,
-    companyId,
-    deliveryIso,
-    price,
-    cakeName,
-    peopleCount,
-    cakeQuantity,
-    cakeLines,
-    giftType,
-    companyCity,
-    companyBakeryId,
-  } = args;
-
-  const deadline =
-    giftType === "cake" ? selectionDeadlineFromDelivery(deliveryIso) : null;
-
-  const { data: existing, error: selErr } = await supabase
-    .from("orders")
-    .select("id, selection_token, selection_deadline")
-    .eq("employee_id", employeeId)
-    .eq("delivery_date", deliveryIso)
-    .maybeSingle();
-
-  if (selErr) throw new Error(`Lookup order failed: ${selErr.message}`);
-  if (existing) {
-    if (giftType === "cake" && deadline && !existing.selection_deadline) {
-      await supabase
-        .from("orders")
-        .update({ selection_deadline: deadline })
-        .eq("id", existing.id);
-    }
-    return {
-      id: existing.id,
-      selectionToken: existing.selection_token,
-      created: false,
-    };
-  }
-
-  const { data: inserted, error: insErr } = await supabase
-    .from("orders")
-    .insert({
-      employee_id: employeeId,
-      employee_first_name: employeeFirstName,
-      employee_last_name: employeeLastName,
-      company_id: companyId,
-      delivery_date: deliveryIso,
-      price,
-      cake_name: cakeName,
-      people_count: peopleCount,
-      cake_quantity: cakeQuantity,
-      cake_lines: cakeLines.length ? cakeLinesToDbJson(cakeLines) : null,
-      gift_type: giftType,
-      status: "scheduled",
-      selection_deadline: deadline,
-    })
-    .select("id, selection_token")
-    .single();
-
-  if (insErr || !inserted) {
-    throw new Error(`Insert order failed: ${insErr?.message ?? "no row"}`);
-  }
-
-  if (giftType === "cake" && companyCity.trim()) {
-    await applyEmployeePreferredToOrder(
-      inserted.id,
-      employeeId,
-      companyCity,
-      companyBakeryId,
-    );
-  }
-
-  return {
-    id: inserted.id,
-    selectionToken: inserted.selection_token,
-    created: true,
-  };
-}
-
-async function reminderAlreadySent(
-  supabase: ReturnType<typeof createAdminClient>,
-  orderId: string,
-  type: ReminderType,
-): Promise<boolean> {
-  const { data, error } = await supabase
-    .from("reminder_log")
-    .select("id")
-    .eq("order_id", orderId)
-    .eq("type", type)
-    .maybeSingle();
-  if (error) throw new Error(`Reminder lookup failed: ${error.message}`);
-  return !!data;
-}
-
-async function buildActions(args: {
-  daysAway: number;
-  company: CompanyJoin;
-  bakery: Partner | null;
-  florist: Partner | null;
-  giftType: GiftType;
-  emp: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    number_of_people: number;
-  };
-  deliveryIso: string;
-  orderId: string;
-  selectionToken: string;
-  cakeName: string | null;
-  cakePeopleCount: number | null;
-  cakeQuantity: number;
-  cakeLines: CakeOrderLine[];
-}): Promise<ReminderAction[]> {
-  const {
-    daysAway,
-    company,
-    bakery,
-    florist,
-    giftType,
-    emp,
-    deliveryIso,
-    orderId,
-    selectionToken,
-    cakeName,
-    cakePeopleCount,
-    cakeQuantity,
-    cakeLines,
-  } = args;
-  const baseCompany = {
-    to: company.contact_email,
-    companyName: company.name,
-    employeeFirstName: emp.first_name,
-    employeeLastName: emp.last_name,
-    deliveryDate: deliveryIso,
-  };
-
-  const partnerOrder =
-    giftType === "flowers" && florist
-      ? {
-          type: "7_days_florist" as const,
-          send: () =>
-            send7DayFlorist({
-              to: florist.email,
-              floristName: florist.name,
-              companyName: company.name,
-              companyAddress: company.address,
-              companyCity: company.city,
-              contactPhone: company.contact_phone,
-              employeeFirstName: emp.first_name,
-              employeeLastName: emp.last_name,
-              deliveryDate: deliveryIso,
-            }),
-        }
-      : bakery
-        ? {
-            type: "7_days_bakery" as const,
-            send: async () => {
-              const productName = await getOrderProductName(orderId);
-              return send7DayBakery({
-                to: bakery.email,
-                bakeryName: bakery.name,
-                companyName: company.name,
-                companyAddress: company.address,
-                companyCity: company.city,
-                contactPhone: company.contact_phone,
-                employeeFirstName: emp.first_name,
-                employeeLastName: emp.last_name,
-                deliveryDate: deliveryIso,
-                numberOfPeople: emp.number_of_people,
-                productName,
-                cakeName,
-                cakePeopleCount,
-                cakeQuantity,
-                cakeLines,
-              });
-            },
-          }
-        : null;
-
-  switch (daysAway) {
-    case 14:
-      return [
-        {
-          type: "14_days",
-          send: async () => {
-            const productName =
-              giftType === "cake" ? await getOrderProductName(orderId) : null;
-            return send14DayCompany({
-              ...baseCompany,
-              giftType,
-              includeCakeSelection: giftType === "cake" && !productName,
-              preSelectedProductName: productName,
-              catalogPdfPath: bakery?.catalog_pdf_path ?? null,
-              selectionUrl: cakeSelectionUrl(selectionToken),
-              selectionDeadline: selectionDeadlineFromDelivery(deliveryIso),
-            });
-          },
-        },
-      ];
-    case 7: {
-      const actions: ReminderAction[] = [
-        {
-          type: "7_days_company",
-          send: () => send7DayCompany(baseCompany),
-        },
-      ];
-      if (partnerOrder) actions.unshift(partnerOrder);
-      return actions;
-    }
-    case 1:
-      return [{ type: "1_day", send: () => send1DayCompany(baseCompany) }];
-    case 0:
-      return [{ type: "day_of", send: () => sendDayOfCompany(baseCompany) }];
-    default:
-      return [];
-  }
-}
+export {
+  ensureOrder,
+  reminderAlreadySent,
+  processDeliverySlot,
+} from "./delivery-processing";
+export {
+  catchUpReminderTypes,
+  isCatchUpEligible,
+  shouldAutoPickCake,
+  cronActionsForDay,
+} from "./catch-up-rules";

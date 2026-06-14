@@ -521,6 +521,13 @@ export const sv = {
         "Vi har tagit emot din förfrågan och skickat en bekräftelse till din mejl. Ändringen granskas i vår kölista och görs i systemet när den är godkänd, vanligtvis inom en arbetsdag.",
     },
   },
+  catchUp: {
+    notice:
+      "Födelsedagen är om {days} dagar — beställningen är startad och bekräftelse har skickats.",
+    shortNotice: "Bageriet har meddelats med kort varsel.",
+    importSummary:
+      "{count} anställda med nära födelsedag — beställning startad och bekräftelse skickad.",
+  },
 };
 
 export type Messages = typeof sv;

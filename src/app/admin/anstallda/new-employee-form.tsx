@@ -36,17 +36,20 @@ export function NewEmployeeForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [catchUpNotice, setCatchUpNotice] = useState<string | null>(null);
   const companyId = lockCompanyId ?? defaultCompanyId ?? companies[0]?.id;
 
   async function action(formData: FormData) {
     setPending(true);
     setError(null);
+    setCatchUpNotice(null);
     try {
       if (lockCompanyId) {
         formData.set("company_id", lockCompanyId);
       }
-      await createEmployee(formData);
+      const result = await createEmployee(formData);
       formRef.current?.reset();
+      setCatchUpNotice(result.catchUpNotice);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Något gick fel");
@@ -121,6 +124,11 @@ export function NewEmployeeForm({
           Aktiv
         </Label>
       </div>
+      {catchUpNotice ? (
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 md:col-span-2">
+          {catchUpNotice}
+        </p>
+      ) : null}
       {error ? (
         <p className="text-sm text-red-600 md:col-span-2">{error}</p>
       ) : null}

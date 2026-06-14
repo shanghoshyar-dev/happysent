@@ -59,10 +59,18 @@ export function KundExcelImportForm() {
           <p className="mt-4 text-sm text-red-600">{result.globalError}</p>
         ) : null}
         {result?.ok ? (
-          <p className="mt-4 text-sm text-emerald-800">
-            {result.imported} anställda importerade
-            {result.failed > 0 ? `, ${result.failed} rader med fel.` : "."}
-          </p>
+          <div className="mt-4 text-sm text-emerald-800">
+            <p>
+              {result.imported} anställda importerade
+              {result.failed > 0 ? `, ${result.failed} rader med fel.` : "."}
+            </p>
+            {(result.catchUpTriggered ?? 0) > 0 ? (
+              <p className="mt-2 text-amber-900">
+                {result.catchUpTriggered} anställda med nära födelsedag — beställning
+                startad och bekräftelse skickad.
+              </p>
+            ) : null}
+          </div>
         ) : null}
       </Card>
     </div>

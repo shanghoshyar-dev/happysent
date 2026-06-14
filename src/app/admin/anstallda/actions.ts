@@ -6,6 +6,8 @@ import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
+import { catchUpEmployeeDelivery } from "@/lib/cron/catch-up-delivery";
+import { formatCatchUpNotice } from "@/lib/cron/catch-up-message";
 import { deleteEmployeePreservingOrders } from "@/lib/employees/delete-employee";
 import {
   parseEmployeeCakeFields,
@@ -37,7 +39,9 @@ function parseGiftTypeField(formData: FormData): GiftType {
   return "cake";
 }
 
-export async function createEmployee(formData: FormData) {
+export async function createEmployee(formData: FormData): Promise<{
+  catchUpNotice: string | null;
+}> {
   const supabase = createClient();
   const cakeFields = parseEmployeeCakeFields(formData);
   await validateEmployeeCakeFields(
@@ -57,8 +61,12 @@ export async function createEmployee(formData: FormData) {
     cake_name: cakeFields.cake_name,
     people_count: cakeFields.people_count,
   };
-  const { error } = await supabase.from("employees").insert(payload);
-  if (error) throw new Error(error.message);
+  const { data: inserted, error } = await supabase
+    .from("employees")
+    .insert(payload)
+    .select("id")
+    .single();
+  if (error || !inserted) throw new Error(error?.message ?? "Insert failed");
   await appendEmployeeAddDigestEntries(payload.company_id, [
     {
       kind: "add",
@@ -68,8 +76,15 @@ export async function createEmployee(formData: FormData) {
       personal_number: null,
     },
   ]);
+  const catchUp = await catchUpEmployeeDelivery(inserted.id);
   revalidatePath("/admin/anstallda");
   revalidatePath(`/admin/foretag/${payload.company_id}/aktivera`);
+  return {
+    catchUpNotice:
+      catchUp.triggered && catchUp.daysAway != null
+        ? formatCatchUpNotice(catchUp.daysAway)
+        : null,
+  };
 }
 
 export async function updateEmployee(id: string, formData: FormData) {

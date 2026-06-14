@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
+import { formatCatchUpNotice } from "@/lib/cron/catch-up-message";
 import { getCompanySession } from "@/lib/auth/session";
 import { displayProductName } from "@/lib/cake-selection/product-name";
 import { createClient } from "@/lib/supabase/server";
@@ -11,9 +12,19 @@ import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function KundAnstalldaPage() {
+interface Props {
+  searchParams: { catchupDays?: string };
+}
+
+export default async function KundAnstalldaPage({ searchParams }: Props) {
   const session = await getCompanySession();
   if (!session) return null;
+
+  const catchupDays = Number(searchParams.catchupDays);
+  const catchUpNotice =
+    Number.isFinite(catchupDays) && catchupDays >= 0 && catchupDays < 14
+      ? formatCatchUpNotice(catchupDays)
+      : null;
 
   const supabase = createClient();
   const { data: employees } = await supabase
@@ -49,6 +60,12 @@ export default async function KundAnstalldaPage() {
           </Link>
         </div>
       </div>
+
+      {catchUpNotice ? (
+        <p className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {catchUpNotice}
+        </p>
+      ) : null}
 
       {!employees || employees.length === 0 ? (
         <div className="mt-8">

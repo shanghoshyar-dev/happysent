@@ -128,6 +128,12 @@ export function ExcelImportForm({
               ))}
             </ul>
           )}
+          {(result.catchUpTriggered ?? 0) > 0 ? (
+            <p className="mt-2 text-amber-900">
+              {result.catchUpTriggered} anställda med nära födelsedag — beställning
+              startad och bekräftelse skickad.
+            </p>
+          ) : null}
         </div>
       )}
     </div>

@@ -525,4 +525,11 @@ export const en: Messages = {
         "We've received your request and sent a confirmation to your email. The change is reviewed in our queue and applied in the system once approved, usually within one business day.",
     },
   },
+  catchUp: {
+    notice:
+      "The birthday is in {days} days — the order has been started and a confirmation has been sent.",
+    shortNotice: "The bakery has been notified on short notice.",
+    importSummary:
+      "{count} employees with an upcoming birthday — order started and confirmation sent.",
+  },
 };
