@@ -6,6 +6,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { trackGaEvent } from "@/components/google-analytics";
 import { HoneypotField } from "@/components/marketing/honeypot-field";
 import { Button } from "@/components/ui/button";
+import { IsoDateInput } from "@/components/ui/iso-date-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -188,10 +189,9 @@ export function EmployeeRequestForm({ className }: { className?: string }) {
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor={`emp_birth_${key}`}>{f.birthdate}</Label>
-                <Input
+                <IsoDateInput
                   id={`emp_birth_${key}`}
                   name="emp_birthday"
-                  type="date"
                   required
                 />
                 <p className="mt-1 text-xs text-slate-500">{f.birthdateHint}</p>

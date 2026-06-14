@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { IsoDateInput } from "@/components/ui/iso-date-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -67,13 +68,13 @@ export function EmployeeForm({
       </div>
       <div>
         <Label htmlFor="birthday">Födelsedag</Label>
-        <Input
+        <IsoDateInput
           id="birthday"
           name="birthday"
-          type="date"
           required
           defaultValue={employee?.birthday}
         />
+        <p className="mt-1 text-xs text-slate-500">Skriv datum som ÅÅÅÅ-MM-DD.</p>
       </div>
       <div>
         <Label htmlFor="number_of_people">Antal personer på avd.</Label>
