@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
+import { getCakePricesForForms } from "@/lib/pricing/get-cake-prices-for-forms";
 import { formatDate } from "@/lib/utils";
 
 import { ImportApplicationExcelButton } from "./import-application-excel-button";
@@ -24,7 +25,7 @@ interface Props {
 export default async function AktiveraForetagPage({ params }: Props) {
   const supabase = createClient();
 
-  const [{ data: company }, { data: employees }, { data: application }] =
+  const [{ data: company }, { data: employees }, { data: application }, cakePrices] =
     await Promise.all([
       supabase
         .from("companies")
@@ -43,6 +44,7 @@ export default async function AktiveraForetagPage({ params }: Props) {
         .eq("created_company_id", params.id)
         .not("employees_import_storage_path", "is", null)
         .maybeSingle(),
+      getCakePricesForForms(),
     ]);
 
   if (!company) notFound();
@@ -97,6 +99,7 @@ export default async function AktiveraForetagPage({ params }: Props) {
           </h2>
           <NewEmployeeForm
             companies={companyOption}
+            cakePrices={cakePrices}
             lockCompanyId={company.id}
           />
         </Card>

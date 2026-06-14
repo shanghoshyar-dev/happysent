@@ -7,7 +7,6 @@ import {
   type FilterableColumn,
 } from "@/components/admin/filterable-table";
 import { Badge } from "@/components/ui/badge";
-import { formatSek } from "@/lib/utils";
 
 export type CompanyTableRow = {
   id: string;
@@ -17,7 +16,6 @@ export type CompanyTableRow = {
   offers_flowers: boolean;
   floristName: string;
   contact_email: string;
-  price_per_cake: number;
   status: "active" | "paused";
 };
 
@@ -81,14 +79,6 @@ export function CompaniesTable({ rows }: Props) {
       sortValue: (r) => r.contact_email.toLowerCase(),
       searchText: (r) => r.contact_email,
       cell: (r) => r.contact_email,
-    },
-    {
-      id: "price",
-      header: "Pris/tårta",
-      sortable: true,
-      sortValue: (r) => r.price_per_cake,
-      searchText: (r) => String(r.price_per_cake),
-      cell: (r) => formatSek(r.price_per_cake),
     },
     {
       id: "status",

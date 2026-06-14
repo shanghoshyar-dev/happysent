@@ -10,6 +10,10 @@ import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { deleteEmployeePreservingOrders } from "@/lib/employees/delete-employee";
+import {
+  parseEmployeeCakeFields,
+  validateEmployeeCakeFields,
+} from "@/lib/pricing/resolve-order-price";
 import { createClient } from "@/lib/supabase/server";
 
 const CELEBRATION_FREQUENCIES = [
@@ -148,6 +152,12 @@ export async function clearPreferredCake(
 export async function createKundEmployee(formData: FormData) {
   const session = await requireCompanySession();
   const supabase = createClient();
+  const cakeFields = parseEmployeeCakeFields(formData);
+  await validateEmployeeCakeFields(
+    supabase,
+    cakeFields.cake_name,
+    cakeFields.people_count,
+  );
 
   const payload = {
     company_id: session.companyId,
@@ -158,6 +168,8 @@ export async function createKundEmployee(formData: FormData) {
     celebration_frequency: parseCelebrationFrequencyField(formData),
     gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
+    cake_name: cakeFields.cake_name,
+    people_count: cakeFields.people_count,
   };
 
   const { error } = await supabase.from("employees").insert(payload);
@@ -180,6 +192,12 @@ export async function createKundEmployee(formData: FormData) {
 export async function updateKundEmployee(id: string, formData: FormData) {
   const session = await requireCompanySession();
   const supabase = createClient();
+  const cakeFields = parseEmployeeCakeFields(formData);
+  await validateEmployeeCakeFields(
+    supabase,
+    cakeFields.cake_name,
+    cakeFields.people_count,
+  );
 
   const payload = {
     company_id: session.companyId,
@@ -190,6 +208,8 @@ export async function updateKundEmployee(id: string, formData: FormData) {
     celebration_frequency: parseCelebrationFrequencyField(formData),
     gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
+    cake_name: cakeFields.cake_name,
+    people_count: cakeFields.people_count,
   };
 
   const { error } = await supabase

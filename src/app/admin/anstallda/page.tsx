@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
+import { getCakePricesForForms } from "@/lib/pricing/get-cake-prices-for-forms";
 import { formatDate } from "@/lib/utils";
 
 import { EmployeeRowActions } from "./employee-row-actions";
@@ -22,10 +23,10 @@ export default async function AnstalldaPage({ searchParams }: Props) {
   const supabase = createClient();
   const filterCompany = searchParams.company;
 
-  const { data: companies } = await supabase
-    .from("companies")
-    .select("id, name")
-    .order("name");
+  const [{ data: companies }, cakePrices] = await Promise.all([
+    supabase.from("companies").select("id, name").order("name"),
+    getCakePricesForForms(),
+  ]);
 
   let query = supabase
     .from("employees")
@@ -62,6 +63,7 @@ export default async function AnstalldaPage({ searchParams }: Props) {
           </h2>
           <NewEmployeeForm
             companies={companies ?? []}
+            cakePrices={cakePrices}
             defaultCompanyId={filterCompany}
           />
         </Card>

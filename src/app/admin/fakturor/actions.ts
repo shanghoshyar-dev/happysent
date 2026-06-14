@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   formatMonthLabel,
   invoiceNumber,
-  vatFromSubtotal,
+  totalInclFromLineItems,
 } from "@/lib/invoices/format";
 import { generateInvoicePdf } from "@/lib/invoices/generate-invoice-pdf";
 import { loadInvoicePdfData } from "@/lib/invoices/load-invoice-data";
@@ -138,8 +138,9 @@ export async function sendInvoiceToCustomer(
     return { ok: false, error: "Kunde inte skapa PDF." };
   }
 
-  const subtotal = invoice.lineItems.reduce((sum, row) => sum + row.amount, 0);
-  const totalInclVat = subtotal + vatFromSubtotal(subtotal);
+  const totalInclVat = totalInclFromLineItems(
+    invoice.lineItems.map((row) => row.amount),
+  );
   const number = invoiceNumber(invoice.id, invoice.month);
 
   try {

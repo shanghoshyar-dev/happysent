@@ -17,7 +17,7 @@ export default async function AdminSettingsPage() {
     <div>
       <PageHeader
         title="Inställningar"
-        description="Operativa standardvärden för mejl, priser och avbokningsregler."
+        description="Operativa standardvärden för mejl och avbokningsregler."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Inställningar" },
@@ -47,20 +47,6 @@ export default async function AdminSettingsPage() {
             <p className="mt-1 text-xs text-slate-500">
               Om tomt används miljövariabeln ADMIN_EMAIL.
             </p>
-          </div>
-
-          <div>
-            <Label htmlFor="default_price_per_cake">
-              Standardpris per tårta (SEK)
-            </Label>
-            <Input
-              id="default_price_per_cake"
-              name="default_price_per_cake"
-              type="number"
-              min={0}
-              required
-              defaultValue={settings.default_price_per_cake}
-            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

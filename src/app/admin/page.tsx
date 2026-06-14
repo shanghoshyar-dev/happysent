@@ -53,13 +53,13 @@ export default async function AdminDashboardPage() {
       .from("employees")
       .select("id, first_name, last_name, birthday, company_id")
       .eq("is_active", true),
-    supabase.from("companies").select("id, name, price_per_cake, status"),
+    supabase.from("companies").select("id, name, status"),
   ]);
 
   const companyMap = new Map(
     (companies ?? []).map((c) => [
       c.id,
-      { name: c.name, price: c.price_per_cake, status: c.status },
+      { name: c.name, status: c.status },
     ]),
   );
 
@@ -89,11 +89,7 @@ export default async function AdminDashboardPage() {
     0,
   );
 
-  const mrr = (employees ?? []).reduce((sum, e) => {
-    const company = companyMap.get(e.company_id);
-    if (!company || company.status !== "active") return sum;
-    return sum + company.price / 12;
-  }, 0);
+  const mrr = Math.round(((employeesActive ?? 0) * 990) / 12);
 
   return (
     <div>
@@ -126,8 +122,8 @@ export default async function AdminDashboardPage() {
         <StatCard
           icon="💰"
           label="Estimerad MRR"
-          value={formatSek(Math.round(mrr))}
-          hint={`${bakeriesCount ?? 0} bagerier`}
+          value={formatSek(mrr)}
+          hint="Uppskattat från standardtårta"
         />
       </div>
 

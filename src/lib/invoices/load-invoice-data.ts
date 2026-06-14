@@ -36,7 +36,7 @@ export async function loadInvoicePdfData(
   const { data: rows, error: rowsErr } = await supabase
     .from("orders")
     .select(
-      `delivery_date, price, employee_first_name, employee_last_name,
+      `delivery_date, price, cake_name, people_count, employee_first_name, employee_last_name,
        employees:employee_id ( first_name, last_name )`,
     )
     .in(
@@ -47,11 +47,21 @@ export async function loadInvoicePdfData(
 
   if (rowsErr) throw new Error(rowsErr.message);
 
-  const lineItems = (rows ?? []).map((row) => ({
-    deliveryDate: row.delivery_date,
-    employeeName: orderEmployeeDisplayName(row),
-    amount: row.price,
-  }));
+  const lineItems = (rows ?? []).map((row) => {
+    const employeeName = orderEmployeeDisplayName(row);
+    const cakeLabel =
+      row.cake_name && row.people_count
+        ? `${row.cake_name}, ${row.people_count} pers.`
+        : null;
+    return {
+      deliveryDate: row.delivery_date,
+      employeeName,
+      description: cakeLabel
+        ? `${employeeName} — ${cakeLabel}`
+        : employeeName,
+      amount: row.price,
+    };
+  });
 
   return {
     id: invoice.id,

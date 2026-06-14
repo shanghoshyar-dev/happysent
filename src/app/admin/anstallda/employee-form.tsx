@@ -1,14 +1,17 @@
+import { CakePriceFields } from "@/components/employees/cake-price-fields";
 import { Button } from "@/components/ui/button";
 import { IsoDateInput } from "@/components/ui/iso-date-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
+import type { CakePriceRow } from "@/lib/pricing/cake-prices-data";
 import type { Tables } from "@/types/database";
 
 interface EmployeeFormProps {
   employee?: Tables<"employees"> | null;
   companies: { id: string; name: string }[];
+  cakePrices: CakePriceRow[];
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
   defaultCompanyId?: string;
@@ -19,6 +22,7 @@ interface EmployeeFormProps {
 export function EmployeeForm({
   employee,
   companies,
+  cakePrices,
   action,
   submitLabel,
   defaultCompanyId,
@@ -120,6 +124,11 @@ export function EmployeeForm({
           Blommor kräver att företaget har blomsterpartner aktiverad.
         </p>
       </div>
+      <CakePriceFields
+        cakePrices={cakePrices}
+        defaultCakeName={employee?.cake_name}
+        defaultPeopleCount={employee?.people_count}
+      />
       <div className="flex items-center gap-2 md:col-span-2">
         <input
           id="is_active"

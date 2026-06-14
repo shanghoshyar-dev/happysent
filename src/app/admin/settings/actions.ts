@@ -19,7 +19,6 @@ export async function saveAppSettings(formData: FormData) {
   const admin_email_override =
     admin_email_override_raw === "" ? null : admin_email_override_raw;
 
-  const default_price_per_cake = num(formData, "default_price_per_cake");
   const cancellation_days_before_delivery = num(
     formData,
     "cancellation_days_before_delivery",
@@ -36,8 +35,6 @@ export async function saveAppSettings(formData: FormData) {
     throw new Error("Leveransfönstret måste ha start och slut.");
   }
   if (
-    Number.isNaN(default_price_per_cake) ||
-    default_price_per_cake < 0 ||
     Number.isNaN(cancellation_days_before_delivery) ||
     cancellation_days_before_delivery < 0
   ) {
@@ -48,7 +45,6 @@ export async function saveAppSettings(formData: FormData) {
     .from("app_settings")
     .update({
       admin_email_override,
-      default_price_per_cake,
       delivery_window_start,
       delivery_window_end,
       cancellation_days_before_delivery,

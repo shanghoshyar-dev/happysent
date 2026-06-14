@@ -48,9 +48,22 @@ export function pdfFilename(companyName: string, month: string): string {
   return `HappySent-faktura-${month}${slug ? `-${slug}` : ""}.pdf`;
 }
 
-/** Moms 25 % — priser i orders antas vara exkl. moms. */
-export const VAT_RATE = 0.25;
+/** Moms 6 % — priser i orders är inkl. moms. */
+export const VAT_RATE = 0.06;
 
+export function exclVatFromIncl(incl: number): number {
+  return Math.round(incl / (1 + VAT_RATE));
+}
+
+export function vatFromIncl(incl: number): number {
+  return incl - exclVatFromIncl(incl);
+}
+
+export function totalInclFromLineItems(amounts: number[]): number {
+  return amounts.reduce((sum, amount) => sum + amount, 0);
+}
+
+/** @deprecated Historiska fakturor — nya priser är inkl moms. */
 export function vatFromSubtotal(subtotal: number): number {
   return Math.round(subtotal * VAT_RATE);
 }

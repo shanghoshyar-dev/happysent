@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
+import { getCakePricesForForms } from "@/lib/pricing/get-cake-prices-for-forms";
 
 import { deleteEmployee, updateEmployee } from "../actions";
 import { EmployeeForm } from "../employee-form";
@@ -17,9 +18,10 @@ interface Props {
 
 export default async function EditEmployeePage({ params }: Props) {
   const supabase = createClient();
-  const [{ data: employee }, { data: companies }] = await Promise.all([
+  const [{ data: employee }, { data: companies }, cakePrices] = await Promise.all([
     supabase.from("employees").select("*").eq("id", params.id).maybeSingle(),
     supabase.from("companies").select("id, name").order("name"),
+    getCakePricesForForms(),
   ]);
 
   if (!employee || !companies) notFound();
@@ -43,6 +45,7 @@ export default async function EditEmployeePage({ params }: Props) {
         <EmployeeForm
           employee={employee}
           companies={companies}
+          cakePrices={cakePrices}
           action={update}
           submitLabel="Spara ändringar"
         />

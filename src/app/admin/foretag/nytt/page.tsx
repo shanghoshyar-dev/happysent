@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { Card } from "@/components/ui/card";
 import { fetchPendingApplicationById } from "@/lib/admin/pending-company-applications";
-import { getAppSettings } from "@/lib/app-settings";
 import { createClient } from "@/lib/supabase/server";
 
 import { createCompany } from "../actions";
@@ -26,8 +25,6 @@ export default async function NyttForetagPage({
   ]);
 
   if (!bakeries || !florists) notFound();
-
-  const settings = await getAppSettings();
 
   const rawApplication =
     typeof searchParams.application === "string"
@@ -125,7 +122,6 @@ export default async function NyttForetagPage({
           }))}
           saveAction={createCompany}
           submitLabel="Spara företag"
-          defaultPricePerCake={settings.default_price_per_cake}
           applicationPrefill={applicationPrefill}
         />
       </Card>

@@ -7,6 +7,10 @@ import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import { deleteEmployeePreservingOrders } from "@/lib/employees/delete-employee";
+import {
+  parseEmployeeCakeFields,
+  validateEmployeeCakeFields,
+} from "@/lib/pricing/resolve-order-price";
 import { createClient } from "@/lib/supabase/server";
 
 const CELEBRATION_FREQUENCIES = [
@@ -35,6 +39,12 @@ function parseGiftTypeField(formData: FormData): GiftType {
 
 export async function createEmployee(formData: FormData) {
   const supabase = createClient();
+  const cakeFields = parseEmployeeCakeFields(formData);
+  await validateEmployeeCakeFields(
+    supabase,
+    cakeFields.cake_name,
+    cakeFields.people_count,
+  );
   const payload = {
     company_id: String(formData.get("company_id") ?? ""),
     first_name: String(formData.get("first_name") ?? "").trim(),
@@ -44,6 +54,8 @@ export async function createEmployee(formData: FormData) {
     celebration_frequency: parseCelebrationFrequencyField(formData),
     gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
+    cake_name: cakeFields.cake_name,
+    people_count: cakeFields.people_count,
   };
   const { error } = await supabase.from("employees").insert(payload);
   if (error) throw new Error(error.message);
@@ -62,6 +74,12 @@ export async function createEmployee(formData: FormData) {
 
 export async function updateEmployee(id: string, formData: FormData) {
   const supabase = createClient();
+  const cakeFields = parseEmployeeCakeFields(formData);
+  await validateEmployeeCakeFields(
+    supabase,
+    cakeFields.cake_name,
+    cakeFields.people_count,
+  );
   const payload = {
     company_id: String(formData.get("company_id") ?? ""),
     first_name: String(formData.get("first_name") ?? "").trim(),
@@ -71,6 +89,8 @@ export async function updateEmployee(id: string, formData: FormData) {
     celebration_frequency: parseCelebrationFrequencyField(formData),
     gift_type: parseGiftTypeField(formData),
     is_active: formData.get("is_active") === "on",
+    cake_name: cakeFields.cake_name,
+    people_count: cakeFields.people_count,
   };
   const { error } = await supabase
     .from("employees")

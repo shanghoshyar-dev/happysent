@@ -86,6 +86,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      cake_prices: {
+        Row: {
+          id: string;
+          cake_name: string;
+          people_count: number;
+          price: number;
+          is_default: boolean;
+        };
+        Insert: {
+          id?: string;
+          cake_name: string;
+          people_count: number;
+          price: number;
+          is_default?: boolean;
+        };
+        Update: {
+          id?: string;
+          cake_name?: string;
+          people_count?: number;
+          price?: number;
+          is_default?: boolean;
+        };
+        Relationships: [];
+      };
       florists: {
         Row: {
           id: string;
@@ -228,7 +252,6 @@ export type Database = {
           bakery_id: string;
           offers_flowers: boolean;
           florist_id: string | null;
-          price_per_cake: number;
           price_per_flowers: number | null;
           default_product_id: string | null;
           status: CompanyStatus;
@@ -247,7 +270,6 @@ export type Database = {
           bakery_id: string;
           offers_flowers?: boolean;
           florist_id?: string | null;
-          price_per_cake: number;
           price_per_flowers?: number | null;
           default_product_id?: string | null;
           status?: CompanyStatus;
@@ -266,7 +288,6 @@ export type Database = {
           bakery_id?: string;
           offers_flowers?: boolean;
           florist_id?: string | null;
-          price_per_cake?: number;
           price_per_flowers?: number | null;
           default_product_id?: string | null;
           status?: CompanyStatus;
@@ -362,6 +383,8 @@ export type Database = {
           gift_type: GiftType;
           is_active: boolean;
           preferred_product_id: string | null;
+          cake_name: string | null;
+          people_count: number | null;
           created_at: string;
         };
         Insert: {
@@ -375,6 +398,8 @@ export type Database = {
           gift_type?: GiftType;
           is_active?: boolean;
           preferred_product_id?: string | null;
+          cake_name?: string | null;
+          people_count?: number | null;
           created_at?: string;
         };
         Update: {
@@ -388,6 +413,8 @@ export type Database = {
           gift_type?: GiftType;
           is_active?: boolean;
           preferred_product_id?: string | null;
+          cake_name?: string | null;
+          people_count?: number | null;
           created_at?: string;
         };
         Relationships: [
@@ -419,6 +446,8 @@ export type Database = {
           price: number;
           gift_type: GiftType;
           product_id: string | null;
+          cake_name: string | null;
+          people_count: number | null;
           selection_token: string;
           selection_deadline: string | null;
           cake_selection_status: CakeSelectionStatus;
@@ -436,6 +465,8 @@ export type Database = {
           price: number;
           gift_type?: GiftType;
           product_id?: string | null;
+          cake_name?: string | null;
+          people_count?: number | null;
           selection_token?: string;
           selection_deadline?: string | null;
           cake_selection_status?: CakeSelectionStatus;
@@ -453,6 +484,8 @@ export type Database = {
           price?: number;
           gift_type?: GiftType;
           product_id?: string | null;
+          cake_name?: string | null;
+          people_count?: number | null;
           selection_token?: string;
           selection_deadline?: string | null;
           cake_selection_status?: CakeSelectionStatus;
@@ -641,7 +674,6 @@ export type Database = {
         Row: {
           id: number;
           admin_email_override: string | null;
-          default_price_per_cake: number;
           delivery_window_start: string;
           delivery_window_end: string;
           cancellation_days_before_delivery: number;
@@ -650,7 +682,6 @@ export type Database = {
         Insert: {
           id?: number;
           admin_email_override?: string | null;
-          default_price_per_cake?: number;
           delivery_window_start?: string;
           delivery_window_end?: string;
           cancellation_days_before_delivery?: number;
@@ -659,7 +690,6 @@ export type Database = {
         Update: {
           id?: number;
           admin_email_override?: string | null;
-          default_price_per_cake?: number;
           delivery_window_start?: string;
           delivery_window_end?: string;
           cancellation_days_before_delivery?: number;

@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getCompanySession } from "@/lib/auth/session";
+import { getCakePricesForForms } from "@/lib/pricing/get-cake-prices-for-forms";
 import { createClient } from "@/lib/supabase/server";
 
 import { EmployeeForm } from "@/app/admin/anstallda/employee-form";
@@ -21,12 +22,15 @@ export default async function KundEditAnstalldPage({ params }: Props) {
   if (!session) redirect("/kund/login");
 
   const supabase = createClient();
-  const { data: employee } = await supabase
-    .from("employees")
-    .select("*")
-    .eq("id", params.id)
-    .eq("company_id", session.companyId)
-    .maybeSingle();
+  const [{ data: employee }, cakePrices] = await Promise.all([
+    supabase
+      .from("employees")
+      .select("*")
+      .eq("id", params.id)
+      .eq("company_id", session.companyId)
+      .maybeSingle(),
+    getCakePricesForForms(),
+  ]);
 
   if (!employee) notFound();
 
@@ -48,6 +52,7 @@ export default async function KundEditAnstalldPage({ params }: Props) {
         <EmployeeForm
           employee={employee}
           companies={companies}
+          cakePrices={cakePrices}
           defaultCompanyId={session.companyId}
           hideCompanySelect
           action={update}

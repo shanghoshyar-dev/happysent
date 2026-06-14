@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getCompanySession } from "@/lib/auth/session";
+import { getCakePricesForForms } from "@/lib/pricing/get-cake-prices-for-forms";
 
 import { EmployeeForm } from "@/app/admin/anstallda/employee-form";
 
@@ -16,6 +17,7 @@ export default async function KundNyAnstalldPage() {
   if (!session) redirect("/kund/login");
 
   const companies = [{ id: session.companyId, name: session.companyName }];
+  const cakePrices = await getCakePricesForForms();
 
   return (
     <div>
@@ -28,6 +30,7 @@ export default async function KundNyAnstalldPage() {
       <Card className="max-w-3xl p-6">
         <EmployeeForm
           companies={companies}
+          cakePrices={cakePrices}
           defaultCompanyId={session.companyId}
           hideCompanySelect
           action={createKundEmployee}

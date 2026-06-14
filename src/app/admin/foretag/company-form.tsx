@@ -16,7 +16,6 @@ export interface CompanyFormProps {
   company?: Tables<"companies"> | null;
   action: (formData: FormData) => void | Promise<void>;
   submitLabel: string;
-  defaultPricePerCake?: number;
   applicationPrefill?: {
     applicationId: string;
     companyName: string;
@@ -35,7 +34,6 @@ export function CompanyForm({
   company,
   action,
   submitLabel,
-  defaultPricePerCake,
   applicationPrefill,
 }: CompanyFormProps) {
   const pre = applicationPrefill;
@@ -245,29 +243,18 @@ export function CompanyForm({
         </div>
       ) : null}
       <div>
-        <Label htmlFor="price_per_cake">Pris per tårta (SEK)</Label>
-        <Input
-          id="price_per_cake"
-          name="price_per_cake"
-          type="number"
-          min={0}
-          required
-          defaultValue={company?.price_per_cake ?? defaultPricePerCake ?? 450}
-        />
-      </div>
-      <div>
         <Label htmlFor="price_per_flowers">Pris per blombukett (SEK)</Label>
         <Input
           id="price_per_flowers"
           name="price_per_flowers"
           type="number"
           min={0}
-          placeholder="Samma som tårta om tomt"
+          placeholder="Obligatoriskt om blommor erbjuds"
           defaultValue={company?.price_per_flowers ?? ""}
         />
         <p className="mt-1 text-xs text-slate-500">
-          Används när en anställd har gåva &quot;Blommor&quot;. Lämna tomt för att
-          använda tårtpriset.
+          Används när en anställd har gåva &quot;Blommor&quot;. Tårtpriser kommer
+          från fast prislista per tårttyp och storlek.
         </p>
       </div>
       <div>

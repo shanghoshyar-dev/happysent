@@ -1,6 +1,7 @@
 export interface InvoiceLineItem {
   deliveryDate: string;
   employeeName: string;
+  description?: string;
   amount: number;
 }
 

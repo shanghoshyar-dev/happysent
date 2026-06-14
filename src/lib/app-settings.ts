@@ -5,7 +5,6 @@ import { requireEnv, optionalEnv } from "@/lib/env";
 
 export type AppSettingsRow = {
   admin_email_override: string | null;
-  default_price_per_cake: number;
   delivery_window_start: string;
   delivery_window_end: string;
   cancellation_days_before_delivery: number;
@@ -13,7 +12,6 @@ export type AppSettingsRow = {
 
 const defaults: AppSettingsRow = {
   admin_email_override: null,
-  default_price_per_cake: 450,
   delivery_window_start: "08:00",
   delivery_window_end: "11:00",
   cancellation_days_before_delivery: 10,
@@ -30,7 +28,7 @@ export async function getAppSettings(): Promise<AppSettingsRow> {
   const { data } = await supabase
     .from("app_settings")
     .select(
-      "admin_email_override, default_price_per_cake, delivery_window_start, delivery_window_end, cancellation_days_before_delivery",
+      "admin_email_override, delivery_window_start, delivery_window_end, cancellation_days_before_delivery",
     )
     .eq("id", 1)
     .maybeSingle();
@@ -38,7 +36,6 @@ export async function getAppSettings(): Promise<AppSettingsRow> {
   const row: AppSettingsRow = data
     ? {
         admin_email_override: data.admin_email_override,
-        default_price_per_cake: data.default_price_per_cake,
         delivery_window_start: data.delivery_window_start,
         delivery_window_end: data.delivery_window_end,
         cancellation_days_before_delivery:

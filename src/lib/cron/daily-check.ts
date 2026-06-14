@@ -13,6 +13,7 @@ import {
 } from "@/lib/cake-selection/auto-pick";
 import { selectionDeadlineFromDelivery } from "@/lib/cake-selection/deadline";
 import { cakeSelectionUrl } from "@/lib/cake-selection/selection-url";
+import { resolveCakeOrderPrice, loadCakePriceRows } from "@/lib/pricing/resolve-order-price";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { diffInDays } from "@/lib/holidays/swedish";
 import {
@@ -61,10 +62,10 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
     .select(
       `
       id, first_name, last_name, birthday, number_of_people, is_active, company_id,
-      celebration_frequency, gift_type,
+      celebration_frequency, gift_type, cake_name, people_count,
       companies:company_id (
         id, name, address, city, contact_email, contact_phone, billing_email,
-        price_per_cake, price_per_flowers, status, offers_flowers, florist_id, bakery_id,
+        price_per_flowers, status, offers_flowers, florist_id, bakery_id,
         bakeries:bakery_id ( id, name, email, catalog_pdf_path ),
         florists:florist_id ( id, name, email )
       )
@@ -78,6 +79,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
   if (!employees) {
     return result;
   }
+
+  const cakePriceRows = await loadCakePriceRows(supabase);
 
   for (const emp of employees) {
     result.scannedEmployees++;
@@ -118,10 +121,29 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           }
         }
 
-        const price =
-          giftType === "flowers"
-            ? (company.price_per_flowers ?? company.price_per_cake)
-            : company.price_per_cake;
+        let price: number;
+        let orderCakeName: string | null = null;
+        let orderPeopleCount: number | null = null;
+
+        if (giftType === "flowers") {
+          if (company.price_per_flowers == null) {
+            throw new Error(
+              `${company.name}: saknar pris per blombukett (price_per_flowers).`,
+            );
+          }
+          price = company.price_per_flowers;
+        } else {
+          const resolved = await resolveCakeOrderPrice({
+            supabase,
+            companyId: company.id,
+            employeeCakeName: emp.cake_name,
+            employeePeopleCount: emp.people_count,
+            priceRows: cakePriceRows,
+          });
+          price = resolved.price;
+          orderCakeName = resolved.cakeName;
+          orderPeopleCount = resolved.peopleCount;
+        }
 
         const order = await ensureOrder({
           supabase,
@@ -131,6 +153,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
           companyId: company.id,
           deliveryIso,
           price,
+          cakeName: orderCakeName,
+          peopleCount: orderPeopleCount,
           giftType,
           companyCity: company.city,
           companyBakeryId: company.bakery_id,
@@ -221,7 +245,6 @@ interface CompanyJoin {
   contact_email: string;
   contact_phone: string | null;
   billing_email: string;
-  price_per_cake: number;
   price_per_flowers: number | null;
   status: "active" | "paused";
   offers_flowers: boolean;
@@ -245,6 +268,8 @@ async function ensureOrder(args: {
   companyId: string;
   deliveryIso: string;
   price: number;
+  cakeName: string | null;
+  peopleCount: number | null;
   giftType: GiftType;
   companyCity: string;
   companyBakeryId: string | null;
@@ -257,6 +282,8 @@ async function ensureOrder(args: {
     companyId,
     deliveryIso,
     price,
+    cakeName,
+    peopleCount,
     giftType,
     companyCity,
     companyBakeryId,
@@ -296,6 +323,8 @@ async function ensureOrder(args: {
       company_id: companyId,
       delivery_date: deliveryIso,
       price,
+      cake_name: cakeName,
+      people_count: peopleCount,
       gift_type: giftType,
       status: "scheduled",
       selection_deadline: deadline,

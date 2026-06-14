@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { CakePriceFields } from "@/components/employees/cake-price-fields";
 import { Button } from "@/components/ui/button";
 import { IsoDateInput } from "@/components/ui/iso-date-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import type { CakePriceRow } from "@/lib/pricing/cake-prices-data";
 
 import { createEmployee } from "./actions";
 
@@ -18,6 +20,7 @@ interface CompanyOption {
 
 interface NewEmployeeFormProps {
   companies: CompanyOption[];
+  cakePrices: CakePriceRow[];
   defaultCompanyId?: string;
   /** Dölj företagsväljare — används vid aktivering efter godkänd ansökan. */
   lockCompanyId?: string;
@@ -25,6 +28,7 @@ interface NewEmployeeFormProps {
 
 export function NewEmployeeForm({
   companies,
+  cakePrices,
   defaultCompanyId,
   lockCompanyId,
 }: NewEmployeeFormProps) {
@@ -104,6 +108,7 @@ export function NewEmployeeForm({
           required
         />
       </div>
+      <CakePriceFields cakePrices={cakePrices} />
       <div className="flex items-center gap-2 md:col-span-2">
         <input
           id="is_active"

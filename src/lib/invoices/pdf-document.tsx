@@ -10,11 +10,13 @@ import type { IssuerProfile } from "./billing-profile";
 import {
   VAT_RATE,
   addDaysIso,
+  exclVatFromIncl,
   formatInvoiceSek,
   formatIsoDateSv,
   formatMonthLabel,
   invoiceNumber,
-  vatFromSubtotal,
+  totalInclFromLineItems,
+  vatFromIncl,
 } from "./format";
 import type { InvoicePdfData } from "./types";
 
@@ -137,9 +139,11 @@ interface Props {
 export function InvoicePdfDocument({ invoice, issuer }: Props) {
   const invoiceDate = invoice.createdAt.slice(0, 10);
   const dueDate = addDaysIso(invoiceDate, 30);
-  const subtotal = invoice.lineItems.reduce((sum, row) => sum + row.amount, 0);
-  const vat = vatFromSubtotal(subtotal);
-  const total = subtotal + vat;
+  const totalIncl = totalInclFromLineItems(
+    invoice.lineItems.map((row) => row.amount),
+  );
+  const subtotalExcl = exclVatFromIncl(totalIncl);
+  const vat = vatFromIncl(totalIncl);
   const number = invoiceNumber(invoice.id, invoice.month);
 
   return (
@@ -194,14 +198,16 @@ export function InvoicePdfDocument({ invoice, issuer }: Props) {
             <View style={styles.tableHead}>
               <Text style={[styles.headText, styles.colDate]}>Leveransdatum</Text>
               <Text style={[styles.headText, styles.colName]}>Anställd</Text>
-              <Text style={[styles.headText, styles.colAmount]}>Belopp exkl. moms</Text>
+              <Text style={[styles.headText, styles.colAmount]}>Belopp inkl. moms</Text>
             </View>
             {invoice.lineItems.map((row, i) => (
               <View key={`${row.deliveryDate}-${i}`} style={styles.tableRow}>
                 <Text style={styles.colDate}>
                   {formatIsoDateSv(row.deliveryDate)}
                 </Text>
-                <Text style={styles.colName}>{row.employeeName}</Text>
+                <Text style={styles.colName}>
+                  {row.description ?? row.employeeName}
+                </Text>
                 <Text style={styles.colAmount}>
                   {formatInvoiceSek(row.amount)}
                 </Text>
@@ -213,7 +219,7 @@ export function InvoicePdfDocument({ invoice, issuer }: Props) {
         <View style={styles.totals}>
           <View style={styles.totalRow}>
             <Text>Summa exkl. moms</Text>
-            <Text>{formatInvoiceSek(subtotal)}</Text>
+            <Text>{formatInvoiceSek(subtotalExcl)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text>Moms ({Math.round(VAT_RATE * 100)} %)</Text>
@@ -221,7 +227,7 @@ export function InvoicePdfDocument({ invoice, issuer }: Props) {
           </View>
           <View style={styles.totalGrand}>
             <Text>Att betala</Text>
-            <Text>{formatInvoiceSek(total)}</Text>
+            <Text>{formatInvoiceSek(totalIncl)}</Text>
           </View>
         </View>
 
@@ -231,8 +237,8 @@ export function InvoicePdfDocument({ invoice, issuer }: Props) {
             {issuer.email ?? "info@happysent.com"}.
           </Text>
           <Text style={{ marginTop: 6 }}>
-            Priser är angivna exklusive moms om inget annat anges. Vid försenad
-            betalning debiteras påminnelseavgift enligt gällande villkor.
+            Priserna är angivna inklusive 6 % moms. Vid försenad betalning
+            debiteras påminnelseavgift enligt gällande villkor.
           </Text>
         </View>
       </Page>

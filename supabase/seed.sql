@@ -35,7 +35,7 @@ values (
 on conflict (id) do nothing;
 
 -- One sample company
-insert into public.companies (id, name, address, city, contact_email, billing_email, bakery_id, price_per_cake, status)
+insert into public.companies (id, name, address, city, contact_email, billing_email, bakery_id, status)
 values (
   '00000000-0000-0000-0000-000000000010',
   'Acme AB',
@@ -44,7 +44,6 @@ values (
   'hr@acme.example',
   'faktura@acme.example',
   '00000000-0000-0000-0000-000000000001',
-  450,
   'active'
 )
 on conflict (id) do nothing;
