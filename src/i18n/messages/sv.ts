@@ -115,7 +115,7 @@ export const sv = {
       "och berätta vilka ni är och vad pengarna ska gå till.",
   },
   cta: {
-    heading: "Redo att fira riktigt?",
+    heading: "Låt oss göra någons dag idag!",
     body: "Hör av er så visar vi hur",
     bodyAfter: "passar er och vilka bagerier som levererar i er stad.",
     primary: "Kom igång",

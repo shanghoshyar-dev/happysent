@@ -118,7 +118,7 @@ export const en: Messages = {
       "and tell us who you are and what the funds should support.",
   },
   cta: {
-    heading: "Ready to celebrate properly?",
+    heading: "Let's make someone's day today!",
     body: "Get in touch and we'll show how",
     bodyAfter: "fits your team and which bakeries deliver in your city.",
     primary: "Get started",
