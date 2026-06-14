@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { orderEmployeeDisplayName } from "@/lib/orders/employee-name";
 
 import type { InvoicePdfData } from "./types";
 
@@ -35,7 +36,8 @@ export async function loadInvoicePdfData(
   const { data: rows, error: rowsErr } = await supabase
     .from("orders")
     .select(
-      `delivery_date, price, employees:employee_id ( first_name, last_name )`,
+      `delivery_date, price, employee_first_name, employee_last_name,
+       employees:employee_id ( first_name, last_name )`,
     )
     .in(
       "id",
@@ -45,16 +47,11 @@ export async function loadInvoicePdfData(
 
   if (rowsErr) throw new Error(rowsErr.message);
 
-  const lineItems = (rows ?? []).map((row) => {
-    const emp = row.employees as
-      | { first_name: string; last_name: string }
-      | null;
-    return {
-      deliveryDate: row.delivery_date,
-      employeeName: emp ? `${emp.first_name} ${emp.last_name}` : "—",
-      amount: row.price,
-    };
-  });
+  const lineItems = (rows ?? []).map((row) => ({
+    deliveryDate: row.delivery_date,
+    employeeName: orderEmployeeDisplayName(row),
+    amount: row.price,
+  }));
 
   return {
     id: invoice.id,

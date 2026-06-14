@@ -410,7 +410,9 @@ export type Database = {
       orders: {
         Row: {
           id: string;
-          employee_id: string;
+          employee_id: string | null;
+          employee_first_name: string;
+          employee_last_name: string;
           company_id: string;
           delivery_date: string;
           status: OrderStatus;
@@ -425,7 +427,9 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          employee_id: string;
+          employee_id?: string | null;
+          employee_first_name: string;
+          employee_last_name: string;
           company_id: string;
           delivery_date: string;
           status?: OrderStatus;
@@ -440,7 +444,9 @@ export type Database = {
         };
         Update: {
           id?: string;
-          employee_id?: string;
+          employee_id?: string | null;
+          employee_first_name?: string;
+          employee_last_name?: string;
           company_id?: string;
           delivery_date?: string;
           status?: OrderStatus;

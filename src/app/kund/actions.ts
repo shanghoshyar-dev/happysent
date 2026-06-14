@@ -9,6 +9,7 @@ import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
+import { deleteEmployeePreservingOrders } from "@/lib/employees/delete-employee";
 import { createClient } from "@/lib/supabase/server";
 
 const CELEBRATION_FREQUENCIES = [
@@ -207,13 +208,7 @@ export async function deleteKundEmployee(id: string) {
   const session = await requireCompanySession();
   const supabase = createClient();
 
-  const { error } = await supabase
-    .from("employees")
-    .delete()
-    .eq("id", id)
-    .eq("company_id", session.companyId);
-
-  if (error) throw new Error(error.message);
+  await deleteEmployeePreservingOrders(supabase, id, session.companyId);
   revalidateKund(session.companyId);
   redirect("/kund/anstallda");
 }

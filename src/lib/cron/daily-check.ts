@@ -126,6 +126,8 @@ export async function runDailyCheck(today: Date): Promise<DailyCheckResult> {
         const order = await ensureOrder({
           supabase,
           employeeId: emp.id,
+          employeeFirstName: emp.first_name,
+          employeeLastName: emp.last_name,
           companyId: company.id,
           deliveryIso,
           price,
@@ -238,6 +240,8 @@ interface OrderRow {
 async function ensureOrder(args: {
   supabase: ReturnType<typeof createAdminClient>;
   employeeId: string;
+  employeeFirstName: string;
+  employeeLastName: string;
   companyId: string;
   deliveryIso: string;
   price: number;
@@ -248,6 +252,8 @@ async function ensureOrder(args: {
   const {
     supabase,
     employeeId,
+    employeeFirstName,
+    employeeLastName,
     companyId,
     deliveryIso,
     price,
@@ -285,6 +291,8 @@ async function ensureOrder(args: {
     .from("orders")
     .insert({
       employee_id: employeeId,
+      employee_first_name: employeeFirstName,
+      employee_last_name: employeeLastName,
       company_id: companyId,
       delivery_date: deliveryIso,
       price,

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TBody, TD, TH, THead, TR, Table } from "@/components/ui/table";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { orderEmployeeDisplayName } from "@/lib/orders/employee-name";
 import { formatDate, formatSek } from "@/lib/utils";
 
 import { DownloadInvoiceButton } from "./download-invoice-button";
@@ -43,7 +44,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
   const { data: lineItems } = await supabase
     .from("orders")
     .select(
-      `id, delivery_date, price,
+      `id, delivery_date, price, employee_first_name, employee_last_name,
        employees:employee_id ( first_name, last_name )`,
     )
     .in("id", orderIds.length ? orderIds : ["00000000-0000-0000-0000-000000000000"]);
@@ -137,20 +138,13 @@ export default async function InvoiceDetailPage({ params }: Props) {
           </TR>
         </THead>
         <TBody>
-          {(lineItems ?? []).map((row) => {
-            const emp = row.employees as
-              | { first_name: string; last_name: string }
-              | null;
-            return (
-              <TR key={row.id}>
-                <TD>{formatDate(row.delivery_date)}</TD>
-                <TD>
-                  {emp ? `${emp.first_name} ${emp.last_name}` : "—"}
-                </TD>
-                <TD className="text-right">{formatSek(row.price)}</TD>
-              </TR>
-            );
-          })}
+          {(lineItems ?? []).map((row) => (
+            <TR key={row.id}>
+              <TD>{formatDate(row.delivery_date)}</TD>
+              <TD>{orderEmployeeDisplayName(row)}</TD>
+              <TD className="text-right">{formatSek(row.price)}</TD>
+            </TR>
+          ))}
         </TBody>
       </Table>
     </div>

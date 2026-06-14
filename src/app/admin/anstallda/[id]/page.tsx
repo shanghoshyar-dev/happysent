@@ -51,7 +51,8 @@ export default async function EditEmployeePage({ params }: Props) {
       <div className="mt-8 max-w-3xl rounded-2xl border border-red-100 bg-red-50/50 p-6">
         <h3 className="font-semibold text-red-800">Ta bort anställd</h3>
         <p className="mt-1 text-sm text-red-700">
-          Tar bort den anställda och alla tillhörande beställningar.
+          Tar bort den anställda och kommande beställningar. Levererade och
+          fakturerade tårtor behålls för fakturering.
         </p>
         <form action={remove} className="mt-4">
           <Button type="submit" variant="danger">

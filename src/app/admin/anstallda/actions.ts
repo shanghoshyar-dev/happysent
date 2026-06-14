@@ -6,6 +6,7 @@ import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
+import { deleteEmployeePreservingOrders } from "@/lib/employees/delete-employee";
 import { createClient } from "@/lib/supabase/server";
 
 const CELEBRATION_FREQUENCIES = [
@@ -92,9 +93,17 @@ export async function toggleEmployeeActive(id: string, next: boolean) {
 
 export async function deleteEmployee(id: string) {
   const supabase = createClient();
-  const { error } = await supabase.from("employees").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  const { data: emp } = await supabase
+    .from("employees")
+    .select("company_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  await deleteEmployeePreservingOrders(supabase, id);
   revalidatePath("/admin/anstallda");
+  if (emp?.company_id) {
+    revalidatePath(`/admin/foretag/${emp.company_id}/aktivera`);
+  }
 }
 
 // ---------- Excel import ----------

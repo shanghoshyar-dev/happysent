@@ -7,6 +7,7 @@ import {
   todayInStockholm,
 } from "@/lib/holidays/swedish";
 import { createClient } from "@/lib/supabase/server";
+import { orderEmployeeDisplayName } from "@/lib/orders/employee-name";
 import type { OrderStatus } from "@/types/database";
 
 import { OrdersTable, type OrderTableRow } from "./orders-table";
@@ -22,6 +23,7 @@ export default async function BestallningarPage() {
     .from("orders")
     .select(
       `id, delivery_date, status, price, cake_selection_status,
+       employee_first_name, employee_last_name,
        employees:employee_id ( first_name, last_name ),
        companies:company_id ( name ),
        products:product_id ( name )`,
@@ -46,7 +48,11 @@ export default async function BestallningarPage() {
       status: o.status as OrderStatus,
       price: o.price,
       companyName: company?.name ?? "—",
-      employeeName: emp ? `${emp.first_name} ${emp.last_name}` : "—",
+      employeeName: orderEmployeeDisplayName({
+        employee_first_name: o.employee_first_name,
+        employee_last_name: o.employee_last_name,
+        employees: emp,
+      }),
       productName: product?.name ?? null,
       selectionStatus: o.cake_selection_status,
       canCancel,
