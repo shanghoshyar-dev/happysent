@@ -245,15 +245,6 @@ export const en: Messages = {
       intro:
         "You only pay for cakes actually delivered. Prices are fixed by cake type and size, including 6% VAT and delivery.",
       popular: "Default",
-      priceTableTitle: "All cake prices",
-      priceTableIntro:
-        "Choose cake type and size per employee in the customer portal — or let us send the default cake automatically.",
-      cakeColumn: "Cake",
-      sizeColumn: "Size",
-      priceColumn: "Price",
-      peopleSuffix: "people",
-      defaultBadge: "Default",
-      vatNote: "All prices include 6% VAT and delivery to your office.",
       tiers: [
         {
           name: "HappySent Cake",

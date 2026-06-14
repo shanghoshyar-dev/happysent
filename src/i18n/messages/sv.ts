@@ -242,15 +242,6 @@ export const sv = {
       intro:
         "Du betalar bara för tårtor som faktiskt levereras. Priserna är fasta per tårttyp och storlek, inklusive 6 % moms och leverans.",
       popular: "Standard",
-      priceTableTitle: "Alla tårtpriser",
-      priceTableIntro:
-        "Välj tårttyp och storlek per anställd i kundportalen — eller låt oss skicka standardtårtan automatiskt.",
-      cakeColumn: "Tårta",
-      sizeColumn: "Storlek",
-      priceColumn: "Pris",
-      peopleSuffix: "pers",
-      defaultBadge: "Standard",
-      vatNote: "Alla priser är inklusive 6 % moms och leverans till kontoret.",
       tiers: [
         {
           name: "HappySent Tårta",
