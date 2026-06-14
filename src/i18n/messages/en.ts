@@ -302,7 +302,14 @@ export const en: Messages = {
         "Tell us briefly about your team and we'll get back within one business day.",
       existingTitle: "Already a customer?",
       existingBody:
-        "Let us know when someone joins or leaves and we'll update your list. No login required.",
+        "Manage employees, cake choices, and imports directly in the customer portal.",
+      existingFeatures: [
+        "Add and remove employees",
+        "Import Excel lists",
+        "Choose cake type per employee",
+      ],
+      existingPortalCta: "Log in to the customer portal",
+      existingHelp: "Need help getting started? Email",
     },
     blog: {
       metaTitle: "Blog on employee wellbeing | HappySent",

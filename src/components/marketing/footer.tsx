@@ -19,7 +19,7 @@ export function MarketingFooter() {
   return (
     <footer className="relative z-20 shrink-0 border-t border-candy-100 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-        <BrandLogo markSize={24} />
+        <BrandLogo markSize={24} className="shrink-0" />
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           <LocalizedLink href="/om-oss" className="hover:text-candy-600">
             {messages.nav.about}

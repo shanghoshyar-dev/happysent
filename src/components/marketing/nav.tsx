@@ -80,7 +80,7 @@ export function MarketingNav() {
             whileHover={reduceMotion ? undefined : { scale: 1.03 }}
             transition={{ duration: 0.2 }}
           >
-            <BrandLogo markSize={28} className="min-w-0" />
+            <BrandLogo markSize={28} className="min-w-0" textClassName="truncate" />
           </motion.span>
         </LocalizedLink>
 

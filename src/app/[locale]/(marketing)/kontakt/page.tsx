@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { BrandName } from "@/components/brand-name";
+import { CtaButton } from "@/components/marketing/cta-button";
 import { getMessages } from "@/i18n/get-messages";
+import Link from "next/link";
 import { parseLocaleParam } from "@/lib/parse-locale";
 import { marketingPageMeta } from "@/lib/marketing-metadata";
 
 import { ContactForm } from "./contact-form";
-import { EmployeeRequestForm } from "./employee-request-form";
 import { ExcelTemplateDownload } from "./excel-template-download";
 
 type Props = { params: { locale: string } };
@@ -72,16 +73,39 @@ export default function KontaktPage({ params }: Props) {
             <ContactForm className="min-h-0 flex-1" />
           </div>
           <div className="flex min-h-0 min-w-0 flex-col gap-6 xl:h-full">
-            <div className="shrink-0">
-              <h2 className="font-display text-2xl text-slate-900 xl:text-3xl">
-                {p.existingTitle}
-              </h2>
-              <p className="mt-4 text-lg text-slate-600">{p.existingBody}</p>
-              <div className="mt-4">
-                <ExcelTemplateDownload label={p.excelLink} />
+            <div className="flex flex-1 flex-col gap-6 rounded-3xl border border-candy-100 bg-white p-8 shadow-sm">
+              <div>
+                <h2 className="font-display text-2xl text-slate-900 xl:text-3xl">
+                  {p.existingTitle}
+                </h2>
+                <p className="mt-4 text-lg text-slate-600">{p.existingBody}</p>
               </div>
+              <ul className="space-y-3 text-sm text-slate-700">
+                {p.existingFeatures.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2">
+                    <span aria-hidden className="text-candy-500">
+                      ✓
+                    </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/kund/login" className="mt-auto block">
+                <CtaButton className="w-full" fullWidth>
+                  {p.existingPortalCta}
+                </CtaButton>
+              </Link>
+              <p className="text-sm text-slate-500">
+                {p.existingHelp}{" "}
+                <a
+                  href="mailto:info@happysent.com"
+                  className="font-medium text-slate-700 underline-offset-4 hover:underline"
+                >
+                  info@happysent.com
+                </a>
+                .
+              </p>
             </div>
-            <EmployeeRequestForm className="min-h-0 flex-1" />
           </div>
         </div>
       </div>

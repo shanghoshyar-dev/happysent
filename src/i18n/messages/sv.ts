@@ -299,7 +299,14 @@ export const sv = {
         "Berätta kort om ert team så återkommer vi inom en arbetsdag.",
       existingTitle: "Redan kund?",
       existingBody:
-        "Skicka in när någon börjar eller slutar så uppdaterar vi personallistan åt er. Du behöver inte logga in någonstans.",
+        "Hantera personal, tårtval och import direkt i kundportalen.",
+      existingFeatures: [
+        "Lägg till och ta bort anställda",
+        "Importera Excel-lista",
+        "Välj tårttyp per anställd",
+      ],
+      existingPortalCta: "Logga in i kundportalen",
+      existingHelp: "Behöver du hjälp att komma igång? Mejla",
     },
     blog: {
       metaTitle: "Blogg om anställdas välmående | HappySent",
