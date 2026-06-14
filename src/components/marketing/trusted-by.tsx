@@ -4,11 +4,19 @@ import Image from "next/image";
 
 import { useLocale } from "@/i18n/locale-provider";
 
-const logos = [
-  { src: "/marketing/logos/crisha.png", alt: "Crisha Marketing" },
-  { src: "/marketing/logos/carpathian.png", alt: "Carpathian Marketing Agency" },
-  { src: "/marketing/logos/shang-taxi.svg", alt: "Shang Taxi" },
-] as const;
+type PartnerLogo =
+  | { kind: "image"; src: string; alt: string }
+  | { kind: "text"; label: string; alt: string };
+
+const logos: PartnerLogo[] = [
+  { kind: "image", src: "/marketing/logos/crisha.png", alt: "Crisha Marketing" },
+  {
+    kind: "image",
+    src: "/marketing/logos/carpathian.png",
+    alt: "Carpathian Marketing Agency",
+  },
+  { kind: "text", label: "Shang Taxi", alt: "Shang Taxi" },
+];
 
 const marqueeLogos = [...logos, ...logos];
 
@@ -38,18 +46,24 @@ export function TrustedBy() {
           <div className="trusted-by-marquee-track flex w-max flex-nowrap">
             {marqueeLogos.map((logo, i) => (
               <div
-                key={`${logo.src}-${i}`}
-                className="relative shrink-0 px-6 md:px-10"
+                key={`${logo.alt}-${i}`}
+                className="relative flex shrink-0 items-center px-6 md:px-10"
               >
-                <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
-                  <Image
-                    src={logo.src}
-                    alt=""
-                    fill
-                    sizes="176px"
-                    className="object-contain"
-                  />
-                </div>
+                {logo.kind === "text" ? (
+                  <span className="whitespace-nowrap font-display text-xl font-semibold tracking-tight text-slate-700 md:text-2xl">
+                    {logo.label}
+                  </span>
+                ) : (
+                  <div className="relative h-11 w-[10rem] md:h-12 md:w-44">
+                    <Image
+                      src={logo.src}
+                      alt=""
+                      fill
+                      sizes="176px"
+                      className="object-contain"
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
