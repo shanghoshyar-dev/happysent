@@ -35,7 +35,7 @@ export const en: Messages = {
     footnote: "No setup fees · Pause anytime",
   },
   trustedBy: {
-    heading: "Companies we work with",
+    heading: "Partners",
     srPartners: "Partners",
   },
   features: {

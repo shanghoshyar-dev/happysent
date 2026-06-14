@@ -33,7 +33,7 @@ export const sv = {
     footnote: "Inga uppstartsavgifter · Pausa när som helst",
   },
   trustedBy: {
-    heading: "Kunder vi jobbar med",
+    heading: "Samarbetspartners",
     srPartners: "Samarbetspartners",
   },
   features: {
