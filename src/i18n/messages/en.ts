@@ -106,10 +106,17 @@ export const en: Messages = {
     previousYearWinner: "Went to {name}",
     winnerGetsAll:
       "The organisation with the most votes receives the full amount when the year ends.",
+    participantsTitle: "Participating organisations",
+    participants: [
+      "Médecins Sans Frontières",
+      "UNICEF Sweden",
+      "Sweden for UNHCR",
+      "Save the Children",
+      "Swedish Red Cross",
+    ],
     voteLeaderboardTitle: "Voting — who's leading?",
     leadingVoteBadge: "Leading the vote",
     votesLabel: "votes",
-    noVotesYet: "No votes yet — be the first to vote in the customer portal.",
     portalCta: "Log in to the customer portal to vote.",
     joinBefore:
       "Want your organisation to join the vote? Email us at",

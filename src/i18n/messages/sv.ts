@@ -102,10 +102,17 @@ export const sv = {
     previousYearWinner: "Gick till {name}",
     winnerGetsAll:
       "Organisationen med flest röster får hela beloppet när året är slut.",
+    participantsTitle: "Deltagande organisationer",
+    participants: [
+      "Läkare Utan Gränser",
+      "UNICEF Sverige",
+      "Sverige för UNHCR",
+      "Rädda Barnen",
+      "Svenska Röda Korset",
+    ],
     voteLeaderboardTitle: "Röstning — vem leder?",
     leadingVoteBadge: "Leder röstningen",
     votesLabel: "röster",
-    noVotesYet: "Inga röster ännu — bli först att rösta i kundportalen.",
     portalCta: "Logga in i kundportalen för att rösta.",
     joinBefore:
       "Vill er organisation vara med i röstningen? Mejla oss på",

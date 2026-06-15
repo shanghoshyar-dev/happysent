@@ -51,8 +51,19 @@ export function DonationCountdown({
     computeCountdown(endMs),
   );
 
-  const totalVotes = leaderboard.reduce((sum, row) => sum + row.voteCount, 0);
-  const maxBarVotes = Math.max(...leaderboard.map((row) => row.voteCount), 1);
+  const orgEntries =
+    leaderboard.length > 0
+      ? leaderboard
+      : d.participants.map((name) => ({
+          charityId: name,
+          name,
+          voteCount: 0,
+          votePercent: 0,
+          isLeading: false,
+        }));
+
+  const totalVotes = orgEntries.reduce((sum, row) => sum + row.voteCount, 0);
+  const maxBarVotes = Math.max(...orgEntries.map((row) => row.voteCount), 1);
 
   useEffect(() => {
     setTotalKr(initialTotalKr);
@@ -154,15 +165,11 @@ export function DonationCountdown({
 
           <div className="mt-10">
             <h3 className="text-center font-display text-xl text-slate-900">
-              {d.voteLeaderboardTitle}
+              {totalVotes > 0 ? d.voteLeaderboardTitle : d.participantsTitle}
             </h3>
-            {totalVotes === 0 ? (
-              <p className="mx-auto mt-4 max-w-xl text-center text-sm text-slate-600">
-                {d.noVotesYet}
-              </p>
-            ) : (
+            {totalVotes > 0 ? (
               <ul className="mx-auto mt-6 max-w-xl space-y-4">
-                {leaderboard.map((row) => (
+                {orgEntries.map((row) => (
                   <li key={row.charityId}>
                     <div className="mb-1 flex items-center justify-between gap-3 text-sm">
                       <span className="font-medium text-slate-800">
@@ -185,6 +192,17 @@ export function DonationCountdown({
                         }}
                       />
                     </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="mx-auto mt-4 grid max-w-xl gap-2 sm:grid-cols-2">
+                {orgEntries.map((row) => (
+                  <li
+                    key={row.charityId}
+                    className="rounded-xl border border-candy-100 bg-cream-50 px-4 py-3 text-center text-sm font-medium text-slate-800"
+                  >
+                    {row.name}
                   </li>
                 ))}
               </ul>
