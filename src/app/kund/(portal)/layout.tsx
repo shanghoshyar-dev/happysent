@@ -41,6 +41,9 @@ export default async function KundPortalLayout({
               <Link href="/kund/tartor" className="hover:text-coral-600">
                 Tårtor
               </Link>
+              <Link href="/kund/donation" className="hover:text-coral-600">
+                Donation
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4 text-sm text-slate-600">

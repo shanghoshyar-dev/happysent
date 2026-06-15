@@ -7,6 +7,7 @@ import { getCompanySession } from "@/lib/auth/session";
 import { validateProductForCompany } from "@/lib/cake-selection/assign-product";
 import { appendEmployeeAddDigestEntries } from "@/lib/cron/employee-add-digest";
 import { catchUpEmployeeDelivery } from "@/lib/cron/catch-up-delivery";
+import { setCompanyDonationVote } from "@/lib/donation-fund";
 import type { CelebrationFrequency, GiftType } from "@/lib/celebrations";
 import type { ExcelImportResult } from "@/lib/employees/excel-import";
 import { importEmployeesExcelBuffer } from "@/lib/employees/excel-import";
@@ -51,7 +52,22 @@ function revalidateKund(companyId: string) {
   revalidatePath("/kund");
   revalidatePath("/kund/anstallda");
   revalidatePath("/kund/tartor");
+  revalidatePath("/kund/donation");
   revalidatePath(`/admin/foretag/${companyId}/aktivera`);
+}
+
+export type DonationVoteResult = { ok: true } | { ok: false; error: string };
+
+export async function setKundDonationVote(
+  charityId: string,
+): Promise<DonationVoteResult> {
+  const session = await requireCompanySession();
+  const result = await setCompanyDonationVote(session.companyId, charityId);
+  if (!result.ok) return result;
+  revalidatePath("/kund/donation");
+  revalidatePath("/sv");
+  revalidatePath("/en");
+  return { ok: true };
 }
 
 export type AssignPreferredCakeResult =

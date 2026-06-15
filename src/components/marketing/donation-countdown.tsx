@@ -4,11 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useLocale } from "@/i18n/locale-provider";
 import { donationCampaignEndMs } from "@/lib/donation-campaign";
+import type { DonationVoteLeaderboardEntry } from "@/lib/donation-fund";
 import { formatSek } from "@/lib/utils";
 
 interface Props {
   initialTotalKr: number;
-  previousYear: { year: number; totalKr: number } | null;
+  previousYear: {
+    year: number;
+    totalKr: number;
+    winningCharityName: string | null;
+  } | null;
+  leaderboard: DonationVoteLeaderboardEntry[];
 }
 
 type CountdownParts = {
@@ -32,7 +38,11 @@ function pad(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-export function DonationCountdown({ initialTotalKr, previousYear }: Props) {
+export function DonationCountdown({
+  initialTotalKr,
+  previousYear,
+  leaderboard,
+}: Props) {
   const { messages } = useLocale();
   const d = messages.donationCountdown;
   const endMs = useMemo(() => donationCampaignEndMs(), []);
@@ -40,6 +50,9 @@ export function DonationCountdown({ initialTotalKr, previousYear }: Props) {
   const [parts, setParts] = useState<CountdownParts>(() =>
     computeCountdown(endMs),
   );
+
+  const totalVotes = leaderboard.reduce((sum, row) => sum + row.voteCount, 0);
+  const maxBarVotes = Math.max(...leaderboard.map((row) => row.voteCount), 1);
 
   useEffect(() => {
     setTotalKr(initialTotalKr);
@@ -121,29 +134,65 @@ export function DonationCountdown({ initialTotalKr, previousYear }: Props) {
                 <span className="font-semibold text-slate-800">
                   {formatSek(previousYear.totalKr)}
                 </span>
+                {previousYear.winningCharityName ? (
+                  <>
+                    {" "}
+                    —{" "}
+                    {d.previousYearWinner.replace(
+                      "{name}",
+                      previousYear.winningCharityName,
+                    )}
+                  </>
+                ) : null}
               </p>
             )}
           </div>
 
           <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-slate-600">
-            {d.lottery}
+            {d.winnerGetsAll}
           </p>
 
           <div className="mt-10">
             <h3 className="text-center font-display text-xl text-slate-900">
-              {d.participantsTitle}
+              {d.voteLeaderboardTitle}
             </h3>
-            <ul className="mx-auto mt-4 grid max-w-xl gap-2 sm:grid-cols-2">
-              {d.participants.map((name) => (
-                <li
-                  key={name}
-                  className="rounded-xl border border-candy-100 bg-cream-50 px-4 py-3 text-center text-sm font-medium text-slate-800"
-                >
-                  {name}
-                </li>
-              ))}
-            </ul>
+            {totalVotes === 0 ? (
+              <p className="mx-auto mt-4 max-w-xl text-center text-sm text-slate-600">
+                {d.noVotesYet}
+              </p>
+            ) : (
+              <ul className="mx-auto mt-6 max-w-xl space-y-4">
+                {leaderboard.map((row) => (
+                  <li key={row.charityId}>
+                    <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                      <span className="font-medium text-slate-800">
+                        {row.name}
+                        {row.isLeading ? (
+                          <span className="ml-2 rounded-full bg-candy-100 px-2 py-0.5 text-xs font-semibold text-candy-700">
+                            {d.leadingVoteBadge}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="shrink-0 text-slate-600">
+                        {row.voteCount} {d.votesLabel}
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-cream-100">
+                      <div
+                        className="h-full rounded-full bg-candy-500 transition-all"
+                        style={{
+                          width: `${Math.max(8, (row.voteCount / maxBarVotes) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
             <p className="mx-auto mt-6 max-w-2xl text-center text-sm text-slate-600">
+              {d.portalCta}
+            </p>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-slate-600">
               {d.joinBefore}{" "}
               <a
                 href="mailto:info@happysent.com"

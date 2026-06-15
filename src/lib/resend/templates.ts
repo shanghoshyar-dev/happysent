@@ -645,15 +645,30 @@ export async function sendCustomerInvoiceEmail(a: CustomerInvoiceArgs) {
 export interface DonationYearSummaryArgs {
   year: number;
   totalKr: number;
+  winningCharityName: string | null;
+  voteCount: number;
+  leaderboard: Array<{ name: string; voteCount: number }>;
 }
 export async function sendDonationYearSummary(a: DonationYearSummaryArgs) {
   const formatted = formatSek(a.totalKr);
   const subject = `HappySent donationskassa ${a.year} – ${formatted} insamlade`;
+  const voteLines =
+    a.leaderboard.length > 0
+      ? a.leaderboard
+          .map((row) => `  ${row.name}: ${row.voteCount} röster`)
+          .join("\n")
+      : "  Inga röster registrerades.";
+  const winnerLine = a.winningCharityName
+    ? `Vinnare: ${a.winningCharityName} (${a.voteCount} röster) får hela ${formatted}.`
+    : `Ingen vinnare utsedd (${a.voteCount} röster totalt på ledaren).`;
+
   const text =
     `Hej!\n\n` +
     `Insamlingsperioden för donationskassan ${a.year} är avslutad.\n\n` +
     `Totalt insamlat: ${formatted}\n\n` +
-    `Kassan är nollställd inför nästa år. Utlottningen sker enligt plan live på TikTok.\n\n` +
+    `${winnerLine}\n\n` +
+    `Röstfördelning:\n${voteLines}\n\n` +
+    `Kassan är nollställd inför nästa år.\n\n` +
     `Hälsningar,\nHappySent`;
 
   return getResend().emails.send({

@@ -257,6 +257,8 @@ export type Database = {
           status: CompanyStatus;
           welcome_email_sent_at: string | null;
           portal_invite_sent_at: string | null;
+          donation_charity_id: string | null;
+          donation_charity_voted_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -275,6 +277,8 @@ export type Database = {
           status?: CompanyStatus;
           welcome_email_sent_at?: string | null;
           portal_invite_sent_at?: string | null;
+          donation_charity_id?: string | null;
+          donation_charity_voted_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -293,6 +297,8 @@ export type Database = {
           status?: CompanyStatus;
           welcome_email_sent_at?: string | null;
           portal_invite_sent_at?: string | null;
+          donation_charity_id?: string | null;
+          donation_charity_voted_at?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -856,18 +862,59 @@ export type Database = {
           total_kr: number;
           closed_at: string;
           email_sent_at: string | null;
+          winning_charity_id: string | null;
+          votes_by_charity: Json | null;
         };
         Insert: {
           year: number;
           total_kr: number;
           closed_at?: string;
           email_sent_at?: string | null;
+          winning_charity_id?: string | null;
+          votes_by_charity?: Json | null;
         };
         Update: {
           year?: number;
           total_kr?: number;
           closed_at?: string;
           email_sent_at?: string | null;
+          winning_charity_id?: string | null;
+          votes_by_charity?: Json | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "donation_campaign_snapshots_winning_charity_id_fkey";
+            columns: ["winning_charity_id"];
+            isOneToOne: false;
+            referencedRelation: "donation_charities";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      donation_charities: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
         };
         Relationships: [];
       };

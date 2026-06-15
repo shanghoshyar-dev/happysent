@@ -91,29 +91,28 @@ export const en: Messages = {
     eyebrow: "Donation fund",
     heading: "Making a difference together",
     intro:
-      "Every cake and flower sold adds to our donation fund. Early next year we draw which charity receives the full amount — live on TikTok.",
+      "Every cake and flower sold adds to our donation fund. Our customers vote in the customer portal — the organisation with the most votes receives the full amount at year end.",
     fundLabel: "Raised so far",
     perDelivery:
       "10 SEK per delivered cake or flower is added when the invoice is marked paid.",
-    countdownLabel: "Countdown to the draw on 31 December",
-    countdownEnded: "The draw is coming soon — follow us on TikTok!",
+    countdownLabel: "Countdown until voting closes on 31 December",
+    countdownEnded:
+      "Voting closes soon — vote in the customer portal if you have not already.",
     days: "Days",
     hours: "Hours",
     minutes: "Min",
     seconds: "Sec",
     previousYearLabel: "Raised in {year}:",
-    lottery:
-      "The winning charity receives the full amount. The draw is streamed live on TikTok early next year.",
-    participantsTitle: "Participating organisations",
-    participants: [
-      "Médecins Sans Frontières Sweden",
-      "UNICEF Sweden",
-      "Sweden for UNHCR",
-      "Save the Children Sweden",
-      "Swedish Red Cross",
-    ],
+    previousYearWinner: "Went to {name}",
+    winnerGetsAll:
+      "The organisation with the most votes receives the full amount when the year ends.",
+    voteLeaderboardTitle: "Voting — who's leading?",
+    leadingVoteBadge: "Leading the vote",
+    votesLabel: "votes",
+    noVotesYet: "No votes yet — be the first to vote in the customer portal.",
+    portalCta: "Log in to the customer portal to vote.",
     joinBefore:
-      "Want your organisation to join the draw? Email us at",
+      "Want your organisation to join the vote? Email us at",
     joinAfter:
       "and tell us who you are and what the funds should support.",
   },
