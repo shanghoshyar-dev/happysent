@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { isAdminUser } from "@/lib/auth/session";
+import { getCompanySession, isAdminUser } from "@/lib/auth/session";
 import { generateInvoicePdf } from "@/lib/invoices/generate-invoice-pdf";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -20,8 +20,23 @@ export async function GET(_request: Request, { params }: RouteContext) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  if (!(await isAdminUser(user.id))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const isAdmin = await isAdminUser(user.id);
+  if (!isAdmin) {
+    const session = await getCompanySession();
+    if (!session) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { data: ownedInvoice } = await supabase
+      .from("invoices")
+      .select("id")
+      .eq("id", params.id)
+      .eq("company_id", session.companyId)
+      .maybeSingle();
+
+    if (!ownedInvoice) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const result = await generateInvoicePdf(params.id);
@@ -29,11 +44,13 @@ export async function GET(_request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Faktura hittades inte" }, { status: 404 });
   }
 
-  const admin = createAdminClient();
-  await admin
-    .from("invoices")
-    .update({ pdf_downloaded_at: new Date().toISOString() })
-    .eq("id", params.id);
+  if (isAdmin) {
+    const admin = createAdminClient();
+    await admin
+      .from("invoices")
+      .update({ pdf_downloaded_at: new Date().toISOString() })
+      .eq("id", params.id);
+  }
 
   return new NextResponse(new Uint8Array(result.buffer), {
     status: 200,
