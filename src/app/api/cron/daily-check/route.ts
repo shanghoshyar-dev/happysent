@@ -15,12 +15,11 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * The cron should fire mejlen at exactly 07:00 Europe/Stockholm year-round.
- * Vercel Cron only speaks UTC, so we schedule it twice (05:00 + 06:00 UTC,
- * covering CEST and CET respectively) and let the route gate execution by
- * checking the actual Stockholm hour.
+ * Cron ska köra mellan 06:00–06:59 Europe/Stockholm året runt.
+ * Vercel Cron använder UTC, så vi schemalägger två gånger (04:00 + 05:00 UTC,
+ * täcker CEST respektive CET) och låter routen köra bara när Stockholms timme är 6.
  */
-const TARGET_STOCKHOLM_HOUR = 7;
+const TARGET_STOCKHOLM_HOUR = 6;
 
 function stockholmHour(now: Date = new Date()): number {
   const formatter = new Intl.DateTimeFormat("sv-SE", {

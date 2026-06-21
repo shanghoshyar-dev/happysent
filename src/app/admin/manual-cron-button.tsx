@@ -27,7 +27,7 @@ export function ManualCronButton() {
             Manuell test: kör daglig kontroll
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Triggar samma flöde som körs automatiskt kl 07:00 svensk tid
+            Triggar samma flöde som körs automatiskt kl 06:00 svensk tid
             (födelsedagspåminnelser, månadsslut vid behov, och samlade mejl om
             nya anställda för gårdagen). Användbart för test.
           </p>

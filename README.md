@@ -77,7 +77,7 @@ npm run dev
 
 1. Push till GitHub och importera repot i Vercel.
 2. Lägg till alla miljövariabler från `.env.local` i Vercel-projektet.
-3. Cronjobbet i `vercel.json` kör automatiskt `/api/cron/daily-check` varje dag kl 07:00 UTC (= 08:00 svensk tid på vintern, 09:00 på sommaren — koden hanterar tidszonen korrekt).
+3. Cronjobbet i `vercel.json` kör automatiskt `/api/cron/daily-check` varje dag kl 06:00–06:59 svensk tid (Vercel schemalägger i UTC; koden kontrollerar Stockholms timme).
 
 ## Daglig logik
 
