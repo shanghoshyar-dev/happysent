@@ -4,6 +4,7 @@ import { isAdminUser } from "@/lib/auth/session";
 import { runDailyCheck } from "@/lib/cron/daily-check";
 import { runDonationCampaignClose } from "@/lib/cron/donation-campaign-close";
 import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
+import { runDeliveryCoordinationDigest } from "@/lib/cron/run-delivery-coordination-digest";
 import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
 import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
 import { recordLog } from "@/lib/logs";
@@ -16,6 +17,9 @@ export interface ManualCheckResult {
   employeeDigest?: Awaited<ReturnType<typeof flushPendingEmployeeAddDigests>>;
   monthly?: Awaited<ReturnType<typeof runMonthlyInvoiceSummary>> | null;
   donationClose?: Awaited<ReturnType<typeof runDonationCampaignClose>> | null;
+  deliveryCoordination?: Awaited<
+    ReturnType<typeof runDeliveryCoordinationDigest>
+  > | null;
   error?: string;
 }
 
@@ -68,7 +72,23 @@ export async function triggerDailyCheckManually(): Promise<ManualCheckResult> {
       console.error("[manual] donation campaign close failed:", err);
     }
 
-    return { ok: true, daily, employeeDigest, monthly, donationClose };
+    let deliveryCoordination: Awaited<
+      ReturnType<typeof runDeliveryCoordinationDigest>
+    > | null = null;
+    try {
+      deliveryCoordination = await runDeliveryCoordinationDigest(today);
+    } catch (err) {
+      console.error("[manual] delivery coordination digest failed:", err);
+    }
+
+    return {
+      ok: true,
+      daily,
+      employeeDigest,
+      monthly,
+      donationClose,
+      deliveryCoordination,
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await recordLog("error", "manual-trigger", message);

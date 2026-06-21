@@ -679,6 +679,22 @@ export async function sendDonationYearSummary(a: DonationYearSummaryArgs) {
   });
 }
 
+export interface DeliveryCoordinationDigestArgs {
+  subjectDate: string;
+  text: string;
+}
+export async function sendDeliveryCoordinationDigest(
+  a: DeliveryCoordinationDigestArgs,
+) {
+  const subject = `HappySent – Leveransplan ${a.subjectDate}`;
+  return getResend().emails.send({
+    from: await mailFrom(),
+    to: await adminInbox(),
+    subject,
+    text: a.text,
+  });
+}
+
 export interface SystemErrorArgs {
   errorMessage: string;
   context?: string;

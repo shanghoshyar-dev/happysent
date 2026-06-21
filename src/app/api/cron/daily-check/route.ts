@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { runDailyCheck } from "@/lib/cron/daily-check";
 import { runDonationCampaignClose } from "@/lib/cron/donation-campaign-close";
+import { runDeliveryCoordinationDigest } from "@/lib/cron/run-delivery-coordination-digest";
 import { flushPendingEmployeeAddDigests } from "@/lib/cron/employee-add-digest";
 import { runMonthlyInvoiceSummary } from "@/lib/cron/monthly-invoice";
 import { isLastDayOfMonth, todayInStockholm } from "@/lib/holidays/swedish";
@@ -87,6 +88,16 @@ export async function GET(request: Request) {
       await notifyError(message, "donation-campaign-close");
     }
 
+    let deliveryCoordination: Awaited<
+      ReturnType<typeof runDeliveryCoordinationDigest>
+    > | null = null;
+    try {
+      deliveryCoordination = await runDeliveryCoordinationDigest(today);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      await notifyError(message, "delivery-coordination-digest");
+    }
+
     return NextResponse.json({
       ok: true,
       today: today.toISOString().slice(0, 10),
@@ -95,6 +106,7 @@ export async function GET(request: Request) {
       employeeDigest,
       monthly,
       donationClose,
+      deliveryCoordination,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
